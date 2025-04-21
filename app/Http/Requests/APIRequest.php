@@ -25,7 +25,13 @@ class APIRequest extends FormRequest
     {
         $errors = (new ValidationException($validator))->errors();
 
-        throw new HttpResponseException(Response::json(ResponseUtil::makeError("Ha ocurrido un error de validación", $errors), 400));
+        throw new HttpResponseException(
+            response()->json(
+                ResponseUtil::makeError("Ha ocurrido un error de validación", 400, $errors),
+                400
+            )
+        );
+
     }
 
 

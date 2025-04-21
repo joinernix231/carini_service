@@ -21,9 +21,9 @@ return new class extends Migration
             $table->string('city')->nullable();
             $table->string('department')->nullable();
 
-            $table->json('emails')->nullable();
+            $table->string('email')->nullable();
             $table->string('phone')->nullable();
-            $table->string('client_type')->nullable(); 
+            $table->string('client_type')->nullable();
             $table->timestamps();
         });
     }

@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\auth\LoginWithEmailAPIRequest;
+use App\Http\Requests\Auth\LoginWithEmailAPIRequest;
 use App\Utils\ResponseUtil;
+use Illuminate\Http\JsonResponse;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthAPIController extends Controller
 {
-    public function login(LoginWithEmailAPIRequest $request): array
+    public function login(LoginWithEmailAPIRequest $request): mixed
     {
         $credentials = $request->only(['email', 'password']);
 
@@ -33,7 +34,7 @@ class AuthAPIController extends Controller
             ]
         ]);
 
-        return ResponseUtil::makeResponse('Login successful.', $data);
+        return ResponseUtil::makeResponseArray('Login successful.', $data);
     }
 }
 

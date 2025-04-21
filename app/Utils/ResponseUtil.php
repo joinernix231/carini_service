@@ -7,13 +7,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ResponseUtil
 {
-    /**
-     * @param string $message
-     * @param mixed $data
-     *
-     * @return JsonResponse
-     */
-
     public function makeResponseResource(string $message, JsonResource $data): JsonResponse
     {
         return response()->json([
@@ -22,7 +15,17 @@ class ResponseUtil
             'message' => $message,
         ]);
     }
-    public static function makeResponse(string $message, mixed $data): array
+
+    public static function makeResponse(string $message, array $data = []): JsonResponse
+    {
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+            'message' => $message,
+        ]);
+    }
+
+    public static function makeResponseArray(string $message, mixed $data)
     {
         return [
             'success' => true,
@@ -31,23 +34,16 @@ class ResponseUtil
         ];
     }
 
-    /**
-     * @param string $message
-     * @param array  $data
-     *
-     * @return array
-     */
-    public static function makeError(string $message, array $data = []): array
+    public static function makeError(string $message, int $code = 404, array $data = [])
     {
-        $res = [
+        $response = [
             'success' => false,
             'message' => $message,
         ];
 
-        if (!empty($data)) {
-            $res['data'] = $data;
+        if (! empty($data)) {
+            $response['data'] = $data;
         }
-
-        return $res;
+        return $response;
     }
 }

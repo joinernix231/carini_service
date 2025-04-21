@@ -1,16 +1,13 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthAPIController;
+use App\Http\Controllers\Client\ClientAPIController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-
 Route::group([], function () {
-    Route::post('/login', [AuthAPIController::class, 'login']);
-
-
-    Route::middleware('auth:api')->get('/user', function (Request $request) {
-        return $request->user();
-    });
+Route::apiResource('/clients', ClientAPIController::class);
 
 });
+
+

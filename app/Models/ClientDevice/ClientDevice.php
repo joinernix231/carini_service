@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\ClientDevice;
 
 use App\Models\Client\Client;
 use App\Models\Device\Device;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 

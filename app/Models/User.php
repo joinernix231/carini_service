@@ -76,4 +76,5 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsTo(Client::class, 'client_id');
     }
+
 }

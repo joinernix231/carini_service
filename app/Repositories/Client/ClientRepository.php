@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Repositories\LinkDevice;
+namespace App\Repositories\Client;
 
-use App\Models\ClientDevice;
+use App\Models\Client\Client;
 use App\Repositories\BaseRepository;
 
 
-class LinkDeviceRepository extends BaseRepository
+class ClientRepository extends BaseRepository
 {
     protected $fieldSearchable = [];
 
@@ -17,6 +17,6 @@ class LinkDeviceRepository extends BaseRepository
 
     public function model(): string
     {
-        return ClientDevice::class;
+        return Client::class;
     }
 }
