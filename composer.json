@@ -7,6 +7,7 @@
     "require": {
         "php": "^8.2",
         "laravel/framework": "^11.0",
+        "laravel/telescope": "^5.7",
         "laravel/tinker": "^2.9",
         "prettus/l5-repository": "^2.10",
         "tymon/jwt-auth": "^2.2"
@@ -15,7 +16,6 @@
         "fakerphp/faker": "^1.23",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",
-        "laravel/telescope": "^5.7",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.0",
         "phpunit/phpunit": "^10.5",
