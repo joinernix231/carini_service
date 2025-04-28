@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Client;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\APIRequest;
 
-class DeleteClientAPIRequest extends FormRequest
+class DeleteClientAPIRequest extends APIRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,11 +14,6 @@ class DeleteClientAPIRequest extends FormRequest
         return false;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [

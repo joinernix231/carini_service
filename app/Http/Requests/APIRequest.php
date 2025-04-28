@@ -63,6 +63,7 @@ class APIRequest extends FormRequest
             'in' => 'El campo :attribute debe ser un valor entre :values',
             'integer' => 'El campo :attribute debe ser numérico',
             'numeric' => 'El campo :attribute debe ser numérico',
+            'boolean' => 'El campo :attribute debe ser booleano',
             'regex' => 'El valor de :attribute no esta en el formato correcto.',
             'required' => 'El campo :attribute es requerido(a)',
             'string' => 'El campo :attribute debe ser texto',

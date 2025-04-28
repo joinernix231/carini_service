@@ -2,27 +2,25 @@
 
 namespace App\Http\Requests\Client;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\APIRequest;
+use App\Models\Client\Client;
+use Illuminate\Validation\Rule;
 
-class UpdateClientAPIRequest extends FormRequest
+class UpdateClientAPIRequest extends APIRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
+
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
+
     public function rules(): array
     {
-        return [
-            //
-        ];
+        $rules = Client::$rules;
+        $rules['identifier'] = ['required', 'string', Rule::unique('clients', 'identifier')];
+        $rules['email'] = ['nullable', 'email', Rule::unique('clients', 'email')];
+
+        return $rules;
     }
 }

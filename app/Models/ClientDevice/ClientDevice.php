@@ -7,10 +7,13 @@ use App\Models\Device\Device;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ClientDevice extends Model
 {
-    protected $table = 'client_devices';
+
+    use SoftDeletes;
+    protected $table = 'client_device';
 
     protected $fillable = [
         'client_id',
@@ -18,9 +21,17 @@ class ClientDevice extends Model
         'linked_by',
         'linked_at',
         'status',
-        'notes',
+        'address',
         'source',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'status' => 'boolean',
+            'password' => 'hashed',
+        ];
+    }
 
     public static array $rules = [
         'client_id'  => 'required|exists:clients,id',

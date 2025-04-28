@@ -19,9 +19,8 @@ return new class extends Migration
             $table->foreignIdFor(Device::class)->constrained()->onDelete('cascade');
             $table->foreignIdFor(User::class, 'linked_by')->nullable()->constrained()->onDelete('set null');
 
-            $table->timestamp('linked_at')->nullable();
-            $table->string('status')->default('active');
-            $table->text('notes')->nullable();
+            $table->boolean('status')->default(true);
+            $table->string('address')->nullable();
             $table->string('source')->nullable();
 
             $table->timestamps();

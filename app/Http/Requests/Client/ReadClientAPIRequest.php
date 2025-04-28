@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Client;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\APIRequest;
 
-class ReadClientAPIRequest extends FormRequest
+class ReadClientAPIRequest extends APIRequest
 {
 
     public function authorize(): bool

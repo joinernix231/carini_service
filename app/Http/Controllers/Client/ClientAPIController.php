@@ -9,6 +9,7 @@ use App\Http\Requests\Client\ReadClientAPIRequest;
 use App\Http\Requests\Client\ShowClientAPIRequest;
 use App\Http\Requests\Client\UpdateClientAPIRequest;
 use App\Http\Resources\Client\ClientResource;
+use App\Models\Client\Client;
 use App\Repositories\Client\ClientRepository;
 use Illuminate\Http\JsonResponse;
 
@@ -27,35 +28,30 @@ class ClientAPIController extends Controller
 
     }
 
-
     public function store(CreateClientAPIRequest $request): JsonResponse
     {
         $input = $request->validated();
 
         $client = $this->clientRepository->create($input);
 
-        return $this->makeResponseResource('Clients created Successfully', new ClientResource($client));
+        return $this->makeResponseResource('Client created Successfully', new ClientResource($client));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(ShowClientAPIRequest $request, int $id)
+    public function show(Client $client, ShowClientAPIRequest $request): JsonResponse
     {
-        //
+        return $this->makeResponseResource('Clients retrieved Successfully', new ClientResource($client));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateClientAPIRequest $request, int $id)
+
+    public function update(Client $client,UpdateClientAPIRequest $request): JsonResponse
     {
-        //
+        $input = $request->validated();
+
+        $client = $this->clientRepository->update($input, $client->id);
+
+        return $this->makeResponseResource('Clients updated Successfully', new ClientResource($client));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(DeleteClientAPIRequest $request,int $id)
     {
         //
