@@ -25,6 +25,8 @@ class DeviceLinkAPIController extends Controller
         $clientDevice = $request->has('unpaginated') ?
             $this->linkDeviceRepository->all() :
             $this->linkDeviceRepository->paginate(20);
+        $clientDevice->load(['client','device']);
+
 
         return $this->makeResponseResource('ClientsDevices retrieved Successfully', ClientDeviceResource::collection($clientDevice));
 
