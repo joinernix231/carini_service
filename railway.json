@@ -3,6 +3,7 @@
         "env": {},
         "commands": [
             "composer install",
+            "composer require laravel/telescope",
             "npm install",
             "npm run prod",
             "php artisan config:cache",
@@ -11,5 +12,9 @@
             "php artisan telescope:publish"
         ]
     },
-    "start": "php artisan serve --host=0.0.0.0 --port=8500"
+    "start":
+    [
+        "php artisan optimize:clear",
+        "php artisan serve --host=0.0.0.0 --port=8500"
+    ]
 }
