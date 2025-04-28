@@ -17,11 +17,9 @@ class ClientFactory extends Factory
     {
         return [
             'identifier' => $this->faker->unique()->numerify('########-#'),
-            'name' => $this->faker->company,
             'legal_representative' => $this->faker->name,
             'address' => $this->faker->address,
             'city' => $this->faker->city,
-            'email' => $this->faker->safeEmail,
             'phone' => $this->faker->phoneNumber,
             'client_type' => $this->faker->randomElement(['empresa', 'institucional']),
             'user_id' => User::factory(),
