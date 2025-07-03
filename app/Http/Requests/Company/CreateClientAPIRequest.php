@@ -6,7 +6,7 @@ use App\Http\Requests\APIRequest;
 use App\Models\Client\Client;
 use Illuminate\Validation\Rule;
 
-class CreateCompanyAPIRequest extends APIRequest
+class CreateClientAPIRequest extends APIRequest
 {
     public function validationData(): array
     {

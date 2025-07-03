@@ -6,7 +6,7 @@ use App\Http\Requests\APIRequest;
 use App\Models\Client\Client;
 use Illuminate\Validation\Rule;
 
-class UpdateCompanyAPIRequest extends APIRequest
+class UpdateClientAPIRequest extends APIRequest
 {
 
     public function authorize(): bool

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Client;
+namespace App\Http\Requests\Device;
 
-use App\Http\Requests\APIRequest;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ShowClientAPIRequest extends APIRequest
+class ReadDeviceAPIRequest extends FormRequest
 {
+
     public function authorize(): bool
     {
         return true;
