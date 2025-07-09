@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 Route::group([], function () {
 Route::apiResource('/clients', ClientAPIController::class);
 Route::apiResource('/linkDevices', DeviceLinkAPIController::class);
-    Route::apiResource('/devices', DeviceAPIController::class);
+Route::apiResource('/devices', DeviceAPIController::class);
 
 });
 
