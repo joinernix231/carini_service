@@ -34,16 +34,17 @@ class ResponseUtil
         ];
     }
 
-    public static function makeError(string $message, int $code = 404, array $data = [])
+    public static function makeError(string $message, int $code = 404, array $data = []): JsonResponse
     {
         $response = [
             'success' => false,
             'message' => $message,
         ];
 
-        if (! empty($data)) {
+        if (!empty($data)) {
             $response['data'] = $data;
         }
-        return $response;
+
+        return response()->json($response, $code);
     }
 }

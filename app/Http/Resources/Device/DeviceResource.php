@@ -23,6 +23,7 @@ class DeviceResource extends Resource
             'model' => $this->resource->model,
             'brand' => $this->resource->brand,
             'type' => $this->resource->type,
+            'photo' => $this->resource->photo,
             'manufactured_at' => $this->resource->manufactured_at
         ];
     }

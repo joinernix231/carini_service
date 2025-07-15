@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Exceptions;
 
 use App\Utils\ResponseUtil;
+use Aws\Exception\AwsException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -20,68 +21,37 @@ use Throwable;
 
 class Handler extends ExceptionHandler
 {
-    public function render($request, Throwable $e)
+    public function render($request, Throwable $e): JsonResponse|Response
     {
-        // Si la petición es una API o espera JSON (como Postman)
-        if ($request->expectsJson() || $request->is('api/*')) {
-            return match (true) {
-                $e instanceof QueryException => $this->handleQueryException(),
-                $e instanceof AuthenticationException => $this->unauthenticated($request, $e),
-                $e instanceof AuthorizationException => $this->unauthorized(),
-                $e instanceof ModelNotFoundException => $this->modelNotFoundException(),
-                $e instanceof NotFoundHttpException => $this->notFound(),
-                $e instanceof MethodNotAllowedHttpException => $this->methodNotAllowed(),
-                $e instanceof UnauthorizedRequestException => $this->customUnauthorized($e),
-                $e instanceof HttpException => $this->httpException($e),
-                default => $this->internalError($e),
-            };
-        }
 
-        return parent::render($request, $e);
+        return match (true) {
+            $e instanceof MethodNotAllowedHttpException, $e instanceof NotFoundHttpException => $this->handleNotFoundException($request),
+            $e instanceof QueryException => $this->handleQueryException(),
+            $e instanceof AuthenticationException => $this->unauthenticated($request, $e),
+            $e instanceof ModelNotFoundException => $this->modelNotFoundException(),
+            default => parent::render($request, $e),
+        };
+
     }
 
-    protected function unauthenticated($request, AuthenticationException $e): array
+
+    protected function handleNotFoundException(Request $request): JsonResponse
     {
-        return ResponseUtil::makeError('Este usuario no tiene permiso para realizar esta acción', 401);
+        return ResponseUtil::makeError('La ruta '.$request->url().' con el método '.$request->method().', no fue encontrada');
     }
 
-    protected function unauthorized(): array
-    {
-        return ResponseUtil::makeError('Acceso no autorizado', 403);
-    }
-
-    protected function handleQueryException(): array
+    protected function handleQueryException(): JsonResponse
     {
         return ResponseUtil::makeError('Existe un error con la base de datos', 500);
     }
 
-    protected function modelNotFoundException(): array
+    protected function unauthenticated($request, AuthenticationException $e): JsonResponse
     {
-        return ResponseUtil::makeError('No se encontró el recurso solicitado', 404);
+        return ResponseUtil::makeError('Este usuario no tiene permiso para realizar esta acción', 401);
     }
 
-    protected function notFound(): array
+    protected function modelNotFoundException(): JsonResponse
     {
-        return ResponseUtil::makeError('Ruta no encontrada', 404);
-    }
-
-    protected function methodNotAllowed(): array
-    {
-        return ResponseUtil::makeError('Método HTTP no permitido para esta ruta', 405);
-    }
-
-    protected function customUnauthorized(UnauthorizedRequestException $e): array
-    {
-        return ResponseUtil::makeError($e->getMessage(), $e->getCode() ?: 401);
-    }
-
-    protected function httpException(HttpException $e): array
-    {
-        return ResponseUtil::makeError($e->getMessage(), $e->getStatusCode());
-    }
-
-    protected function internalError(Throwable $e): array
-    {
-        return ResponseUtil::makeError('Error interno del servidor: ' . $e->getMessage(), 500);
+        return ResponseUtil::makeError('No se encontró el recurso solicitado', 400);
     }
 }

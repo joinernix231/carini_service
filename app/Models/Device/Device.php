@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
 
 class Device extends Model
 {
@@ -24,6 +25,7 @@ class Device extends Model
         'brand',
         'description',
         'type',
+        'photo',
         'operation_id',
     ];
 
@@ -33,6 +35,7 @@ class Device extends Model
         'brand' => 'nullable|string|max:100',
         'description' => 'nullable|string',
         'type' => 'nullable|string|max:50',
+        'photo' => 'nullable|string',
         'operation_id' => 'required|exists:operations,id',
     ];
 
@@ -44,5 +47,12 @@ class Device extends Model
     protected static function newFactory(): DeviceFactory
     {
         return DeviceFactory::new();
+    }
+
+    public function getPhotoAttribute(): ?string
+    {
+        if ($photo = Arr::get($this->attributes, 'photo'))
+            return config('filesystems.disks.s3.url') . 'images/' . $photo . '.PNG';
+        return null;
     }
 }
