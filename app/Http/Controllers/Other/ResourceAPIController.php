@@ -19,7 +19,7 @@ class ResourceAPIController extends Controller
     public function loadImage(LoadImageAPIRequest $request): JsonResponse
     {
         $response = $this->resourceService->uploadImage($request->get('name'),
-            $request->get('image'));
+            $request->file('image'));
 
 
         if ($response['status'])
