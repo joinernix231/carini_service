@@ -13,6 +13,8 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Carbon\Carbon;
@@ -20,87 +22,98 @@ use Carbon\Carbon;
 
 class APIRequest extends FormRequest
 {
-
-    protected function failedValidation(Validator $validator)
+    /**
+     * Handle a failed validation attempt.
+     *
+     * @throws HttpResponseException
+     */
+    protected function failedValidation(Validator $validator): void
     {
         $errors = (new ValidationException($validator))->errors();
 
-        throw new HttpResponseException(
-            response()->json(
-                ResponseUtil::makeError("Ha ocurrido un error de validación", 400, $errors),
-                400
-            )
-        );
-
+        throw new HttpResponseException(ResponseUtil::makeError(message: 'Ha ocurrido un error de validación', code: 400, data: $errors));
     }
 
-
-    protected function failedAuthorization()
+    /**
+     * Handle a failed authorization attempt.
+     *
+     * @throws HttpResponseException
+     */
+    protected function failedAuthorization(): void
     {
-        throw new HttpResponseException(Response::json(ResponseUtil::makeError("Este usuario no tiene permiso para realizar esta acción"), 403));
+        throw new HttpResponseException(ResponseUtil::makeError(message: 'Este usuario no tiene permiso para realizar esta acción', code: 403));
     }
 
-    public function failedExists($modelName)
+    /**
+     * Throw an exception when a requested model does not exist.
+     *
+     * @throws HttpResponseException
+     */
+    public function failedExists(string $modelName): void
     {
-        throw new HttpResponseException(Response::json(ResponseUtil::makeError("Este " . $modelName . " no se ha encontrado."), 404));
+        throw new HttpResponseException(ResponseUtil::makeError(message: "Este $modelName no se ha encontrado.", code: 404));
     }
 
     public function addParametersToRequest(array $params): void
     {
-        $parameters = $this->all();
-
-        foreach ($params as $key => $param) {
-            $parameters[$key] = $param;
-        }
-        $this->replace($parameters);
+        $this->merge($params);
     }
 
+    /**
+     * Get the validation messages for the defined validation rules.
+     */
     public function messages(): array
     {
-        $messages = [
-            'email' => 'El email no es válido',
-            'exists' => 'Este(a) :attribute no existe',
-            'in' => 'El campo :attribute debe ser un valor entre :values',
-            'integer' => 'El campo :attribute debe ser numérico',
-            'numeric' => 'El campo :attribute debe ser numérico',
-            'boolean' => 'El campo :attribute debe ser booleano',
-            'regex' => 'El valor de :attribute no esta en el formato correcto.',
-            'required' => 'El campo :attribute es requerido(a)',
-            'string' => 'El campo :attribute debe ser texto',
-            'unique' => 'Este(a) :attribute ya ha sido tomado(a)'
+        return [
+            'required' => 'El valor :attribute es requerido',
+            'required_if' => 'El valor :attribute es requerido cuando :other es :value',
+
+            'exists' => 'El valor :attribute no existe',
+            'unique' => 'El valor :attribute ya existe',
+            'in' => 'El valor :attribute debe ser uno de los siguientes valores: :values',
+
+            'integer' => 'El valor :attribute debe ser un número entero',
+            'numeric' => 'El valor :attribute debe ser numérico',
+            'string' => 'El valor :attribute debe ser un texto',
+            'boolean' => 'El valor :attribute debe ser verdadero o falso',
+            'date' => 'El valor :attribute debe ser una fecha válida',
+            'email' => 'El valor :attribute debe ser un correo electrónico válido',
+            'confirmed' => 'El valor :attribute no coincide con la confirmación',
+
+            'min' => [
+                'numeric' => 'El valor :attribute debe ser al menos :min.',
+                'file' => 'El archivo :attribute debe tener al menos :min kilobytes.',
+                'string' => 'El valor :attribute debe tener al menos :min caracteres.',
+                'array' => 'El valor :attribute debe tener al menos :min elementos.',
+            ],
+
+            'max' => [
+                'numeric' => 'El valor :attribute no debe ser mayor que :max.',
+                'file' => 'El archivo :attribute no debe pesar más de :max kilobytes.',
+                'string' => 'El valor :attribute no debe tener más de :max caracteres.',
+                'array' => 'El valor :attribute no debe contener más de :max elementos.',
+            ],
+
+            'between' => [
+                'numeric' => 'El valor :attribute debe estar entre :min y :max.',
+                'file' => 'El archivo :attribute debe tener entre :min y :max kilobytes.',
+                'string' => 'El valor :attribute debe tener entre :min y :max caracteres.',
+                'array' => 'El valor :attribute debe tener entre :min y :max elementos.',
+            ],
         ];
-        return $messages;
     }
 
-    public function getData($repository, $id = '')
+    public function existsRule(string $table, string $column = 'id'): Exists
     {
-        $id = !$id ? $this->route('id') : $id;
-        return $repository->findWithoutFail($id);
-    }
-
-    public function existsRule($table, $column = 'id', $deleted_at = true): \Illuminate\Validation\Rules\Exists
-    {
-        return Rule::exists($table, $column)->where(function ($q) use ($deleted_at) {
-            if ($deleted_at)
-                $q->where('deleted_at', null);
+        return Rule::exists($table, $column)->where(function ($q) {
+            $q->where('deleted_at', null);
         });
     }
 
-    public function uniqueRule($table, $column = 'id', $deleted_at = true): \Illuminate\Validation\Rules\Unique
+    public function uniqueRule(string $table, string $column = 'id'): Unique
     {
-        return Rule::unique($table, $column)->where(function ($q) use ($deleted_at) {
-            if ($deleted_at)
-                $q->where('deleted_at', null);
+        return Rule::unique($table, $column)->where(function ($q) {
+            $q->where('deleted_at', null);
         });
-    }
-
-    public function formatDate($dateField): ?string
-    {
-        $date = null;
-        if ($this->has($dateField)) {
-            $date = new Carbon($this->get($dateField));
-            $date = $date->toDateString();
-        }
-        return $date;
     }
 }

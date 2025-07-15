@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Other;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\API\Other\LoadDocAPIRequest;
 use App\Http\Requests\API\Other\LoadImageAPIRequest;
 use App\Utils\ResourceService;
 use Illuminate\Http\JsonResponse;
@@ -24,6 +25,18 @@ class ResourceAPIController extends Controller
 
         if ($response['status'])
         return $this->makeResponse('Image loaded successfully', null);
+
+        return $this->makeError($response['message']);
+    }
+
+    public function loadDoc(LoadDocAPIRequest $request): JsonResponse
+    {
+        $filename = 'pdfs/' . $request->get('name');
+
+        $response = $this->resourceService->uploadFile($filename, $request->file('file'));
+
+        if ($response['status'])
+            return $this->makeResponse('File loaded successfully', null);
 
         return $this->makeError($response['message']);
     }

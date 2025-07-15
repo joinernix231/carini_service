@@ -55,4 +55,11 @@ class Device extends Model
             return config('filesystems.disks.s3.url') . 'images/' . $photo . '.PNG';
         return null;
     }
+
+    public function getPdfUrlAttribute(): ?string
+    {
+        if ($value = Arr::get($this->attributes, 'pdf_url'))
+            return config('filesystems.disks.s3.url') . 'docs/' . $value . '.pdf';
+        return null;
+    }
 }

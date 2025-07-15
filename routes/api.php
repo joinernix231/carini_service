@@ -17,7 +17,7 @@ Route::apiResource('/linkDevices', DeviceLinkAPIController::class);
 Route::apiResource('/devices', DeviceAPIController::class);
 // Other
 Route::post('loadImage', ResourceAPIController::class . '@loadImage');
-
+Route::post('loadDoc', ResourceAPIController::class . '@loadDoc');
 });
 
 

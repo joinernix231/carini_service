@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('devices', function (Blueprint $table) {
             $table->string('photo')->after('type');
+            $table->string('pdf_url')->after('photo');
         });
     }
 
@@ -23,6 +24,7 @@ return new class extends Migration
     {
         Schema::table('devices', function (Blueprint $table) {
             $table->dropColumn('photo');
+            $table->dropColumn('pdf_url');
         });
     }
 };

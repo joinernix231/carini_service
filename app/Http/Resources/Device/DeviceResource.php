@@ -24,6 +24,7 @@ class DeviceResource extends Resource
             'brand' => $this->resource->brand,
             'type' => $this->resource->type,
             'photo' => $this->resource->photo,
+            'pdf_url' => $this->resource->pdf_url,
             'manufactured_at' => $this->resource->manufactured_at
         ];
     }
