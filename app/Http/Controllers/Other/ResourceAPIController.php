@@ -20,7 +20,7 @@ class ResourceAPIController extends Controller
     {
         $response = $this->resourceService->uploadImage($request->get('name'),
             $request->get('image'));
-        dd($response);
+
 
         if ($response['status'])
         return $this->makeResponse('Image loaded successfully', null);
