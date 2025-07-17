@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Other;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\Other\LoadDocAPIRequest;
 use App\Http\Requests\API\Other\LoadImageAPIRequest;
-use App\Utils\ResourceService;
+use App\Utils\Resources\ResourceService;
 use Illuminate\Http\JsonResponse;
 
 class ResourceAPIController extends Controller

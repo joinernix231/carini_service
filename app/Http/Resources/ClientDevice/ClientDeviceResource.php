@@ -5,7 +5,7 @@ namespace App\Http\Resources\ClientDevice;
 use App\Http\Resources\Client\ClientResource;
 use App\Http\Resources\Device\DeviceResource;
 use App\Models\ClientDevice\ClientDevice;
-use App\Utils\Resource;
+use App\Utils\Resources\Resource;
 use Illuminate\Http\Request;
 
 /**

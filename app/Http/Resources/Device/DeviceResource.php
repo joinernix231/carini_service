@@ -2,10 +2,8 @@
 
 namespace App\Http\Resources\Device;
 
-use App\Http\Resources\Client\ClientResource;
-use App\Models\ClientDevice\ClientDevice;
 use App\Models\Device\Device;
-use App\Utils\Resource;
+use App\Utils\Resources\Resource;
 use Illuminate\Http\Request;
 
 /**

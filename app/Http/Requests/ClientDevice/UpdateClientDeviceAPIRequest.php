@@ -16,6 +16,7 @@ class UpdateClientDeviceAPIRequest extends APIRequest
     {
         $rules = [];
 
+
         $rules['status'] = ['required','boolean'];
         $rules['address'] = ['required','string'];
 

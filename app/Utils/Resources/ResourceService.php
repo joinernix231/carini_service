@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Utils;
+namespace App\Utils\Resources;
 
 use Aws\S3\Exception\S3Exception;
 use Illuminate\Http\File;

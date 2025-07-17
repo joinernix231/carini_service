@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Utils;
+namespace App\Utils\Resources;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;

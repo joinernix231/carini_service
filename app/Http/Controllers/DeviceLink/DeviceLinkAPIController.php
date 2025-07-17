@@ -12,6 +12,8 @@ use App\Http\Resources\ClientDevice\ClientDeviceResource;
 use App\Models\ClientDevice\ClientDevice;
 use App\Repositories\Device\DeviceRepository;
 use App\Repositories\LinkDevice\LinkDeviceRepository;
+use App\Utils\Criterias\BasicCriteria\OrderByCriteria;
+use App\Utils\Criterias\BasicCriteria\WhereFieldCriteria;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class DeviceLinkAPIController extends Controller
@@ -22,6 +24,10 @@ class DeviceLinkAPIController extends Controller
 
     public function index(ReadClientDeviceAPIRequest $request): JsonResponse
     {
+
+        $this->linkDeviceRepository->pushCriteria(new OrderByCriteria('updated_at', 'desc'));
+        $this->linkDeviceRepository->pushCriteria(new WhereFieldCriteria('client_id', session('client_id')));
+
         $clientDevice = $request->has('unpaginated') ?
             $this->linkDeviceRepository->all() :
             $this->linkDeviceRepository->paginate(20);

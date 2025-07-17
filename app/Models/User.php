@@ -14,7 +14,6 @@ namespace App\Models;
  * @property Carbon|null $updated_at
  */
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Client\Client;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

@@ -19,4 +19,11 @@ class ClientRepository extends BaseRepository
     {
         return Client::class;
     }
+
+    public function getClientByUserId(int $id)
+    {
+        return $this->model
+            ->where('user_id', $id)
+            ->first();
+    }
 }

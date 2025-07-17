@@ -2,11 +2,11 @@
 
 namespace App\Repositories\Maintenance;
 
-use App\Models\Maintenance\Maintenance;
+use App\Models\Maintenance\MaintenanceType;
 use App\Repositories\BaseRepository;
 
 
-class MaintenanceRepository extends BaseRepository
+class MaintenanceTypeRepository extends BaseRepository
 {
     protected $fieldSearchable = [];
 
@@ -17,13 +17,7 @@ class MaintenanceRepository extends BaseRepository
 
     public function model(): string
     {
-        return Maintenance::class;
+        return MaintenanceType::class;
     }
 
-    public function create(array $input)
-    {
-        $input['status'] = 'pending';
-
-        return parent::create($input);
-    }
 }

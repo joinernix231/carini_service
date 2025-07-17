@@ -6,6 +6,7 @@ use App\Exceptions\UnauthorizedRequestException;
 use App\Models\Agent\Agent;
 use App\Models\Client\Client;
 use App\Models\User;
+use App\Repositories\Client\ClientRepository;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,34 +15,31 @@ use Symfony\Component\HttpFoundation\Response;
 readonly class ValidateUserToken
 {
 
+    public function __construct(protected readonly ClientRepository $clientRepository)
+    {}
+
     public function handle(Request $request, Closure $next)
     {
         $token = $request->bearerToken();
+        /**@var User $user**/
         $user = Auth::user();
 
-
         if (!$token) {
-            return response()->json([
-                'error' => 'Unauthorized',
-                'message' => 'Este usuario no tiene permiso para realizar esta acción (1)',
-            ], 401);
+            $this->throwUserDoesNotHaveAccessResponse('Este usuario no tiene permiso para realizar esta acción(1)', $request);
         }
         if (!$user) {
-            return response()->json([
-                'error' => 'Unauthorized',
-                'message' => 'Este usuario no tiene permiso para realizar esta acción (2)',
-            ], 401);
+            $this->throwUserDoesNotHaveAccessResponse('Este usuario no tiene permiso para realizar esta acción(2)', $request);
         }
 
+        $client = $this->clientRepository->getClientByUserId($user->id);
 
-        /** @var User $user */
-        session(['user_id' => $user->id, 'user' => $user]);
+        session(['user_id' => $user->id, 'user' => $user, 'client' => $client, 'client_id' => $client->id]);
 
         return $next($request);
     }
 
 
-    protected function throwUnauthorizedException(string $message, Request $request): void
+    protected function throwUserDoesNotHaveAccessResponse(string $message, Request $request): void
     {
         throw new UnauthorizedRequestException($message, 401, $request);
     }

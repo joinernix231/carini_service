@@ -14,8 +14,12 @@ class MaintenanceType extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'value'
+        'device_id',
+        'type',
+        'date_maintenance',
+        'maintenance_type_id',
+        'photo',
+        'description',
     ];
 
     public function casts(): array
