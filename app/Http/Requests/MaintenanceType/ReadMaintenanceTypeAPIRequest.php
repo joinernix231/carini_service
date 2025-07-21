@@ -2,8 +2,6 @@
 
 namespace App\Http\Requests\MaintenanceType;
 
-
-
 use App\Http\Requests\APIRequest;
 
 class ReadMaintenanceTypeAPIRequest extends APIRequest

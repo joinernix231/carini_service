@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Maintenance;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Maintenance\CreateMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\DeleteMaintenanceTypeAPIRequest;
+use App\Http\Requests\Maintenance\ReadMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\ReadMaintenanceTypeAPIRequest;
 use App\Http\Requests\Maintenance\ShowMaintenanceTypeAPIRequest;
 use App\Http\Requests\Maintenance\UpdateMaintenanceTypeAPIRequest;
@@ -19,7 +20,7 @@ class MaintenanceAPIController extends Controller
     public function __construct(private readonly MaintenanceRepository $maintenanceRepository)
     {}
 
-    public function index(ReadMaintenanceTypeAPIRequest $request): JsonResponse
+    public function index(ReadMaintenanceAPIRequest $request): JsonResponse
     {
         $clientId = session('client_id');
 
