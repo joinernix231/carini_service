@@ -4,11 +4,10 @@ namespace App\Http\Controllers\Maintenance;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Maintenance\CreateMaintenanceAPIRequest;
-use App\Http\Requests\Maintenance\DeleteMaintenanceTypeAPIRequest;
+use App\Http\Requests\Maintenance\DeleteMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\ReadMaintenanceAPIRequest;
-use App\Http\Requests\Maintenance\ReadMaintenanceTypeAPIRequest;
-use App\Http\Requests\Maintenance\ShowMaintenanceTypeAPIRequest;
-use App\Http\Requests\Maintenance\UpdateMaintenanceTypeAPIRequest;
+use App\Http\Requests\Maintenance\ShowMaintenanceAPIRequest;
+use App\Http\Requests\Maintenance\UpdateMaintenanceAPIRequest;
 use App\Http\Resources\Maintenance\MaintenanceResource;
 use App\Models\Maintenance\Maintenance;
 use App\Repositories\Maintenance\MaintenanceRepository;
