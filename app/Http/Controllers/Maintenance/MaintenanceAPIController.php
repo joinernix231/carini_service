@@ -43,14 +43,14 @@ class MaintenanceAPIController extends Controller
 
         return $this->makeResponseResource('Maintenance Created Successfully', new MaintenanceResource($maintenance));
     }
-    public function show(Maintenance $maintenance, ShowMaintenanceTypeAPIRequest $request): JsonResponse
+    public function show(Maintenance $maintenance, ShowMaintenanceAPIRequest $request): JsonResponse
     {
         $maintenance->load('clientDevice.device', 'maintenanceType');
 
         return $this->makeResponseResource('Maintenance retrieved Successfully', new MaintenanceResource($maintenance));
     }
 
-    public function update(Maintenance $maintenance, UpdateMaintenanceTypeAPIRequest $request): JsonResponse
+    public function update(Maintenance $maintenance, UpdateMaintenanceAPIRequest $request): JsonResponse
     {
         $input = $request->validated();
 
@@ -59,7 +59,7 @@ class MaintenanceAPIController extends Controller
         return $this->makeResponseResource('Maintenance Updated Successfully', new MaintenanceResource($maintenance));
     }
 
-    public function destroy(Maintenance $maintenance, DeleteMaintenanceTypeAPIRequest $request): JsonResponse
+    public function destroy(Maintenance $maintenance, DeleteMaintenanceAPIRequest $request): JsonResponse
     {
         $this->maintenanceRepository->delete($maintenance->id);
 
