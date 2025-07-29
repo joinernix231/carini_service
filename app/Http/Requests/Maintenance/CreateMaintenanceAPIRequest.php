@@ -22,9 +22,9 @@ class CreateMaintenanceAPIRequest extends APIRequest
         $rules = Maintenance::$rules;
 
 
-        $rules['maintenance_type_id'] = ['exists:maintenance_types,id'];
+        $rules['maintenance_type_id'] = ['nullable'];
 
-        $rules['client_device_id'] = ['integer', new UniquePendingMaintenance()];
+        $rules['client_device_id'] = ['integer', $this->existsRule('client_device'), new UniquePendingMaintenance()];
 
         return $rules;
     }
@@ -33,6 +33,8 @@ class CreateMaintenanceAPIRequest extends APIRequest
     {
         return [
             'maintenance_type_id.exists' => 'El tipo de mantenimiento seleccionado no existe.',
+            'client_device_id.exists' => 'El equipo seleccionado no existe en la base de datos.',
         ];
     }
+
 }
