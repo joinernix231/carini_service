@@ -7,6 +7,7 @@ use App\Models\Maintenance\Maintenance;
 use App\Repositories\Technician\TechnicianRepository;
 use App\Rules\Maintenance\UniquePendingMaintenance;
 use App\Rules\Technician\ValidateDateOfTechnician;
+use Illuminate\Validation\Rule;
 
 class CreateMaintenanceAPIRequest extends APIRequest
 {
@@ -28,7 +29,10 @@ class CreateMaintenanceAPIRequest extends APIRequest
 
         $rules['client_device_id'] = ['integer', $this->existsRule('client_device'), new UniquePendingMaintenance()];
 
-        $rules['date_maintenance'] = ['date', 'nullable' , new ValidateDateOfTechnician($this->technicianRepository)];
+        $rules['date_maintenance'] = [
+            Rule::requiredIf(fn() => $this->input('type') === 'preventive'),
+            'nullable', 'date', new ValidateDateOfTechnician($this->technicianRepository),
+        ];
 
         return $rules;
     }

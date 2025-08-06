@@ -19,9 +19,8 @@ return new class extends Migration
 
             $table->foreignIdFor(ClientDevice::class)->constrained()->onDelete('cascade');
             $table->enum('type', ['preventive', 'corrective']);
-            $table->date('date_maintenance');
+            $table->date('date_maintenance')->nullable();
 
-            $table->foreignId('maintenance_type_id')->constrained()->onDelete('cascade');
 
             $table->string('photo')->nullable();
             $table->string('description')->nullable();
