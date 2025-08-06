@@ -44,7 +44,7 @@ class MaintenanceAPIController extends Controller
     }
     public function show(Maintenance $maintenance, ShowMaintenanceAPIRequest $request): JsonResponse
     {
-        $maintenance->load('clientDevice.device', 'maintenanceType');
+        $maintenance->load('clientDevice.device', 'maintenanceType', 'technician.user');
 
         return $this->makeResponseResource('Maintenance retrieved Successfully', new MaintenanceResource($maintenance));
     }

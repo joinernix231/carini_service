@@ -15,6 +15,7 @@ namespace App\Models;
  */
 
 use App\Models\Client\Client;
+use App\Models\Technician\Technician;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -76,5 +77,11 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(Client::class);
     }
+
+    public function technician(): HasOne
+    {
+        return $this->hasOne(Technician::class);
+    }
+
 
 }

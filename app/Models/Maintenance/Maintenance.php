@@ -3,6 +3,7 @@
 namespace App\Models\Maintenance;
 
 use App\Models\ClientDevice\ClientDevice;
+use App\Models\Technician\Technician;
 use Database\Factories\MaintenanceFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -58,6 +59,12 @@ class Maintenance extends Model
     {
         return $this->belongsTo(MaintenanceType::class);
     }
+
+    public function technician(): BelongsTo
+    {
+        return $this->belongsTo(Technician::class)->with('user');
+    }
+
 
     public function getPhotoAttribute(): ?string
     {
