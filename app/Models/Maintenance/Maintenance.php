@@ -30,7 +30,7 @@ class Maintenance extends Model
     public static array $rules = [
         'client_device_id' => 'required|integer',
         'type' => 'required|string',
-        'date_maintenance' => 'required|date',
+        'date_maintenance' => 'nullable|date',
         'maintenance_type_id' => 'required|string|max:50',
         'photo' => 'nullable|string',
         'description' => 'nullable|string',
