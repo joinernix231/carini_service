@@ -11,7 +11,6 @@ use App\Http\Requests\Maintenance\UpdateMaintenanceAPIRequest;
 use App\Http\Resources\Maintenance\MaintenanceResource;
 use App\Models\Maintenance\Maintenance;
 use App\Repositories\Maintenance\MaintenanceRepository;
-use App\Utils\Criterias\BasicCriteria\WithRelationshipsCriteria;
 use App\Utils\Criterias\Maintenance\ClientMaintenancesCriteria;
 use Illuminate\Http\JsonResponse;
 

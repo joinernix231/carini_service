@@ -26,7 +26,7 @@ class CreateMaintenanceAPIRequest extends APIRequest
 
         $rules['maintenance_type_id'] = ['nullable'];
 
-        //$rules['client_device_id'] = ['integer', $this->existsRule('client_device'), new UniquePendingMaintenance()];
+        $rules['client_device_id'] = ['integer', $this->existsRule('client_device'), new UniquePendingMaintenance()];
 
         $rules['date_maintenance'] = ['date', 'required' , new ValidateDateOfTechnician($this->technicianRepository)];
 
