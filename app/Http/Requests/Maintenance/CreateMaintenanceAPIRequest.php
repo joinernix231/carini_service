@@ -4,13 +4,15 @@ namespace App\Http\Requests\Maintenance;
 
 use App\Http\Requests\APIRequest;
 use App\Models\Maintenance\Maintenance;
+use App\Repositories\Technician\TechnicianRepository;
 use App\Rules\Maintenance\UniquePendingMaintenance;
+use App\Rules\Technician\ValidateDateOfTechnician;
 
 class CreateMaintenanceAPIRequest extends APIRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
+    public function __construct(private readonly TechnicianRepository $technicianRepository)
+    {}
+
     public function authorize(): bool
     {
         return true;
@@ -24,7 +26,9 @@ class CreateMaintenanceAPIRequest extends APIRequest
 
         $rules['maintenance_type_id'] = ['nullable'];
 
-        $rules['client_device_id'] = ['integer', $this->existsRule('client_device'), new UniquePendingMaintenance()];
+        //$rules['client_device_id'] = ['integer', $this->existsRule('client_device'), new UniquePendingMaintenance()];
+
+        $rules['date_maintenance'] = ['date', 'required' , new ValidateDateOfTechnician($this->technicianRepository)];
 
         return $rules;
     }
