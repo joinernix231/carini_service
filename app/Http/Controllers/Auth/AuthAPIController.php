@@ -57,7 +57,7 @@ class AuthAPIController extends Controller
         $user = auth()->user();
 
         if ($user->policy_accepted_at) {
-            return ResponseUtil::makeError('Ya aceptaste las políticas.', 400);
+            return ResponseUtil::makeResponse('Ya aceptaste las políticas.');
         }
 
         $user->update([
