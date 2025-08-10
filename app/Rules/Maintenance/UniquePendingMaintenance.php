@@ -11,11 +11,11 @@ class UniquePendingMaintenance implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $exists = Maintenance::where('client_device_id', $value)
-            ->where('status', 'pending')
+            ->where('status', '!=', 'complete')
             ->exists();
 
         if ($exists) {
-            $fail('Este equipo ya tiene un mantenimiento pendiente.');
+            $fail('Este equipo ya tiene un mantenimiento activo o en proceso.');
         }
     }
 }
