@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthAPIController;
 use App\Http\Controllers\Client\ClientAPIController;
 use App\Http\Controllers\Device\DeviceAPIController;
 use App\Http\Controllers\DeviceLink\DeviceLinkAPIController;
@@ -10,6 +11,9 @@ use App\Http\Controllers\Technician\AvailableTechnicianController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([], function () {
+// Auth
+Route::post('/acceptPolicy', AuthAPIController::class . '@acceptPolicy');
+Route::get('/me', AuthAPIController::class . '@me');
 // Clients
 Route::apiResource('/clients', ClientAPIController::class);
 // LinkDevices
