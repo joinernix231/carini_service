@@ -55,14 +55,20 @@ class TechnicianRepository extends BaseRepository
         $availableDates = [];
 
         for ($i = 0; $i < $dias; $i++) {
-            $date = $today->copy()->addDays($i)->format('Y-m-d');
-            $available = $this->getAvailableTechnicianForShift($date);
+            $date = $today->copy()->addDays($i);
+
+            if (in_array($date->dayOfWeek, [Carbon::SATURDAY, Carbon::SUNDAY])) {
+                continue;
+            }
+
+            $available = $this->getAvailableTechnicianForShift($date->format('Y-m-d'));
 
             if ($available !== null) {
-                $availableDates[] = $date;
+                $availableDates[] = $date->format('Y-m-d');
             }
         }
 
         return $availableDates;
     }
+
 }
