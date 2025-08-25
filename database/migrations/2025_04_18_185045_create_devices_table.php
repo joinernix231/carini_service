@@ -13,13 +13,11 @@ return new class extends Migration
     {
         Schema::create('devices', function (Blueprint $table) {
             $table->id();
-
-            $table->string('serial')->unique();
             $table->string('model')->nullable();
             $table->string('brand')->nullable();
             $table->string('type')->nullable();
-            $table->string('firmware_version')->nullable();
-            $table->date('manufactured_at')->nullable();
+            $table->string('photo')->nullable();
+            $table->string('pdf_url')->nullable();
             $table->text('description')->nullable();
 
             $table->timestamps();

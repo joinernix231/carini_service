@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('role', ['cliente', 'tecnico', 'coordinador']);
+            $table->dateTime('policy_accepted_at')->nullable();
             $table->rememberToken();
             $table->softDeletes();
             $table->timestamps();

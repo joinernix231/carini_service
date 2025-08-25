@@ -54,7 +54,7 @@ class TechnicianRepository extends BaseRepository
         $today = Carbon::today();
         $availableDates = [];
 
-        for ($i = 0; $i < $dias; $i++) {
+        for ($i = 1; $i < $dias; $i++) {
             $date = $today->copy()->addDays($i);
 
             if (in_array($date->dayOfWeek, [Carbon::SATURDAY, Carbon::SUNDAY])) {

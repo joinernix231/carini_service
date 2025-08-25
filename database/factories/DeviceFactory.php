@@ -15,12 +15,10 @@ class DeviceFactory extends Factory
     public function definition(): array
     {
         return [
-            'serial' => $this->faker->unique()->bothify('SN-####-???'),
             'model' => $this->faker->word(),
             'brand' => $this->faker->company(),
             'description' => $this->faker->optional()->sentence(),
-            'type' => $this->faker->word(),
-            'manufactured_at' => $this->faker->date('Y-m-d'),
+            'type' => $this->faker->randomElement(['lavadora','secadora']),
         ];
     }
 }

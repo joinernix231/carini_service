@@ -17,11 +17,10 @@ class ClientFactory extends Factory
     {
         return [
             'identifier' => $this->faker->unique()->numerify('########-#'),
-            'legal_representative' => $this->faker->name,
+            'name' => $this->faker->name,
             'address' => $this->faker->address,
             'city' => $this->faker->city,
             'phone' => $this->faker->phoneNumber,
-            'client_type' => $this->faker->randomElement(['empresa', 'institucional']),
             'user_id' => User::factory(),
         ];
     }

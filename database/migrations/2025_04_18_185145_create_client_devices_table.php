@@ -17,6 +17,7 @@ return new class extends Migration
 
             $table->foreignIdFor(Client::class)->constrained()->onDelete('cascade');
             $table->foreignIdFor(Device::class)->constrained()->onDelete('cascade');
+            $table->string('serial')->unique();
             $table->foreignIdFor(User::class, 'linked_by')->nullable()->constrained()->onDelete('set null');
 
             $table->boolean('status')->default(true);
