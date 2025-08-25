@@ -21,6 +21,7 @@ class ClientDeviceResource extends Resource
             'id' => $this->resource->id,
             'client_id' => $this->resource->client_id,
             'device_id' => $this->resource->device_id,
+            'serial' => $this->resource->serial,
             'linked_by' => $this->resource->linked_by,
             'status' => $this->resource->status,
             'address' => $this->resource->address,

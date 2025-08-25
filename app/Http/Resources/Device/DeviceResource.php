@@ -17,7 +17,6 @@ class DeviceResource extends Resource
     {
         return [
             'id' => $this->resource->id,
-            'serial' => $this->resource->serial,
             'model' => $this->resource->model,
             'brand' => $this->resource->brand,
             'type' => $this->resource->type,
