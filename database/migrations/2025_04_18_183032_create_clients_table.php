@@ -21,7 +21,9 @@ return new class extends Migration
             $table->string('address')->nullable();
             $table->string('city')->nullable();
             $table->string('phone')->nullable();
+
             $table->timestamps();
+            $table->softDeletes();
 
         });
     }

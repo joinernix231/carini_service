@@ -30,13 +30,11 @@ class Client extends Model
     public static array $rules = [
         'identifier' => 'required|string|max:20',
         'name' => 'required|string|max:255',
-        'legal_representative' => 'nullable|string|max:255',
         'address' => 'nullable|string|max:255',
         'city' => 'nullable|string|max:255',
         'email' => 'nullable|string',
         'email.*' => 'email',
         'phone' => 'nullable|string|max:20',
-        'client_type' => 'nullable|string|max:100',
     ];
 
     public function user(): hasOne

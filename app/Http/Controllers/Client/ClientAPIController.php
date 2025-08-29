@@ -11,12 +11,14 @@ use App\Http\Requests\Client\UpdateClientAPIRequest;
 use App\Http\Resources\Client\ClientResource;
 use App\Models\Client\Client;
 use App\Repositories\Client\ClientRepository;
+use App\Repositories\User\UserRepository;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Arr;
 
 
 class ClientAPIController extends Controller
 {
-    public function __construct(private readonly ClientRepository $clientRepository)
+    public function __construct(private readonly ClientRepository $clientRepository, private readonly UserRepository $userRepository)
     {}
     public function index(ReadClientAPIRequest $request): JsonResponse
     {
@@ -32,10 +34,16 @@ class ClientAPIController extends Controller
     {
         $input = $request->validated();
 
-        $client = $this->clientRepository->create($input);
+        $user = $this->userRepository->createClient($input);
+
+        $clientData = Arr::only($input, ['identifier', 'name', 'address', 'city', 'phone']);
+        $clientData['user_id'] = $user->id;
+
+        $client = $this->clientRepository->create($clientData);
 
         return $this->makeResponseResource('Client created Successfully', new ClientResource($client));
     }
+
 
     public function show(Client $client, ShowClientAPIRequest $request): JsonResponse
     {
@@ -43,13 +51,20 @@ class ClientAPIController extends Controller
     }
 
 
-    public function update(Client $client,UpdateClientAPIRequest $request): JsonResponse
+    public function update(Client $client, UpdateClientAPIRequest $request): JsonResponse
     {
         $input = $request->validated();
 
-        $client = $this->clientRepository->update($input, $client->id);
+        $userData = Arr::only($input, ['email', 'name']);
+        if (!empty($userData)) {
+            $this->userRepository->update($userData, $client->user_id);
+        }
 
-        return $this->makeResponseResource('Clients updated Successfully', new ClientResource($client));
+        $clientData = Arr::only($input, ['identifier', 'name', 'address', 'city', 'phone']);
+
+        $client = $this->clientRepository->update($clientData, $client->id);
+
+        return $this->makeResponseResource('Client updated Successfully', new ClientResource($client));
     }
 
     public function destroy(DeleteClientAPIRequest $request,int $id)
