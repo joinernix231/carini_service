@@ -69,6 +69,8 @@ class ClientAPIController extends Controller
 
     public function destroy(DeleteClientAPIRequest $request,int $id)
     {
-        //
+        $this->clientRepository->delete($id);
+
+        return $this->makeResponse('Client deleted Successfully',[$id]);
     }
 }

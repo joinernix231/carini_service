@@ -11,7 +11,6 @@ class DeleteClientAPIRequest extends APIRequest
      */
     public function authorize(): bool
     {
-        return false;
     }
 
     public function rules(): array
