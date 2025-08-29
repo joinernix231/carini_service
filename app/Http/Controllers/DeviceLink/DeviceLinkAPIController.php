@@ -41,9 +41,8 @@ class DeviceLinkAPIController extends Controller
     public function store(CreateClientDeviceAPIRequest $request): JsonResponse
     {
         $input = $request->validated();
-        $deviceId = $this->deviceRepository->findBySerial($input['serial']);
 
-        $clientDevice = $this->linkDeviceRepository->linkDevice($input, $deviceId);
+        $clientDevice = $this->linkDeviceRepository->linkDevice($input);
 
         return $this->makeResponseResource('ClientDevice created Successfully', new ClientDeviceResource($clientDevice));
     }

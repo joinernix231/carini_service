@@ -23,10 +23,10 @@ class LinkDeviceRepository extends BaseRepository
         return ClientDevice::class;
     }
 
-    public function linkDevice(array $input, int $deviceId)
+    public function linkDevice(array $input)
     {
-        $input['device_id'] = $deviceId;
         $input['linked_by'] = session('user_id');
+        $input['client_id'] = session('client_id');
         $input['status'] = true;
 
 

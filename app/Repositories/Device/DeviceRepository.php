@@ -20,12 +20,4 @@ class DeviceRepository extends BaseRepository
     {
         return Device::class;
     }
-
-    public function findBySerial(string $serial): ?int
-    {
-        return $this->model
-            ->where('serial', $serial)
-            ->whereNull('deleted_at')
-            ->first()?->id;
-    }
 }

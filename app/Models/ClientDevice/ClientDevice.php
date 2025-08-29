@@ -37,10 +37,9 @@ class ClientDevice extends Model
     public static array $rules = [
         'client_id'  => 'integer|exists:clients,id',
         'device_id'  => 'integer|exists:devices,id',
-        'serial'     => 'required|string|max:100|unique:client_device,serial_number',
+        'serial'     => 'required|string|max:100|unique:client_device,serial',
         'linked_by'  => 'nullable|exists:users,id',
         'linked_at'  => 'nullable|date',
-        'status'     => 'required|in:active,inactive',
         'notes'      => 'nullable|string',
         'source'     => 'nullable|in:qr,manual',
     ];
