@@ -26,6 +26,8 @@ class ClientAPIController extends Controller
             $this->clientRepository->all() :
             $this->clientRepository->paginate(20);
 
+        $clients->load('user');
+
         return $this->makeResponseResource('Clients retrieved Successfully', ClientResource::collection($clients));
 
     }
