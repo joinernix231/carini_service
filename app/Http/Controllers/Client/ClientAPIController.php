@@ -49,6 +49,7 @@ class ClientAPIController extends Controller
 
     public function show(Client $client, ShowClientAPIRequest $request): JsonResponse
     {
+        $client->load('user');
         return $this->makeResponseResource('Clients retrieved Successfully', new ClientResource($client));
     }
 
