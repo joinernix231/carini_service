@@ -8,7 +8,9 @@ use App\Repositories\BaseRepository;
 
 class ClientRepository extends BaseRepository
 {
-    protected $fieldSearchable = [];
+    protected $fieldSearchable = [
+        'name'
+    ];
 
     public function getFieldsSearchable(): array
     {
