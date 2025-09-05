@@ -7,12 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Client extends Model
 {
-
     use HasFactory;
+
+    public const CLIENT_TYPES = ['Natural', 'Jurídico'];
+    public const DOCUMENT_TYPES = ['CC', 'CE', 'CI', 'PASS', 'NIT'];
 
     protected $table = 'clients';
 
@@ -22,10 +23,12 @@ class Client extends Model
         'legal_representative',
         'address',
         'city',
+        'department',
         'user_id',
         'email',
         'phone',
         'client_type',
+        'document_type',
     ];
 
     public static array $rules = [
@@ -33,9 +36,12 @@ class Client extends Model
         'name' => 'string|max:255',
         'address' => 'nullable|string|max:255',
         'city' => 'nullable|string|max:255',
+        'department' => 'nullable|string|max:255',
         'email' => 'nullable|string',
         'email.*' => 'nullable|email',
         'phone' => 'nullable|string|max:20',
+        'client_type' => 'nullable|string|in:Natural,Jurídico',
+        'document_type' => 'nullable|string|in:CC,CE,CI,PASS,NIT',
     ];
 
     public function user(): BelongsTo
@@ -43,4 +49,8 @@ class Client extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function contacts(): HasMany
+    {
+        return $this->hasMany(Contact::class);
+    }
 }
