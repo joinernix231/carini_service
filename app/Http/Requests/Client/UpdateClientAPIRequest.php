@@ -17,9 +17,11 @@ class UpdateClientAPIRequest extends APIRequest
 
     public function rules(): array
     {
+        $clientId = $this->route('client');
+
         $rules = Client::$rules;
-        $rules['identifier'] = ['sometimes', 'string', $this->uniqueRule('clients', 'identifier')];;
-        $rules['email'] = ['sometimes', 'email', 'max:255', $this->uniqueRule('users', 'email')];
+        $rules['identifier'] = ['sometimes', 'string', $this->uniqueRule('clients', 'identifier', $clientId)];;
+        $rules['email'] = ['sometimes', 'email', 'max:255', $this->uniqueRule('users', 'email', $clientId)];
         return $rules;
     }
 }

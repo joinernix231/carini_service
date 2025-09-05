@@ -108,10 +108,15 @@ class APIRequest extends FormRequest
         });
     }
 
-    public function uniqueRule(string $table, string $column = 'id'): Unique
+    public function uniqueRule(string $table, string $column = 'id', $ignoreId = null, $ignoreColumn = 'id'): Unique
     {
-        return Rule::unique($table, $column)->where(function ($q) {
-            $q->where('deleted_at', null);
-        });
+        $rule = Rule::unique($table, $column)
+            ->where(fn($q) => $q->whereNull('deleted_at'));
+
+        if ($ignoreId) {
+            $rule->ignore($ignoreId, $ignoreColumn);
+        }
+
+        return $rule;
     }
 }
