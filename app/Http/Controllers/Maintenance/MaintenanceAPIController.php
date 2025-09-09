@@ -53,6 +53,7 @@ class MaintenanceAPIController extends Controller
     {
         $input = $request->validated();
 
+
         $maintenance = $this->maintenanceRepository->update($input,$maintenance->id,);
 
         return $this->makeResponseResource('Maintenance Updated Successfully', new MaintenanceResource($maintenance));
