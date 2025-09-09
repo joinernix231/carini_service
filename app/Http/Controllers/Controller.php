@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 abstract class Controller
 {
-    public function makeResponseResource(string $message, JsonResource $data): JsonResponse
+    public function makeResponseResource(string $message,  $data): JsonResponse
     {
         return response()->json([
             'success' => true,

@@ -13,6 +13,7 @@ use App\Models\Client\Client;
 use App\Repositories\Client\ClientRepository;
 use App\Repositories\User\UserRepository;
 use App\Utils\Criterias\BasicCriteria\FiltersCriteria;
+use App\Utils\Criterias\BasicCriteria\OrderByCriteria;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 
@@ -23,12 +24,14 @@ class ClientAPIController extends Controller
 
     public function index(ReadClientAPIRequest $request): JsonResponse
     {
+        $this->clientRepository->pushCriteria(new OrderByCriteria('name', 'asc'));
+
         if ($request->has('filters'))
             $this->clientRepository->pushCriteria(new FiltersCriteria($request->get('filters')));
 
         $clients = $request->has('unpaginated') ?
             $this->clientRepository->all() :
-            $this->clientRepository->paginate(20);
+            $this->clientRepository->paginate(10);
 
         $clients->load(['user']);
 
@@ -79,6 +82,7 @@ class ClientAPIController extends Controller
     public function destroy(DeleteClientAPIRequest $request, int $id)
     {
         $this->clientRepository->delete($id);
+        $this->userRepository->delete($id);
 
         return $this->makeResponse('Client deleted Successfully', [$id]);
     }

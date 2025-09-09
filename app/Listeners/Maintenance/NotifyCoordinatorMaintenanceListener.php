@@ -3,15 +3,15 @@
 namespace App\Listeners\Maintenance;
 
 use App\Events\Maintenance\MaintenanceCreated;
-use App\Jobs\Maintenance\AssignTechnicianJob;
+use App\Jobs\Maintenance\SendCoordinatorMaintenance;
 
-class AssignTechnicianToMaintenance
+class NotifyCoordinatorMaintenanceListener
 {
 
     public function handle(MaintenanceCreated $event): void
     {
         $maintenance = $event->maintenance;
 
-        AssignTechnicianJob::dispatch($maintenance->id)->onQueue('default');
+        SendCoordinatorMaintenance::dispatch($maintenance->id)->onQueue('default');
     }
 }

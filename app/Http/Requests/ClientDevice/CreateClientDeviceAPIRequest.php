@@ -15,7 +15,7 @@ class CreateClientDeviceAPIRequest extends APIRequest
 
     public function authorize(): bool
     {
-        return true;
+        return session()->has('client');
     }
     public function rules(): array
     {

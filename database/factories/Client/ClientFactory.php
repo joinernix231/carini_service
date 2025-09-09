@@ -18,6 +18,8 @@ class ClientFactory extends Factory
         return [
             'identifier' => $this->faker->unique()->numerify('########-#'),
             'name' => $this->faker->name,
+            'client_type' => $this->faker->randomElement(['Natural','Jurídico']),
+            'document_type' => $this->faker->randomElement(['CC', 'CE', 'CI', 'PASS', 'NIT']),
             'address' => $this->faker->address,
             'city' => $this->faker->city,
             'phone' => $this->faker->phoneNumber,

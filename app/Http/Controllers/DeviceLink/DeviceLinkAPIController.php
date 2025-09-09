@@ -10,7 +10,6 @@ use App\Http\Requests\ClientDevice\ShowClientDeviceAPIRequest;
 use App\Http\Requests\ClientDevice\UpdateClientDeviceAPIRequest;
 use App\Http\Resources\ClientDevice\ClientDeviceResource;
 use App\Models\ClientDevice\ClientDevice;
-use App\Repositories\Device\DeviceRepository;
 use App\Repositories\LinkDevice\LinkDeviceRepository;
 use App\Utils\Criterias\BasicCriteria\OrderByCriteria;
 use App\Utils\Criterias\BasicCriteria\WhereFieldCriteria;
@@ -19,7 +18,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class DeviceLinkAPIController extends Controller
 {
 
-    public function __construct(private readonly LinkDeviceRepository $linkDeviceRepository, private readonly DeviceRepository $deviceRepository)
+    public function __construct(private readonly LinkDeviceRepository $linkDeviceRepository)
     {}
 
     public function index(ReadClientDeviceAPIRequest $request): JsonResponse

@@ -2,17 +2,21 @@
 
 namespace App\Jobs\Maintenance;
 
+use App\Mail\TSTMAIL;
 use App\Models\Maintenance\Maintenance;
 use App\Models\Technician\Technician;
+use App\Notifications\Maintenance\MaintenanceNotification;
 use App\Repositories\Maintenance\MaintenanceRepository;
 use App\Repositories\Technician\TechnicianRepository;
+use App\Repositories\User\UserRepository;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Notification;
 
-class AssignTechnicianJob implements ShouldQueue
+class SendCoordinatorMaintenance implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -23,21 +27,25 @@ class AssignTechnicianJob implements ShouldQueue
         $this->maintenanceId = $maintenanceId;
     }
 
-    public function handle(TechnicianRepository $technicianRepository, MaintenanceRepository $maintenanceRepository): void
+    public function handle(UserRepository $userRepository, MaintenanceRepository $maintenanceRepository): void
     {
         $maintenance = $maintenanceRepository->findWithoutFail($this->maintenanceId);
+        $maintenance->load('clientDevice.client', 'clientDevice.device');
 
-        $available = $technicianRepository->getAvailableTechnicianForShift($maintenance->date_maintenance);
+        $coordinators = $userRepository->findWhere([
+            'role' => 'coordinador',
+        ]);
 
-        if (!$available) {
-            logger()->warning("No hay técnicos disponibles para el mantenimiento {$maintenance->id}");
-            return;
+        foreach ($coordinators as $coordinator)
+        {
+            if ($maintenance) {
+                Notification::send($coordinator, new MaintenanceNotification($maintenance));
+            }
         }
 
-        $technician = $available['technician'];
-        $shift = $available['shift'];
 
-        $maintenanceRepository->assignTechnician($maintenance, $technician, $shift);
+
+
     }
 }
 

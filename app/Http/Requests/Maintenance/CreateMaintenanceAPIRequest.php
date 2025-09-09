@@ -11,8 +11,6 @@ use Illuminate\Validation\Rule;
 
 class CreateMaintenanceAPIRequest extends APIRequest
 {
-    public function __construct(private readonly TechnicianRepository $technicianRepository)
-    {}
 
     public function authorize(): bool
     {
@@ -24,15 +22,7 @@ class CreateMaintenanceAPIRequest extends APIRequest
 
         $rules = Maintenance::$rules;
 
-
-        $rules['maintenance_type_id'] = ['nullable'];
-
         $rules['client_device_id'] = ['integer', $this->existsRule('client_device'), new UniquePendingMaintenance()];
-
-        $rules['date_maintenance'] = [
-            Rule::requiredIf(fn() => $this->input('type') === 'preventive'),
-            'nullable', 'date', new ValidateDateOfTechnician($this->technicianRepository),
-        ];
 
         return $rules;
     }

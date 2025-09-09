@@ -38,6 +38,7 @@ class ClientDevice extends Model
         'client_id'  => 'integer|exists:clients,id',
         'device_id'  => 'integer|exists:devices,id',
         'serial'     => 'required|string|max:100|unique:client_device,serial',
+        'address'     => 'required|string|regex:/^[a-zA-Z0-9\s\-\.,#]+$/',
         'linked_by'  => 'nullable|exists:users,id',
         'linked_at'  => 'nullable|date',
         'notes'      => 'nullable|string',
