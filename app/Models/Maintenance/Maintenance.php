@@ -53,12 +53,6 @@ class Maintenance extends Model
         return $this->belongsTo(ClientDevice::class);
     }
 
-
-    public function maintenanceType(): BelongsTo
-    {
-        return $this->belongsTo(MaintenanceType::class);
-    }
-
     public function technician(): BelongsTo
     {
         return $this->belongsTo(Technician::class)->with('user');
