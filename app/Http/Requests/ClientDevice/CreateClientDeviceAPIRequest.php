@@ -23,6 +23,9 @@ class CreateClientDeviceAPIRequest extends APIRequest
 
         $rules = ClientDevice::$rules;
 
+        
+        $rules['device_id'] = ['required', 'integer'];
+        
         return $rules;
     }
 }
