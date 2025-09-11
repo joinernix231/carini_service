@@ -10,7 +10,7 @@ use App\Http\Requests\Client\ShowClientAPIRequest;
 use App\Http\Requests\Client\UpdateClientAPIRequest;
 use App\Http\Resources\Client\ClientResource;
 use App\Models\Client\Client;
-use App\Repositories\Client\ClientRepository;
+use App\Repositories\Client\CoordinatorRepository;
 use App\Repositories\User\UserRepository;
 use App\Utils\Criterias\BasicCriteria\FiltersCriteria;
 use App\Utils\Criterias\BasicCriteria\OrderByCriteria;
@@ -19,7 +19,7 @@ use Illuminate\Support\Arr;
 
 class ClientAPIController extends Controller
 {
-    public function __construct(private readonly ClientRepository $clientRepository, private readonly UserRepository $userRepository)
+    public function __construct(private readonly CoordinatorRepository $clientRepository, private readonly UserRepository $userRepository)
     {}
 
     public function index(ReadClientAPIRequest $request): JsonResponse
