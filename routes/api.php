@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthAPIController;
 use App\Http\Controllers\Client\ClientAPIController;
-use App\Http\Controllers\Coordinator\CoordinatorController;
+use App\Http\Controllers\Coordinator\CoordinatorAPIController;
 use App\Http\Controllers\Device\DeviceAPIController;
 use App\Http\Controllers\DeviceLink\DeviceLinkAPIController;
 use App\Http\Controllers\Maintenance\MaintenanceAPIController;
@@ -28,7 +28,7 @@ Route::post('loadImage', ResourceAPIController::class . '@loadImage');
 Route::post('loadDoc', ResourceAPIController::class . '@loadDoc');
 // Technician
 Route::get('/availableDates', AvailableTechnicianController::class);
-Route::post('/coordinators', CoordinatorController::class . '@store');
+Route::get('/coordinators', CoordinatorAPIController::class . '@store');
 
 });
 
