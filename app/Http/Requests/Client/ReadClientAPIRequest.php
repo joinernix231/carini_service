@@ -9,7 +9,9 @@ class ReadClientAPIRequest extends APIRequest
 
     public function authorize(): bool
     {
-        return true;
+        $admin = session('user');
+
+        return $admin && $admin->role === 'administrador';
     }
 
 

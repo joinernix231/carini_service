@@ -17,8 +17,6 @@ class UpdateClientAPIRequest extends APIRequest
     {
         $clientId = $this->route('client');
 
-        dd($clientId);
-
         $rules = Client::$rules;
         $rules['identifier'] = ['sometimes', 'string', $this->uniqueRule('clients', 'identifier', $clientId)];
         $rules['name'] = ['sometimes', 'string', 'max:255'];
