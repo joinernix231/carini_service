@@ -20,11 +20,7 @@ class UpdateTechnicianAPIRequest extends APIRequest
         $technical = $this->route('technical');
 
         $rules = Technician::$rules;
-        $rules['document'] = [
-            'sometimes',
-            'string',
-            $this->uniqueRule('technicians', 'document', $technical)
-        ];
+        $rules['document'] = ['sometimes', 'string', $this->uniqueRule('technicians', 'document', $technical)];
 
         $rules['name'] = ['sometimes', 'string', 'max:255'];
         $rules['email'] = ['sometimes', 'email', 'max:255', $this->uniqueRule('users', 'email', $technical->user_id)];
