@@ -17,7 +17,6 @@ class TechnicianResource extends JsonResource
             'document' => $this->resource->document,
             'phone' => $this->resource->phone,
             'address' => $this->resource->address,
-            'status' => $this->resource->status,
         ];
     }
 }

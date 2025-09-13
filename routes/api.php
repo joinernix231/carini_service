@@ -8,6 +8,7 @@ use App\Http\Controllers\Maintenance\MaintenanceAPIController;
 use App\Http\Controllers\Maintenance\MaintenanceTypeAPIController;
 use App\Http\Controllers\Other\ResourceAPIController;
 use App\Http\Controllers\Technician\AvailableTechnicianController;
+use App\Http\Controllers\Technician\TechnicianAPIController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([], function () {
@@ -22,13 +23,12 @@ Route::apiResource('/linkDevices', DeviceLinkAPIController::class);
 Route::apiResource('/devices', DeviceAPIController::class);
 // Maintenance
 Route::apiResource('/maintenances', MaintenanceAPIController::class);
-Route::apiResource('/maintenanceTypes', MaintenanceTypeAPIController::class);
 // Other
 Route::post('loadImage', ResourceAPIController::class . '@loadImage');
 Route::post('loadDoc', ResourceAPIController::class . '@loadDoc');
 // Technician
 Route::get('/availableDates', AvailableTechnicianController::class);
-
+Route::apiResource('/technical', TechnicianAPIController::class);
 });
 
 

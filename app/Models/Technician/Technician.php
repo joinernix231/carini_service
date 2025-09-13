@@ -11,16 +11,21 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Technician extends Model
 {
-    use SoftDeletes;
 
     protected $table = 'technicians';
 
     protected $fillable = [
-        'user_id ',
-        'document ',
+        'user_id',
+        'document',
         'phone',
         'address',
         'status',
+    ];
+
+    public static array $rules = [
+        'document' => 'string|max:20',
+        'phone' => 'nullable|string|max:20',
+        'address' => 'nullable|string|max:255',
     ];
 
     public function user() : BelongsTo

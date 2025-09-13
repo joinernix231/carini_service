@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Client;
+namespace App\Http\Requests\Technician;
 
 use App\Http\Requests\APIRequest;
 
-class ReadClientAPIRequest extends APIRequest
+class ShowTechnicianAPIRequest extends APIRequest
 {
 
     public function authorize(): bool
@@ -15,10 +15,4 @@ class ReadClientAPIRequest extends APIRequest
     }
 
 
-    public function rules(): array
-    {
-        return [
-            //
-        ];
-    }
 }
