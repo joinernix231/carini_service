@@ -10,7 +10,9 @@ use Illuminate\Support\Carbon;
 
 class TechnicianRepository extends BaseRepository
 {
-    protected $fieldSearchable = [];
+    protected $fieldSearchable = [
+        'name'
+    ];
 
     public function getFieldsSearchable(): array
     {
