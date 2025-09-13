@@ -2,13 +2,21 @@
 
 namespace App\Models\Coordinator;
 
+use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Coordinator extends Model
+
+
 {
+    use HasFactory, SoftDeletes;
+
     protected $table = 'coordinators';
 
     protected $fillable = [
+        'user_id',
         'identification',
         'address',
         'phone',
@@ -19,6 +27,9 @@ class Coordinator extends Model
         'identification' => 'integer|unique:coordinators,identification',
         'address' => 'required|string',
         'phone' => 'required|integer',
-        'status' => 'required|boolean',
     ];
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

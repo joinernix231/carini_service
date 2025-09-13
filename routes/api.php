@@ -28,7 +28,13 @@ Route::post('loadImage', ResourceAPIController::class . '@loadImage');
 Route::post('loadDoc', ResourceAPIController::class . '@loadDoc');
 // Technician
 Route::get('/availableDates', AvailableTechnicianController::class);
-Route::get('/coordinators', CoordinatorAPIController::class . '@store');
+//Coordinators
+Route::post('/coordinators', CoordinatorAPIController::class . '@store');
+Route::get('/coordinators', CoordinatorAPIController::class . '@index');
+Route::put('/coordinators/{coordinator}', CoordinatorAPIController::class . '@update');
+Route::get('/coordinators/{coordinator}', CoordinatorAPIController::class . '@show');
+Route::delete('/coordinators/{coordinator}', CoordinatorAPIController::class . '@destroy');
+
 
 });
 

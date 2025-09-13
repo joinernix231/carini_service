@@ -2,11 +2,9 @@
 
 namespace App\Http\Requests\Coordinator;
 
-use App\Http\Requests\APIRequest;
-use App\Models\Coordinator\Coordinator;
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateCoordinatorAPIRequest extends APIRequest
+class ShowCoordinatorAPIRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,12 +21,8 @@ class CreateCoordinatorAPIRequest extends APIRequest
      */
     public function rules(): array
     {
-
-        $rules = Coordinator::$rules;
-
-        $rules['name'] = ['bail', 'required', 'string', 'max:255'];
-        $rules['email'] = ['bail', 'required', 'string', 'email', 'max:255', $this->uniqueRule('users', 'email')];
-
-       return $rules;
+        return [
+            //
+        ];
     }
 }
