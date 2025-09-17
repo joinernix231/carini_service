@@ -4,13 +4,17 @@ namespace App\Models\Technician;
 
 use App\Models\Maintenance\Maintenance;
 use App\Models\User;
+use Database\Factories\TechnicalFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Technician extends Model
 {
+
+    /** @use HasFactory<TechnicalFactory> */
+    use HasFactory;
 
     protected $table = 'technicians';
 
@@ -36,6 +40,11 @@ class Technician extends Model
     public function maintenances() : hasMany
     {
         return $this->hasMany(Maintenance::class);
+    }
+
+    protected static function newFactory(): TechnicalFactory
+    {
+        return TechnicalFactory::new();
     }
 }
 
