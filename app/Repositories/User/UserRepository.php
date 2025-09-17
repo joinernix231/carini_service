@@ -41,6 +41,8 @@ class UserRepository extends BaseRepository
         $userData['role'] = 'coordinador';
 
         $userData['password'] = bcrypt($userData['identification']);
+
+        return parent::create($userData);
     }
     public function createTechnician(array $attributes)
     {

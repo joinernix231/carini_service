@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Client\Client;
 use App\Models\Technician\Technician;
 use Illuminate\Database\Seeder;
 

@@ -27,6 +27,7 @@ class CreateCoordinatorAPIRequest extends APIRequest
         $rules = Coordinator::$rules;
 
         $rules['name'] = ['bail', 'required', 'string', 'max:255'];
+        $rules['identification'] = ['bail', 'required', 'string', 'max:255'];
         $rules['email'] = ['bail', 'required', 'string', 'email', 'max:255', $this->uniqueRule('users', 'email')];
 
        return $rules;

@@ -3,15 +3,18 @@
 namespace App\Models\Coordinator;
 
 use App\Models\User;
+use Database\Factories\CoordinatorFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Coordinator extends Model
 
-
 {
-    use HasFactory, SoftDeletes;
+    use SoftDeletes;
+    /** @use HasFactory<CoordinatorFactory> */
+    use HasFactory;
 
     protected $table = 'coordinators';
 
@@ -28,8 +31,13 @@ class Coordinator extends Model
         'address' => 'required|string',
         'phone' => 'required|integer',
     ];
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    protected static function newFactory(): CoordinatorFactory
+    {
+        return CoordinatorFactory::new();
     }
 }

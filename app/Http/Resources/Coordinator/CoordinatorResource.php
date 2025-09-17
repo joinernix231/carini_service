@@ -2,11 +2,10 @@
 
 namespace App\Http\Resources\Coordinator;
 
+use App\Http\Resources\BaseJsonResource;
 use App\Http\Resources\User\UserResource;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-
-class CoordinatorResource extends JsonResource
+class CoordinatorResource extends BaseJsonResource
 {
     /**
      * Transform the resource into an array.
@@ -20,6 +19,7 @@ class CoordinatorResource extends JsonResource
             'identification' => $this->resource->identification,
             'address' => $this->resource->address,
             'phone' => $this->resource->phone,
+            'status' => $this->resource->status,
             'user_id' => $this->resource->user_id,
             'user' => new UserResource($this->whenLoaded('user')),
             'created_at' => $this->resource->created_at?->toDateTimeString(),
