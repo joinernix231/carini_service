@@ -32,7 +32,7 @@ class TechnicianAPIController extends Controller
 
         $technician = $request->has('unpaginated') ?
             $this->technicianRepository->all() :
-            $this->technicianRepository->paginate(20);
+            $this->technicianRepository->paginate(10);
 
         $technician->load('user');
 
