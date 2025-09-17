@@ -15,7 +15,8 @@ class DatabaseSeeder extends Seeder
             ClientSeeder::class,
             DeviceSeeder::class,
             ContactSeeder::class,
-            TechnicalSeeder::class
+            TechnicalSeeder::class,
+            CoordinatorSeeder::class,
         ]);
     }
 }

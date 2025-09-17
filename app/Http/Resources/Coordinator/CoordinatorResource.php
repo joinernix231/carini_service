@@ -2,11 +2,10 @@
 
 namespace App\Http\Resources\Coordinator;
 
+use App\Http\Resources\BaseJsonResource;
 use App\Http\Resources\User\UserResource;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-
-class CoordinatorResource extends JsonResource
+class CoordinatorResource extends BaseJsonResource
 {
     /**
      * Transform the resource into an array.
