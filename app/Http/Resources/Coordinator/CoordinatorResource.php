@@ -19,6 +19,7 @@ class CoordinatorResource extends BaseJsonResource
             'identification' => $this->resource->identification,
             'address' => $this->resource->address,
             'phone' => $this->resource->phone,
+            'status' => $this->resource->status,
             'user_id' => $this->resource->user_id,
             'user' => new UserResource($this->whenLoaded('user')),
             'created_at' => $this->resource->created_at?->toDateTimeString(),
