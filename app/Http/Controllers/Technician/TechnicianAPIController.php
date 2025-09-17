@@ -78,6 +78,7 @@ class TechnicianAPIController extends Controller
     public function destroy(Technician $technical, DeleteTechnicianAPIRequest $request): JsonResponse
     {
         $this->technicianRepository->delete($technical->id);
+        $this->userRepository->delete($technical->user_id);
 
         return $this->makeResponse('Technician Deleted Successfully',[$technical->id]);
     }
