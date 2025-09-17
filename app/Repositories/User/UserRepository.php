@@ -34,6 +34,14 @@ class UserRepository extends BaseRepository
         return parent::create($userData);
     }
 
+    public function createCoordinator(array $attributes)
+    {
+        $userData = Arr::only($attributes, ['name', 'email', 'address', 'identification']);
+
+        $userData['role'] = 'coordinador';
+
+        $userData['password'] = bcrypt($userData['identification']);
+    }
     public function createTechnician(array $attributes)
     {
         $userData = Arr::only($attributes, ['email', 'document', 'name']);

@@ -2,10 +2,10 @@
 
 use App\Http\Controllers\Auth\AuthAPIController;
 use App\Http\Controllers\Client\ClientAPIController;
+use App\Http\Controllers\Coordinator\CoordinatorAPIController;
 use App\Http\Controllers\Device\DeviceAPIController;
 use App\Http\Controllers\DeviceLink\DeviceLinkAPIController;
 use App\Http\Controllers\Maintenance\MaintenanceAPIController;
-use App\Http\Controllers\Maintenance\MaintenanceTypeAPIController;
 use App\Http\Controllers\Other\ResourceAPIController;
 use App\Http\Controllers\Technician\AvailableTechnicianController;
 use App\Http\Controllers\Technician\TechnicianAPIController;
@@ -28,6 +28,12 @@ Route::post('loadImage', ResourceAPIController::class . '@loadImage');
 Route::post('loadDoc', ResourceAPIController::class . '@loadDoc');
 // Technician
 Route::get('/availableDates', AvailableTechnicianController::class);
+//Coordinators
+Route::post('/coordinators', CoordinatorAPIController::class . '@store');
+Route::get('/coordinators', CoordinatorAPIController::class . '@index');
+Route::put('/coordinators/{coordinator}', CoordinatorAPIController::class . '@update');
+Route::get('/coordinators/{coordinator}', CoordinatorAPIController::class . '@show');
+Route::delete('/coordinators/{coordinator}', CoordinatorAPIController::class . '@destroy');
 Route::apiResource('/technical', TechnicianAPIController::class);
 });
 
