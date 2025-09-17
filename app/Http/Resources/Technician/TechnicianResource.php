@@ -17,7 +17,10 @@ class TechnicianResource extends BaseJsonResource
             'user' => new UserResource($this->whenLoaded('user')),
             'document' => $this->resource->document,
             'phone' => $this->resource->phone,
+            'status' => $this->resource->status,
             'address' => $this->resource->address,
+            'created_at' => $this->resource->created_at,
+            'updated_at' => $this->resource->updated_at,
         ];
     }
 }
