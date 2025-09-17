@@ -14,7 +14,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ClientSeeder::class,
             DeviceSeeder::class,
-            ContactSeeder::class
+            ContactSeeder::class,
+            TechnicalSeeder::class
         ]);
     }
 }

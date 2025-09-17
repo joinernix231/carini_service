@@ -4,9 +4,9 @@ namespace App\Http\Resources\Technician;
 
 use App\Http\Resources\User\UserResource;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\BaseJsonResource;
 
-class TechnicianResource extends JsonResource
+class TechnicianResource extends BaseJsonResource
 {
     public function toArray(Request $request): array
     {
@@ -16,8 +16,10 @@ class TechnicianResource extends JsonResource
             'user' => new UserResource($this->whenLoaded('user')),
             'document' => $this->resource->document,
             'phone' => $this->resource->phone,
-            'address' => $this->resource->address,
             'status' => $this->resource->status,
+            'address' => $this->resource->address,
+            'created_at' => $this->resource->created_at,
+            'updated_at' => $this->resource->updated_at,
         ];
     }
 }
