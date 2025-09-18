@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthAPIController;
 use App\Http\Controllers\Client\ClientAPIController;
+use App\Http\Controllers\Client\InactiveClientAPIController;
 use App\Http\Controllers\Coordinator\CoordinatorAPIController;
 use App\Http\Controllers\Coordinator\InactiveCoordinatorAPIController;
 use App\Http\Controllers\Device\DeviceAPIController;
@@ -19,6 +20,7 @@ Route::post('/acceptPolicy', AuthAPIController::class . '@acceptPolicy');
 Route::get('/me', AuthAPIController::class . '@me');
 // Clients
 Route::apiResource('/clients', ClientAPIController::class);
+    Route::put('/clients/{client}/status', InactiveClientAPIController::class);
 // LinkDevices
 Route::apiResource('/linkDevices', DeviceLinkAPIController::class);
 // Devices
