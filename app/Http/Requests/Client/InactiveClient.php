@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Http\Requests\Client;
+
+use App\Http\Requests\APIRequest;
+use App\Models\Technician\Technician;
+
+class InactiveClient extends APIRequest
+{
+
+    public function authorize(): bool
+    {
+        $admin = session('user');
+
+        return $admin && $admin->role === 'administrador';
+    }
+
+    public function rules(): array
+    {
+        return [
+            'status' => ['required', 'in:active,inactive'],
+        ];
+    }
+}

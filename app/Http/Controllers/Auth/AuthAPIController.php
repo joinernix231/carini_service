@@ -25,6 +25,14 @@ class AuthAPIController extends Controller
 
         $user = JWTAuth::user();
 
+        if (
+            ($user->technician && $user->technician->status === 'inactive') ||
+            ($user->coordinator && $user->coordinator->status === 'inactive') ||
+            ($user->client && $user->client->status === 'inactive')
+        ) {
+            return ResponseUtil::makeError('Tu cuenta está inactiva, contacta con el administrador.', 403);
+        }
+
         $data = [
             'token' => $token,
             'user' => [
@@ -37,6 +45,7 @@ class AuthAPIController extends Controller
 
         return ResponseUtil::makeResponse('Login exitoso.', $data);
     }
+
 
     public function me(): JsonResponse
     {

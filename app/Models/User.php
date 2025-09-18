@@ -15,6 +15,7 @@ namespace App\Models;
  */
 
 use App\Models\Client\Client;
+use App\Models\Coordinator\Coordinator;
 use App\Models\Technician\Technician;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -83,6 +84,11 @@ class User extends Authenticatable implements JWTSubject
     public function technician(): HasOne
     {
         return $this->hasOne(Technician::class);
+    }
+
+    public function coordinator(): HasOne
+    {
+        return $this->hasOne(Coordinator::class);
     }
 
 
