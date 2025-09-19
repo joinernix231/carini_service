@@ -21,6 +21,7 @@ class ClientResource extends BaseJsonResource
             'phone' => $this->resource->phone,
             'client_type' => $this->resource->client_type,
             'document_type' => $this->resource->document_type,
+            'status' => $this->resource->status,
             'user_id' => $this->resource->user_id,
             'user' => new UserResource($this->whenLoaded('user')),
             'contacts' => ContactResource::collection($this->whenLoaded('contacts')),

@@ -11,7 +11,7 @@ class CreateDeviceAPIRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
