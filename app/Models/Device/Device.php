@@ -26,6 +26,7 @@ class Device extends Model
         'description',
         'type',
         'photo',
+        'pdf'
     ];
 
     public static array $rules = [
@@ -35,6 +36,7 @@ class Device extends Model
         'description' => 'nullable|string',
         'type' => 'nullable|string|max:50',
         'photo' => 'nullable|string',
+        'pdf' => 'nullable|string',
     ];
 
     public function clientDevices(): HasMany
