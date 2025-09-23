@@ -57,7 +57,7 @@ class Device extends Model
     public function getPdfUrlAttribute(): ?string
     {
         if ($value = Arr::get($this->attributes, 'pdf_url'))
-            return config('filesystems.disks.s3.url') . 'docs/pdfs' . $value;
+            return config('filesystems.disks.s3.url') . 'docs/pdfs/' . $value;
         return null;
     }
 }
