@@ -2,27 +2,32 @@
 
 namespace App\Http\Requests\Device;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\APIRequest;
+use App\Models\Device\Device;
 
-class UpdateDeviceAPIRequest extends FormRequest
+class UpdateDeviceAPIRequest extends APIRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        $admin = session('user');
+
+        return $admin && $admin->role === 'administrador';
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
-        return [
-            //
-        ];
+        $device = $this->route('device'); // el objeto device que llega por la ruta
+
+        $rules = Device::$rules;
+
+        $rules['serial'] = ['sometimes', 'string', 'max:100', $this->uniqueRule('devices', 'serial', $device)];
+        $rules['model'] = ['sometimes', 'string', 'max:100'];
+        $rules['brand'] = ['sometimes', 'string', 'max:100'];
+        $rules['description'] = ['sometimes', 'string'];
+        $rules['type'] = ['sometimes', 'string', 'max:50'];
+        $rules['photo'] = ['sometimes', 'string'];
+        $rules['pdf_url'] = ['sometimes', 'string'];
+
+        return $rules;
     }
 }

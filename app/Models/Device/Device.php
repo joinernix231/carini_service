@@ -20,23 +20,21 @@ class Device extends Model
     protected $table = 'devices';
 
     protected $fillable = [
-        'serial',
         'model',
         'brand',
         'description',
         'type',
         'photo',
-        'pdf'
+        'pdf_url'
     ];
 
     public static array $rules = [
-        'serial' => 'required|string|max:100|unique:devices,serial_number',
         'model' => 'nullable|string|max:100',
         'brand' => 'nullable|string|max:100',
         'description' => 'nullable|string',
         'type' => 'nullable|string|max:50',
         'photo' => 'nullable|string',
-        'pdf' => 'nullable|string',
+        'pdf_url' => 'nullable|string',
     ];
 
     public function clientDevices(): HasMany

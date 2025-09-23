@@ -2,27 +2,27 @@
 
 namespace App\Http\Requests\Device;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\APIRequest;
+use App\Models\Device\Device;
 
-class CreateDeviceAPIRequest extends FormRequest
+class CreateDeviceAPIRequest extends APIRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return true;
+        $admin = session('user');
+
+        return $admin && $admin->role === 'administrador';
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
-        return [
-            //
-        ];
+        $rules = Device::$rules;
+
+        $rules['model'] = ['required', 'string'];
+        $rules['type'] = ['required', 'string'];
+        $rules['photo'] = ['required', 'string'];
+        $rules['pdf_url'] = ['required', 'string'];
+
+        return $rules;
     }
 }
