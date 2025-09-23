@@ -26,7 +26,7 @@ class UpdateDeviceAPIRequest extends APIRequest
         $rules['description'] = ['sometimes', 'string'];
         $rules['type'] = ['sometimes', 'string', 'max:50'];
         $rules['photo'] = ['sometimes', 'string'];
-        $rules['pdf_url'] = ['sometimes', 'string'];
+        $rules['pdf_url'] = ['sometimes', 'nullable', 'string'];
 
         return $rules;
     }
