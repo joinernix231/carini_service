@@ -22,7 +22,7 @@ class DeviceAPIController extends Controller
     {
         $devices = $request->has('unpaginated') ?
             $this->deviceRepository->all() :
-            $this->deviceRepository->paginate(20);
+            $this->deviceRepository->paginate(8);
 
         return $this->makeResponseResource('Devices retrieved Successfully', DeviceResource::collection($devices));
 
