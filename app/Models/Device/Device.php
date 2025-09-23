@@ -50,14 +50,14 @@ class Device extends Model
     public function getPhotoAttribute(): ?string
     {
         if ($photo = Arr::get($this->attributes, 'photo'))
-            return config('filesystems.disks.s3.url') . 'images/devices/' . $photo . '.png';
+            return config('filesystems.disks.s3.url') . 'images/devices/' . $photo . '.PNG';
         return null;
     }
 
     public function getPdfUrlAttribute(): ?string
     {
         if ($value = Arr::get($this->attributes, 'pdf_url'))
-            return config('filesystems.disks.s3.url') . 'docs/' . $value . '.pdf';
+            return config('filesystems.disks.s3.url') . 'docs/pdfs' . $value . '.pdf';
         return null;
     }
 }
