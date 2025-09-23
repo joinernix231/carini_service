@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Device;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Device\CreateDeviceAPIRequest;
+use App\Http\Requests\Device\DeleteDeviceAPIRequest;
 use App\Http\Requests\Device\ReadDeviceAPIRequest;
 use App\Http\Requests\Device\ShowDeviceAPIRequest;
 use App\Http\Requests\Device\UpdateDeviceAPIRequest;
@@ -39,7 +40,7 @@ class DeviceAPIController extends Controller
 
     public function show(Device $device, ShowDeviceAPIRequest $request): JsonResponse
     {
-        return $this->makeResponseResource('Devices retrieved Successfully', new DeviceResource($device));
+        return $this->makeResponseResource('Device retrieved Successfully', new DeviceResource($device));
     }
     public function update(Device $device,UpdateDeviceAPIRequest $request): JsonResponse
     {
@@ -48,5 +49,12 @@ class DeviceAPIController extends Controller
         $client = $this->deviceRepository->update($input, $device->id);
 
         return $this->makeResponseResource('Devices updated Successfully', new DeviceResource($client));
+    }
+
+    public function destroy(Device $device,DeleteDeviceAPIRequest $request): JsonResponse
+    {
+        $this->deviceRepository->delete($device->id);
+
+        return $this->makeResponse('Device Deleted Successfully',[]);
     }
 }
