@@ -49,7 +49,7 @@ class MaintenanceRepository extends BaseRepository
         $maintenance->status = 'assigned';
         $maintenance->technician_id = $input['technician_id'];
         $maintenance->date_maintenance = $input['date_maintenance'];
-        $maintenance->value = $input['value'];
+        $maintenance->value = $input['value'] ?? null;;
         $maintenance->spare_parts = $input['spare_parts'];
         $maintenance->shift = $input['shift'];
         $maintenance->save();
