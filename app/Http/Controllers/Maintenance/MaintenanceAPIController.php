@@ -25,13 +25,13 @@ class MaintenanceAPIController extends Controller
 
         $this->maintenanceRepository->pushCriteria(new ClientMaintenancesCriteria($clientId));
 
-        $clientDevice = $request->has('unpaginated') ?
+        $maintenances = $request->has('unpaginated') ?
             $this->maintenanceRepository->all($clientId) :
             $this->maintenanceRepository->paginate(20);
-        $clientDevice->load(['clientDevice']);
+        $maintenances->load(['clientDevice']);
 
 
-        return $this->makeResponseResource('Maintenances retrieved Successfully', MaintenanceResource::collection($clientDevice));
+        return $this->makeResponseResource('Maintenances retrieved Successfully', MaintenanceResource::collection($maintenances));
 
     }
 
