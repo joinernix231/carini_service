@@ -83,7 +83,7 @@ class TechnicianRepository extends BaseRepository
     public function getAvailableTechnicians(?string $date = null, ?string $shift = null)
     {
         // Obtener todos los técnicos activos con rol 'tecnico'
-        $query = $this->model()
+        $query = $this->model
             ->where('status', 'active')
             ->whereHas('user', function ($q) {
                 $q->where('role', 'tecnico');

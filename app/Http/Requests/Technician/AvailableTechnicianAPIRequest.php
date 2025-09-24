@@ -17,8 +17,8 @@ class AvailableTechnicianAPIRequest extends APIRequest
     public function rules(): array
     {
         return [
-            'date' => ['nullable', 'date_format:Y-m-d'],
-            'shift' => ['nullable', 'string', 'in:AM,PM'],
+            'date' => ['required', 'date_format:Y-m-d'],
+            'shift' => ['required', 'string', 'in:AM,PM'],
         ];
     }
 }
