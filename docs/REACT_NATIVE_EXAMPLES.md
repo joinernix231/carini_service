@@ -52,8 +52,15 @@ class MaintenanceService {
   }
 
   // Obtener técnicos disponibles
-  async getAvailableTechnicians(date, shift) {
-    return this.makeRequest(`/availableDates?date=${date}&shift=${shift}`);
+  async getAvailableTechnicians(date = null, shift = null) {
+    const params = new URLSearchParams();
+    if (date) params.append('date', date);
+    if (shift) params.append('shift', shift);
+    
+    const queryString = params.toString();
+    const url = queryString ? `/availableTechnicians?${queryString}` : '/availableTechnicians';
+    
+    return this.makeRequest(url);
   }
 }
 
