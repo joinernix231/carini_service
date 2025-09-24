@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Technician;
 
-use App\Models\Maintenance\MaintenanceType;
+use App\Models\Maintenance\Maintenance;
 use App\Models\Technician\Technician;
 use App\Repositories\BaseRepository;
 use Illuminate\Support\Carbon;
@@ -71,6 +71,44 @@ class TechnicianRepository extends BaseRepository
         }
 
         return $availableDates;
+    }
+
+    /**
+     * Obtener técnicos disponibles para una fecha y turno específicos
+     *
+     * @param string|null $date Fecha en formato Y-m-d
+     * @param string|null $shift Turno (AM o PM)
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getAvailableTechnicians(?string $date = null, ?string $shift = null)
+    {
+        // Obtener todos los técnicos activos con rol 'tecnico'
+        $query = $this->model
+            ->where('status', 'active')
+            ->whereHas('user', function ($q) {
+                $q->where('role', 'tecnico');
+            })
+            ->with('user');
+
+        // Si no se proporcionan fecha y turno, retornar todos los técnicos
+        if (!$date || !$shift) {
+            return $query->get();
+        }
+
+        // Obtener IDs de técnicos que tienen mantenimientos asignados para la fecha y turno específicos
+        $busyTechnicianIds = Maintenance::where('date_maintenance', $date)
+            ->where('shift', $shift)
+            ->whereIn('status', ['assigned', 'in_progress'])
+            ->pluck('technician_id')
+            ->filter()
+            ->toArray();
+
+        // Excluir técnicos ocupados
+        if (!empty($busyTechnicianIds)) {
+            $query->whereNotIn('id', $busyTechnicianIds);
+        }
+
+        return $query->get();
     }
 
 }

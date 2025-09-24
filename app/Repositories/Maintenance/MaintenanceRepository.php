@@ -43,4 +43,18 @@ class MaintenanceRepository extends BaseRepository
         return $maintenance;
     }
 
+    public function assignMaintenance(Maintenance $maintenance, array $input): Maintenance
+    {
+
+        $maintenance->status = 'assigned';
+        $maintenance->technician_id = $input['technician_id'];
+        $maintenance->date_maintenance = $input['date_maintenance'];
+        $maintenance->value = $input['value'];
+        $maintenance->spare_parts = $input['spare_parts'];
+        $maintenance->shift = $input['shift'];
+        $maintenance->save();
+
+        return $maintenance;
+    }
+
 }

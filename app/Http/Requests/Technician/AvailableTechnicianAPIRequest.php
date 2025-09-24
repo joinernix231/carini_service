@@ -6,11 +6,19 @@ use App\Http\Requests\APIRequest;
 
 class AvailableTechnicianAPIRequest extends APIRequest
 {
-
     public function authorize(): bool
     {
-        return true;
+        $allowedRoles = ['coordinador', 'administrador'];
+        $user = session('user');
+
+        return $user && in_array($user->role, $allowedRoles);
     }
 
-
+    public function rules(): array
+    {
+        return [
+            'date' => ['required', 'date_format:Y-m-d'],
+            'shift' => ['required', 'string', 'in:AM,PM'],
+        ];
+    }
 }
