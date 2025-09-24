@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Maintenance;
 
+use App\Http\Resources\Client\ClientResource;
 use App\Http\Resources\Device\DeviceResource;
 use App\Http\Resources\Technician\TechnicianResource;
 use Illuminate\Http\Request;
@@ -20,8 +21,12 @@ class MaintenanceResource extends JsonResource
           'id' => $this->resource->id,
           'type' => $this->resource->type,
           'date_maintenance' => $this->resource->date_maintenance,
+          'shift' => $this->resource->shift,
           'status' => $this->resource->status,
+          'value' => $this->resource->value,
+          'spare_parts' => $this->resource->spare_parts,
           'device' => new DeviceResource(optional($this->whenLoaded('clientDevice'))->device),
+          'client' => new ClientResource($this->whenLoaded('client')),
           'technician' => new TechnicianResource($this->whenLoaded('technician')),
           'description' => $this->resource->description,
           'photo' => $this->resource->photo,

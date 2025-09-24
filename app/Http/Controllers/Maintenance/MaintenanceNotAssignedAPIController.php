@@ -23,8 +23,10 @@ class MaintenanceNotAssignedAPIController extends Controller
         $maintenances = $request->has('unpaginated') ?
             $this->maintenanceRepository->all() :
             $this->maintenanceRepository->paginate(20);
-        $maintenances->load(['clientDevice']);
-
+        $maintenances->load([
+            'client',
+            'clientDevice.device'
+        ]);
 
         return $this->makeResponseResource('Maintenances retrieved Successfully', MaintenanceResource::collection($maintenances));
 
