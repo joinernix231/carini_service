@@ -10,6 +10,7 @@ use App\Http\Controllers\DeviceLink\DeviceLinkAPIController;
 use App\Http\Controllers\Maintenance\MaintenanceAPIController;
 use App\Http\Controllers\Maintenance\MaintenanceNotAssignedAPIController;
 use App\Http\Controllers\Other\ResourceAPIController;
+use App\Http\Controllers\Technician\AvailableTechnicianAPIController;
 use App\Http\Controllers\Technician\AvailableTechnicianController;
 use App\Http\Controllers\Technician\InactiveTechnicianAPIController;
 use App\Http\Controllers\Technician\TechnicianAPIController;
@@ -35,6 +36,7 @@ Route::post('loadImage', ResourceAPIController::class . '@loadImage');
 Route::post('loadDoc', ResourceAPIController::class . '@loadDoc');
 // Technician
 Route::get('/availableDates', AvailableTechnicianController::class);
+Route::get('/availableTechnicians', AvailableTechnicianAPIController::class);
 Route::apiResource('/technical', TechnicianAPIController::class);
 Route::put('/technical/{technical}/status', InactiveTechnicianAPIController::class);
 //Coordinators

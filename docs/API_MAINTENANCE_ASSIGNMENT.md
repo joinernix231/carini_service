@@ -6,6 +6,48 @@ Esta documentación describe la implementación completa de la funcionalidad par
 
 ## Endpoints Implementados
 
+### Obtener Técnicos Disponibles
+```
+GET /api/availableTechnicians?date=2024-01-15&shift=AM
+```
+
+**Headers requeridos:**
+```
+Authorization: Bearer {jwt_token}
+```
+
+**Parámetros de consulta (opcionales):**
+- `date`: Fecha en formato YYYY-MM-DD (opcional)
+- `shift`: Turno AM o PM (opcional)
+
+**Comportamiento:**
+- Sin parámetros: Retorna todos los técnicos activos
+- Con fecha y turno: Retorna solo técnicos disponibles para esa fecha y turno específicos
+
+**Respuesta exitosa (200):**
+```json
+{
+    "success": true,
+    "message": "Available technicians retrieved successfully",
+    "data": [
+        {
+            "id": 27,
+            "user_id": 55,
+            "document": "1505848568",
+            "phone": "3002653698",
+            "address": "Prueba",
+            "status": "active",
+            "user": {
+                "id": 55,
+                "name": "Cristian vargas",
+                "email": "joinernix2@gmail.comj",
+                "role": "tecnico"
+            }
+        }
+    ]
+}
+```
+
 ### Asignar Mantenimiento
 ```
 PUT /api/assignMaintenance/{maintenance}
