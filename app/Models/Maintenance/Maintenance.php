@@ -75,7 +75,7 @@ class Maintenance extends Model
         'date_maintenance' => 'nullable|date',
         'photo' => 'nullable|string',
         'description' => 'nullable|string',
-        'status' => 'required|in:pending,assigned,in_progress,completed',
+        'status' => 'in:pending,assigned,in_progress,completed',
         'technician_id' => 'nullable|integer',
         'value' => 'nullable|string',
         'is_paid' => 'nullable|boolean',
