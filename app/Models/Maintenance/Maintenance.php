@@ -2,12 +2,14 @@
 
 namespace App\Models\Maintenance;
 
+use App\Models\Client\Client;
 use App\Models\ClientDevice\ClientDevice;
 use App\Models\Technician\Technician;
 use Database\Factories\MaintenanceFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 
@@ -122,6 +124,23 @@ class Maintenance extends Model
     public function technician(): BelongsTo
     {
         return $this->belongsTo(Technician::class)->with('user');
+    }
+
+    /**
+     * Relación directa con el cliente a través de clientDevice.
+     *
+     * @return HasOneThrough<Client, Maintenance>
+     */
+    public function client(): HasOneThrough
+    {
+        return $this->hasOneThrough(
+            Client::class,
+            ClientDevice::class,
+            'id', // Foreign key on ClientDevice table
+            'id', // Foreign key on Client table
+            'client_device_id', // Local key on Maintenance table
+            'client_id' // Local key on ClientDevice table
+        );
     }
 
     /**
