@@ -163,7 +163,7 @@ class Maintenance extends Model
      */
     public function getPaymentSupportAttribute(): ?string
     {
-        if ($paymentSupport = Arr::get($this->attributes, 'paymentSupport')) {
+        if ($paymentSupport = Arr::get($this->attributes, 'payment_support')) {
             return config('filesystems.disks.s3.url') . 'docs/pdfs/' . $paymentSupport;
         }
         return null;
