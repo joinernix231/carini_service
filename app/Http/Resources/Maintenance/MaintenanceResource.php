@@ -30,6 +30,8 @@ class MaintenanceResource extends JsonResource
           'technician' => new TechnicianResource($this->whenLoaded('technician')),
           'description' => $this->resource->description,
           'photo' => $this->resource->photo,
+          'is_paid' => $this->resource->is_paid,
+          'created_at' => $this->resource->created_at,
         ];
     }
 }

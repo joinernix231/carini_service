@@ -10,7 +10,9 @@ use App\Repositories\BaseRepository;
 
 class MaintenanceRepository extends BaseRepository
 {
-    protected $fieldSearchable = [];
+    protected $fieldSearchable = [
+        'created_at'
+    ];
 
     public function getFieldsSearchable(): array
     {
@@ -45,16 +47,21 @@ class MaintenanceRepository extends BaseRepository
 
     public function assignMaintenance(Maintenance $maintenance, array $input): Maintenance
     {
-
         $maintenance->status = 'assigned';
         $maintenance->technician_id = $input['technician_id'];
         $maintenance->date_maintenance = $input['date_maintenance'];
-        $maintenance->value = $input['value'] ?? null;;
+        $maintenance->value = $input['value'] ?? null;
         $maintenance->spare_parts = $input['spare_parts'];
         $maintenance->shift = $input['shift'];
+
+        if (!empty($input['value'])) {
+            $maintenance->is_paid = false;
+        }
+
         $maintenance->save();
 
         return $maintenance;
     }
+
 
 }

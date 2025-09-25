@@ -8,6 +8,7 @@ use App\Http\Controllers\Coordinator\InactiveCoordinatorAPIController;
 use App\Http\Controllers\Device\DeviceAPIController;
 use App\Http\Controllers\DeviceLink\DeviceLinkAPIController;
 use App\Http\Controllers\Maintenance\MaintenanceAPIController;
+use App\Http\Controllers\Maintenance\MaintenanceAssignedAPIController;
 use App\Http\Controllers\Maintenance\MaintenanceNotAssignedAPIController;
 use App\Http\Controllers\Other\ResourceAPIController;
 use App\Http\Controllers\Technician\AvailableTechnicianAPIController;
@@ -30,7 +31,8 @@ Route::apiResource('/devices', DeviceAPIController::class);
 // Maintenance
 Route::apiResource('/maintenances', MaintenanceAPIController::class);
 Route::get('/maintenancesNotAssigned', MaintenanceNotAssignedAPIController::class);
-Route::put('/assignMaintenance/{maintenance}', MaintenanceNotAssignedAPIController::class . '@assignMaintenance');
+Route::get('/maintenancesAssigned', MaintenanceAssignedAPIController::class);
+Route::put('/assignMaintenance/{maintenance}', MaintenanceAssignedAPIController::class . '@assignMaintenance');
 // Other
 Route::post('loadImage', ResourceAPIController::class . '@loadImage');
 Route::post('loadDoc', ResourceAPIController::class . '@loadDoc');
