@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Maintenance;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Maintenance\AssignMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\ReadMaintenanceAssignedAPIRequest;
+use App\Http\Requests\Maintenance\VerifyPaymentMaintenanceAPIRequest;
 use App\Http\Resources\Maintenance\MaintenanceResource;
 use App\Models\Maintenance\Maintenance;
 use App\Repositories\Maintenance\MaintenanceRepository;
@@ -39,6 +40,12 @@ class MaintenanceAssignedAPIController extends Controller
 
         $maintenance = $this->maintenanceRepository->assignMaintenance($maintenance, $input);
         $maintenance->load(['clientDevice']);
+
+        return $this->makeResponseResource('Maintenance assigned Successfully', new MaintenanceResource($maintenance));
+    }
+    public function verifyPaymentOfMaintenance(Maintenance $maintenance, VerifyPaymentMaintenanceAPIRequest $request): JsonResponse
+    {
+        $maintenance = $this->maintenanceRepository->verifyPayment($maintenance);
 
         return $this->makeResponseResource('Maintenance assigned Successfully', new MaintenanceResource($maintenance));
     }

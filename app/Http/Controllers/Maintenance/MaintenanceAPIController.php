@@ -11,6 +11,7 @@ use App\Http\Requests\Maintenance\UpdateMaintenanceAPIRequest;
 use App\Http\Resources\Maintenance\MaintenanceResource;
 use App\Models\Maintenance\Maintenance;
 use App\Repositories\Maintenance\MaintenanceRepository;
+use App\Utils\Criterias\BasicCriteria\OrderByCriteria;
 use App\Utils\Criterias\Maintenance\ClientMaintenancesCriteria;
 use Illuminate\Http\JsonResponse;
 
@@ -24,6 +25,7 @@ class MaintenanceAPIController extends Controller
         $clientId = session('client_id');
 
         $this->maintenanceRepository->pushCriteria(new ClientMaintenancesCriteria($clientId));
+        $this->maintenanceRepository->pushCriteria(new OrderByCriteria('created_at','asc'));
 
         $maintenances = $request->has('unpaginated') ?
             $this->maintenanceRepository->all($clientId) :
@@ -44,7 +46,7 @@ class MaintenanceAPIController extends Controller
     }
     public function show(Maintenance $maintenance, ShowMaintenanceAPIRequest $request): JsonResponse
     {
-        $maintenance->load('clientDevice.device', 'technician.user');
+        $maintenance->load('clientDevice.device', 'technician.user', 'client');
 
         return $this->makeResponseResource('Maintenance retrieved Successfully', new MaintenanceResource($maintenance));
     }

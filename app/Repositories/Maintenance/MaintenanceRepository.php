@@ -63,5 +63,13 @@ class MaintenanceRepository extends BaseRepository
         return $maintenance;
     }
 
+    public function verifyPayment(Maintenance $maintenance): Maintenance
+    {
+        $maintenance->is_paid = true;
+        $maintenance->save();
+
+        return $maintenance;
+    }
+
 
 }

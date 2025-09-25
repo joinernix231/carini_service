@@ -33,6 +33,7 @@ Route::apiResource('/maintenances', MaintenanceAPIController::class);
 Route::get('/maintenancesNotAssigned', MaintenanceNotAssignedAPIController::class);
 Route::get('/maintenancesAssigned', MaintenanceAssignedAPIController::class);
 Route::put('/assignMaintenance/{maintenance}', MaintenanceAssignedAPIController::class . '@assignMaintenance');
+Route::put('/verifyMaintenance/{maintenance}', MaintenanceAssignedAPIController::class . '@verifyPaymentOfMaintenance');
 // Other
 Route::post('loadImage', ResourceAPIController::class . '@loadImage');
 Route::post('loadDoc', ResourceAPIController::class . '@loadDoc');

@@ -31,6 +31,7 @@ class MaintenanceResource extends JsonResource
           'description' => $this->resource->description,
           'photo' => $this->resource->photo,
           'is_paid' => $this->resource->is_paid,
+          'payment_support' => $this->resource->payment_support,
           'created_at' => $this->resource->created_at,
         ];
     }
