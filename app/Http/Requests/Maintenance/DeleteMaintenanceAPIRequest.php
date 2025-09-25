@@ -10,9 +10,18 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class DeleteMaintenanceAPIRequest extends APIRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
+
+    public function validationData(): array
+    {
+        $maintenance = $this->route('maintenance');
+
+        $this->addParametersToRequest([
+            'id' => $maintenance->id,
+        ]);
+
+        return $this->all();
+    }
+
     public function authorize(): bool
     {
         /** @var Maintenance $maintenance */
@@ -31,7 +40,7 @@ class DeleteMaintenanceAPIRequest extends APIRequest
         $maintenance = $this->route('maintenance');
 
         return [
-            'maintenance_id' => [
+            'id' => [
                 'required',
                 new MaintenancePendingForDeletionRule($maintenance)
             ]
