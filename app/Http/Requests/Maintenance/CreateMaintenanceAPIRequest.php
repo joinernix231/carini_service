@@ -14,7 +14,10 @@ class CreateMaintenanceAPIRequest extends APIRequest
 
     public function authorize(): bool
     {
-        return true;
+        $allowedRoles = ['cliente'];
+        $user = session('user');
+
+        return  in_array($user->role, $allowedRoles);
     }
 
     public function rules(): array

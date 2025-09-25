@@ -10,13 +10,9 @@ class ShowMaintenanceAPIRequest extends APIRequest
 {
     public function authorize(): bool
     {
-        /** @var Maintenance $maintenance */
-        $maintenance = $this->route('maintenance');
-        /** @var Client $client */
-        $client = session('client');
+        $allowedRoles = ['coordinador', 'administrador','cliente'];
+        $user = session('user');
 
-        return $maintenance
-            && $maintenance->clientDevice
-            && $maintenance->clientDevice->client_id === $client->id;
+        return $user && in_array($user->role, $allowedRoles);
     }
 }
