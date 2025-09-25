@@ -33,7 +33,7 @@ readonly class ValidateUserToken
 
         $client = $this->clientRepository->getClientByUserId($user->id) ;
 
-        session(['user_id' => $user->id, 'user' => $user, 'client' => $client, 'client_id' => $client->id]);
+        session(['user_id' => $user->id, 'user' => $user, 'client' => $client ?? null, 'client_id' => $client->id]);
 
         return $next($request);
     }
