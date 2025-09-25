@@ -23,7 +23,7 @@ class TechnicalSeeder extends Seeder
         Technician::firstOrCreate(
             ['user_id' => $user->id],
             [
-                'document' => '87654321',
+                'document' => '12345678',
                 'phone' => '3007654321',
                 'address' => 'Calle Técnico 456',
                 'status' => 'active',

@@ -15,15 +15,14 @@ class MaintenanceSeeder extends Seeder
         $clientDevices = ClientDevice::with(['client', 'device'])->take(5)->get();
 
         if ($clientDevices->count() > 0) {
-            // Crear mantenimientos de prueba
             foreach ($clientDevices as $clientDevice) {
-                Maintenance::factory()->count(2)->create([
+                Maintenance::factory()->create([
                     'client_device_id' => $clientDevice->id,
                     'status' => 'pending',
                 ]);
             }
 
-            $this->command->info('✅ 10 mantenimientos de prueba creados correctamente.');
+            $this->command->info('✅ ' . $clientDevices->count() . ' mantenimientos de prueba creados correctamente (1 por equipo).');
         } else {
             $this->command->warn('⚠️ No se encontraron dispositivos de clientes. Ejecute primero ClientSeeder y DeviceSeeder.');
         }

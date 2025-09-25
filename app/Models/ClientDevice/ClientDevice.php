@@ -5,6 +5,7 @@ namespace App\Models\ClientDevice;
 use App\Models\Client\Client;
 use App\Models\Device\Device;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class ClientDevice extends Model
 {
 
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
     protected $table = 'client_device';
 
     protected $fillable = [

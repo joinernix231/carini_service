@@ -4,18 +4,18 @@
 
 ### **Credenciales de Acceso:**
 
-| Email | Contraseña | Rol | Nombre |
-|-------|------------|-----|--------|
-| `joinernix2@gmail.com` | `saiz123` | Administrador | Joiner Administrador |
-| `mauricio@gmail.com` | `saiz123` | Coordinador | Mauricio Coordinador |
-| `eyder@gmail.com` | `saiz123` | Técnico | Eyder Técnico |
-| `jo@gmail.com` | `password123` | Cliente | Joiner Davila Cliente |
+| Email | Contraseña | Rol | Nombre | Documento/Identificación |
+|-------|------------|-----|--------|-------------------------|
+| `joinernix2@gmail.com` | `saiz123` | Administrador | Joiner Administrador | 12345678 |
+| `mauricio@gmail.com` | `saiz123` | Coordinador | Mauricio Coordinador | 12345678 |
+| `eyder@gmail.com` | `saiz123` | Técnico | Eyder Técnico | 12345678 |
+| `jo@gmail.com` | `saiz123` | Cliente | Joiner Davila Cliente | 12345678 |
 
 ## 📊 Seeders Implementados
 
 ### **1. ClientSeeder**
 - ✅ **Administrador:** `joinernix2@gmail.com` (saiz123)
-- ✅ **Cliente específico:** `jo@gmail.com` (password123)
+- ✅ **Cliente específico:** `jo@gmail.com` (saiz123)
 - ✅ **9 clientes adicionales** generados con factory
 - ✅ **Total:** 1 administrador + 1 cliente específico + 9 clientes de prueba
 
@@ -107,18 +107,18 @@ php artisan migrate:fresh --seed
 ## 🧪 Testing del Sistema
 
 ### **Flujo de Asignación:**
-1. **Login como Coordinador:** `mauricio@gmail.com` / `saiz123`
+1. **Login como Coordinador:** `mauricio@gmail.com` / `12345678`
 2. **Ver mantenimientos pendientes:** `GET /api/maintenancesNotAssigned`
 3. **Ver técnicos disponibles:** `GET /api/availableTechnicians`
 4. **Asignar mantenimiento:** `PUT /api/assignMaintenance/{id}`
 
 ### **Flujo de Técnico:**
-1. **Login como Técnico:** `eyder@gmail.com` / `saiz123`
+1. **Login como Técnico:** `eyder@gmail.com` / `87654321`
 2. **Ver mantenimientos asignados**
 3. **Actualizar estado de mantenimientos**
 
 ### **Flujo de Cliente:**
-1. **Login como Cliente:** `jo@gmail.com` / `password123`
+1. **Login como Cliente:** `jo@gmail.com` / `12345678-9`
 2. **Ver sus mantenimientos**
 3. **Eliminar mantenimientos pendientes**
 

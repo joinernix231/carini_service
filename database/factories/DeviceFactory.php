@@ -19,6 +19,7 @@ class DeviceFactory extends Factory
             'brand' => $this->faker->company(),
             'description' => $this->faker->optional()->sentence(),
             'type' => $this->faker->randomElement(['lavadora','secadora']),
+            'photo' => 'equipo',
         ];
     }
 }

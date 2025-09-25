@@ -25,7 +25,7 @@ class ClientSeeder extends Seeder
             ['email' => 'jo@gmail.com'],
             [
                 'name' => 'Joiner Davila Cliente',
-                'password' => bcrypt('password123'),
+                'password' => bcrypt('saiz123'),
                 'role' => 'cliente',
             ]
         );
@@ -33,8 +33,8 @@ class ClientSeeder extends Seeder
         Client::firstOrCreate(
             ['user_id' => $user->id],
             [
-                'identifier' => '12345678-9',
-                'name' => 'Cliente Especial',
+                'identifier' => '12345678',
+                'name' => 'Joiner Davila Cliente',
                 'client_type' => 'Natural',
                 'document_type' => 'CC',
                 'address' => 'Calle Siempre Viva 123',

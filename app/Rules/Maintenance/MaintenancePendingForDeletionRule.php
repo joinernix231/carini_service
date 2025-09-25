@@ -18,7 +18,7 @@ class MaintenancePendingForDeletionRule implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if ($this->maintenance->status !== 'pending') {
-            $fail('Solo se pueden eliminar mantenimientos con estado pendiente. El mantenimiento actual tiene estado: ' . $this->maintenance->status);
+            $fail('Solo se pueden eliminar mantenimientos con estado pendiente.');
         }
     }
 }
