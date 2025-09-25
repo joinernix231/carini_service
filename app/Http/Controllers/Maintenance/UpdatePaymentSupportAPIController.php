@@ -22,23 +22,15 @@ class UpdatePaymentSupportAPIController extends Controller
 
     public function __invoke(Maintenance $maintenance, UpdatePaymentSupportAPIRequest $request): JsonResponse
     {
-        $paymentSupportFile = $request->file('payment_support');
-        
-        // Generar nombre único para el archivo
-        $fileName = 'payment_support_' . $maintenance->id . '_' . time() . '_' . Str::random(10) . '.' . $paymentSupportFile->getClientOriginalExtension();
-        
-        // Subir archivo a S3
-        $filePath = $paymentSupportFile->storeAs('docs/pdfs', $fileName, 's3');
-        
-        // Actualizar el mantenimiento usando el repositorio
+        $input = $request->validated();
+
+        $fileName = $input['payment_support'];
+
         $maintenance = $this->maintenanceRepository->updatePaymentSupport($maintenance, $fileName);
-        
-        // Cargar relaciones para la respuesta
+
         $maintenance->load(['clientDevice.device', 'technician.user', 'client']);
-        
-        return $this->makeResponseResource(
-            'Soporte de pago actualizado exitosamente',
-            new MaintenanceResource($maintenance)
+
+        return $this->makeResponseResource('Soporte de pago actualizado exitosamente', new MaintenanceResource($maintenance)
         );
     }
 }

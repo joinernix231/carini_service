@@ -11,27 +11,15 @@ class UpdatePaymentSupportAPIRequest extends APIRequest
     {
         /** @var Maintenance $maintenance */
         $maintenance = $this->route('maintenance');
-        
-        // Solo el cliente propietario del mantenimiento puede actualizar el soporte de pago
-        return $maintenance && 
-               $maintenance->clientDevice && 
-               $maintenance->clientDevice->client_id === session('client_id');
+
+        return true;
     }
 
     public function rules(): array
     {
         return [
-            'payment_support' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'], // 10MB max
+            'payment_support' => ['required', 'string'],
         ];
     }
 
-    public function messages(): array
-    {
-        return [
-            'payment_support.required' => 'El soporte de pago es obligatorio.',
-            'payment_support.file' => 'El soporte de pago debe ser un archivo.',
-            'payment_support.mimes' => 'El soporte de pago debe ser un archivo PDF, JPG, JPEG o PNG.',
-            'payment_support.max' => 'El soporte de pago no puede ser mayor a 10MB.',
-        ];
-    }
 }
