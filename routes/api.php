@@ -10,6 +10,7 @@ use App\Http\Controllers\DeviceLink\DeviceLinkAPIController;
 use App\Http\Controllers\Maintenance\MaintenanceAPIController;
 use App\Http\Controllers\Maintenance\MaintenanceAssignedAPIController;
 use App\Http\Controllers\Maintenance\MaintenanceNotAssignedAPIController;
+use App\Http\Controllers\Maintenance\UpdatePaymentSupportAPIController;
 use App\Http\Controllers\Other\ResourceAPIController;
 use App\Http\Controllers\Technician\AvailableTechnicianAPIController;
 use App\Http\Controllers\Technician\AvailableTechnicianController;
@@ -34,6 +35,7 @@ Route::get('/maintenancesNotAssigned', MaintenanceNotAssignedAPIController::clas
 Route::get('/maintenancesAssigned', MaintenanceAssignedAPIController::class);
 Route::put('/assignMaintenance/{maintenance}', MaintenanceAssignedAPIController::class . '@assignMaintenance');
 Route::put('/verifyMaintenance/{maintenance}', MaintenanceAssignedAPIController::class . '@verifyPaymentOfMaintenance');
+Route::put('/maintenances/{maintenance}/payment-support', UpdatePaymentSupportAPIController::class);
 // Other
 Route::post('loadImage', ResourceAPIController::class . '@loadImage');
 Route::post('loadDoc', ResourceAPIController::class . '@loadDoc');

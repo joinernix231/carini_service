@@ -21,7 +21,7 @@ class MaintenanceAssignedAPIController extends Controller
     public function __invoke(ReadMaintenanceAssignedAPIRequest $request): JsonResponse
     {
         $this->maintenanceRepository->pushCriteria(new WhereFieldCriteria('status', 'assigned'));
-        $this->maintenanceRepository->pushCriteria(new OrderByCriteria('created_at'));
+        $this->maintenanceRepository->pushCriteria(new OrderByCriteria('created_at','asc'));
 
         $maintenances = $request->has('unpaginated') ?
             $this->maintenanceRepository->all() :

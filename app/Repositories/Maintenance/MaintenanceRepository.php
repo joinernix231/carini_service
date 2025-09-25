@@ -71,5 +71,12 @@ class MaintenanceRepository extends BaseRepository
         return $maintenance;
     }
 
+    public function updatePaymentSupport(Maintenance $maintenance, string $paymentSupportFileName): Maintenance
+    {
+        $maintenance->payment_support = $paymentSupportFileName;
+        $maintenance->save();
+
+        return $maintenance;
+    }
 
 }
