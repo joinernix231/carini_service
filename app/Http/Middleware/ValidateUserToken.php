@@ -31,9 +31,15 @@ readonly class ValidateUserToken
             $this->throwUserDoesNotHaveAccessResponse('Este usuario no tiene permiso para realizar esta acción(2)', $request);
         }
 
-        $client = $this->clientRepository->getClientByUserId($user->id) ;
+        $client = $this->clientRepository->getClientByUserId($user->id);
 
-        session(['user_id' => $user->id, 'user' => $user, 'client' => $client ?? null, 'client_id' => $client->id]);
+        session([
+            'user_id'   => $user->id,
+            'user'      => $user,
+            'client'    => $client,
+            'client_id' => $client?->id,
+        ]);
+
 
         return $next($request);
     }
