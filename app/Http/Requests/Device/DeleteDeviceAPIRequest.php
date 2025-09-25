@@ -18,9 +18,10 @@ class DeleteDeviceAPIRequest extends APIRequest
 
     public function authorize(): bool
     {
-        $admin = session('user');
+        $allowedRoles = ['coordinador', 'administrador'];
+        $user = session('user');
 
-        return $admin && $admin->role === 'administrador';
+        return $user && in_array($user->role, $allowedRoles);
     }
 
     public function rules(): array
