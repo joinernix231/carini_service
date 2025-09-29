@@ -15,9 +15,15 @@
 
 ### **1. ClientSeeder**
 - ✅ **Administrador:** `joinernix2@gmail.com` (saiz123)
-- ✅ **Cliente específico:** `jo@gmail.com` (saiz123)
-- ✅ **9 clientes adicionales** generados con factory
-- ✅ **Total:** 1 administrador + 1 cliente específico + 9 clientes de prueba
+- ✅ **Cliente específico:** `jo@gmail.com` (saiz123) - Natural con CC
+- ✅ **5 clientes naturales** con documentos CC, CE, CI, PASS
+- ✅ **4 clientes jurídicos** con documento NIT y representante legal
+- ✅ **Total:** 1 administrador + 1 cliente específico + 5 naturales + 4 jurídicos
+
+#### **🔧 Lógica de Clientes Jurídicos:**
+- **Documento:** Siempre `NIT` para clientes jurídicos
+- **Representante Legal:** Campo obligatorio para clientes jurídicos
+- **Clientes Naturales:** Documentos CC, CE, CI, PASS (sin representante legal)
 
 ### **2. CoordinatorSeeder**
 - ✅ **Coordinador específico:** `mauricio@gmail.com` (saiz123)

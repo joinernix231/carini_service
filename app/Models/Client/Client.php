@@ -2,6 +2,7 @@
 
 namespace App\Models\Client;
 
+use App\Models\ClientDevice\ClientDevice;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,7 +19,7 @@ class Client extends Model
 
     protected $table = 'clients';
 
-    protected $fillable = [
+     protected $fillable = [
         'identifier',
         'name',
         'legal_representative',
@@ -39,6 +40,7 @@ class Client extends Model
         'address' => 'nullable|string|max:255',
         'city' => 'nullable|string|max:255',
         'department' => 'nullable|string|max:255',
+        'legal_representative' => 'nullable|string|max:255',
         'email' => 'nullable|string',
         'email.*' => 'nullable|email',
         'phone' => 'nullable|string|max:20',
@@ -54,5 +56,15 @@ class Client extends Model
     public function contacts(): HasMany
     {
         return $this->hasMany(Contact::class);
+    }
+
+    public function clientDevice(): HasMany
+    {
+        return $this->hasMany(ClientDevice::class);
+    }
+
+    public function clientDevices(): HasMany
+    {
+        return $this->hasMany(ClientDevice::class);
     }
 }

@@ -24,7 +24,7 @@ class UpdateClientAPIRequest extends APIRequest
         $rules['document_type'] = ['sometimes', Rule::in(Client::DOCUMENT_TYPES)];
         $rules['department'] = ['sometimes', 'string', 'max:255'];
 
-        $rules['email'] = ['sometimes', 'email', 'max:255', $this->uniqueRule('users', 'email', $clientId)];
+        $rules['email'] = ['sometimes', 'email', 'max:255', $this->uniqueRule('users', 'email', $clientId->user_id)];
         $rules['phone'] = ['sometimes', 'string', 'max:20'];
 
         // Contacts may be provided to sync (add/edit/delete)

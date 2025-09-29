@@ -43,9 +43,10 @@ class ClientSeeder extends Seeder
             ]
         );
 
-        // Crear 9 clientes adicionales de prueba
-        Client::factory(9)->create();
+        // Crear 5 clientes naturales y 4 clientes jurídicos
+        Client::factory(5)->natural()->create();
+        Client::factory(4)->juridico()->create();
 
-        $this->command->info('✅ Administrador con email joinernix2@gmail.com, cliente fijo con email jo@gmail.com y 9 clientes de prueba agregados correctamente.');
+        $this->command->info('✅ Administrador con email joinernix2@gmail.com, cliente fijo con email jo@gmail.com, 5 clientes naturales y 4 clientes jurídicos agregados correctamente.');
     }
 }

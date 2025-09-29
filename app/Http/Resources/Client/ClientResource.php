@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Client;
 
+use App\Http\Resources\ClientDevice\ClientDeviceResource;
 use App\Http\Resources\User\UserResource;
 use App\Http\Resources\BaseJsonResource;
 use Illuminate\Http\Request;
@@ -25,6 +26,7 @@ class ClientResource extends BaseJsonResource
             'user_id' => $this->resource->user_id,
             'user' => new UserResource($this->whenLoaded('user')),
             'contacts' => ContactResource::collection($this->whenLoaded('contacts')),
+            'client_devices' => ClientDeviceResource::collection($this->whenLoaded('clientDevices')),
             'created_at' => $this->resource->created_at?->toDateTimeString(),
             'updated_at' => $this->resource->updated_at?->toDateTimeString(),
         ];

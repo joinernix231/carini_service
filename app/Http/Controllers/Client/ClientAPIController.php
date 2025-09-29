@@ -57,7 +57,7 @@ class ClientAPIController extends Controller
 
     public function show(Client $client, ShowClientAPIRequest $request): JsonResponse
     {
-        $client->load(['user', 'contacts']);
+        $client->load(['user', 'contacts', 'clientDevices.device']);
         return $this->makeResponseResource('Clients retrieved Successfully', new ClientResource($client));
     }
 
@@ -70,7 +70,7 @@ class ClientAPIController extends Controller
             $this->userRepository->update($userData, $client->user_id);
         }
 
-        $clientData = Arr::only($input, ['identifier', 'name', 'address', 'city', 'department', 'phone', 'client_type', 'document_type', 'contacts']);
+        $clientData = Arr::only($input, ['identifier', 'name','legal_representative','address', 'city', 'department', 'phone', 'client_type', 'document_type', 'contacts']);
 
         $client = $this->clientRepository->updateWithContacts($client->id, $clientData);
 

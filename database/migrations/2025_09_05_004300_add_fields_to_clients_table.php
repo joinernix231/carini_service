@@ -18,6 +18,9 @@ return new class extends Migration {
             if (!Schema::hasColumn('clients', 'department')) {
                 $table->string('department')->nullable()->after('city');
             }
+            if (!Schema::hasColumn('clients', 'legal_representative')) {
+                $table->string('legal_representative')->nullable()->after('document_type');
+            }
         });
     }
 
@@ -32,6 +35,9 @@ return new class extends Migration {
             }
             if (Schema::hasColumn('clients', 'department')) {
                 $table->dropColumn('department');
+            }
+            if (Schema::hasColumn('clients', 'legal_representative')) {
+                $table->dropColumn('legal_representative');
             }
         });
     }

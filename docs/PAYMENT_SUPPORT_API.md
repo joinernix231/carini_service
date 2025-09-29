@@ -178,3 +178,4 @@ const selectAndUploadPaymentSupport = () => {
 - El archivo anterior se sobrescribe si se sube uno nuevo
 - Se recomienda limpiar archivos antiguos periódicamente
 - El archivo debe ser legible y de buena calidad para revisión
+
