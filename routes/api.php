@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthAPIController;
+use App\Http\Controllers\Auth\MeController;
 use App\Http\Controllers\Client\ClientAPIController;
 use App\Http\Controllers\Client\InactiveClientAPIController;
 use App\Http\Controllers\Coordinator\CoordinatorAPIController;
@@ -21,7 +22,7 @@ use Illuminate\Support\Facades\Route;
 Route::group([], function () {
 // Auth
 Route::post('/acceptPolicy', AuthAPIController::class . '@acceptPolicy');
-Route::get('/me', AuthAPIController::class . '@me');
+Route::get('/me', MeController::class . '@me');
 // Clients
 Route::apiResource('/clients', ClientAPIController::class);
     Route::put('/clients/{client}/status', InactiveClientAPIController::class);

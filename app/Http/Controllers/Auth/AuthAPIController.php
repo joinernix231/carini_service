@@ -47,19 +47,6 @@ class AuthAPIController extends Controller
     }
 
 
-    public function me(): JsonResponse
-    {
-        $user = auth()->user();
-
-        $data = [
-            'id' => $user->id,
-            'name' => $user->name,
-            'role' => $user->role,
-            'policy_accepted' => !is_null($user->policy_accepted_at)
-        ];
-
-        return ResponseUtil::makeResponse('Usuario obtenido correctamente.', $data);
-    }
 
     public function acceptPolicy(): JsonResponse
     {
