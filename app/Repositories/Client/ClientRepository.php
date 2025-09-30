@@ -82,13 +82,40 @@ class ClientRepository extends BaseRepository
                 throw new \Exception('No se encontró el perfil del cliente');
             }
 
-            // Si se proporciona document, actualizar identifier
-            if (isset($attributes['document'])) {
-                $attributes['identifier'] = $attributes['document'];
-                unset($attributes['document']);
+            // Separar datos del cliente y del usuario
+            $clientData = [];
+            $userData = [];
+
+            // Campos que van a la tabla clients
+            $clientFields = ['name', 'address', 'city', 'phone'];
+            foreach ($clientFields as $field) {
+                if (isset($attributes[$field])) {
+                    $clientData[$field] = $attributes[$field];
+                }
             }
 
-            return $this->update($attributes, $client->id);
+            // Si se proporciona document, actualizar identifier
+            if (isset($attributes['document'])) {
+                $clientData['identifier'] = $attributes['document'];
+            }
+
+            // Campos que van a la tabla users
+            if (isset($attributes['email'])) {
+                $userData['email'] = $attributes['email'];
+            }
+
+            // Actualizar datos del usuario si hay cambios
+            if (!empty($userData)) {
+                $userRepo = app(\App\Repositories\User\UserRepository::class);
+                $userRepo->updateProfile($userId, $userData);
+            }
+
+            // Actualizar datos del cliente
+            if (!empty($clientData)) {
+                return $this->update($clientData, $client->id);
+            }
+
+            return $client;
         });
     }
 }
