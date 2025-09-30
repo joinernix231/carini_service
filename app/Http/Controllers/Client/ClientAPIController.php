@@ -44,11 +44,16 @@ class ClientAPIController extends Controller
 
         $user = $this->userRepository->createClient($input);
 
-        $clientData = Arr::only($input, ['identifier', 'name', 'address', 'city', 'department', 'phone', 'client_type', 'document_type']);
+        $clientData = Arr::only($input, ['identifier', 'name', 'address', 'city', 'department', 'phone', 'client_type', 'document_type', 'legal_representative']);
         $clientData['user_id'] = $user->id;
-        $clientData['contacts'] = $input['contacts'] ?? [];
-
-        $client = $this->clientRepository->createWithContacts($clientData);
+        
+        // Si hay contactos, los incluimos; si no, creamos el cliente sin contactos
+        if (!empty($input['contacts'])) {
+            $clientData['contacts'] = $input['contacts'];
+            $client = $this->clientRepository->createWithContacts($clientData);
+        } else {
+            $client = $this->clientRepository->create($clientData);
+        }
 
         $client->load(['user', 'contacts']);
 
@@ -79,7 +84,7 @@ class ClientAPIController extends Controller
         return $this->makeResponseResource('Client updated Successfully', new ClientResource($client));
     }
 
-    public function destroy(DeleteClientAPIRequest $request, int $id)
+    public function destroy(DeleteClientAPIRequest $request, int $id): JsonResponse
     {
         $this->clientRepository->delete($id);
         $this->userRepository->delete($id);

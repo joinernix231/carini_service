@@ -29,9 +29,9 @@ class CreateClientAPIRequest extends APIRequest
         $rules['email'] = ['bail', 'required', 'string', 'email', 'max:255', $this->uniqueRule('users', 'email')];
         $rules['phone'] = ['nullable', 'string', 'max:20'];
 
-        // Contacts validation
-        $rules['contacts'] = ['bail', 'nullable', 'array', 'min:1'];
-        $rules['contacts.*.nombre_contacto'] = ['required', 'string', 'max:255'];
+        // Contacts validation - completely optional
+        $rules['contacts'] = ['bail', 'nullable', 'array'];
+        $rules['contacts.*.nombre_contacto'] = ['required_with:contacts', 'string', 'max:255'];
         $rules['contacts.*.correo'] = ['nullable', 'email', 'max:255'];
         $rules['contacts.*.telefono'] = ['nullable', 'string', 'max:20'];
         $rules['contacts.*.direccion'] = ['nullable', 'string', 'max:255'];
