@@ -55,4 +55,17 @@ class UserRepository extends BaseRepository
 
         return parent::create($userData);
     }
+
+    public function updateProfile(int $userId, array $attributes): User
+    {
+        return \DB::transaction(function () use ($userId, $attributes) {
+            $user = $this->find($userId);
+            
+            if (!$user) {
+                throw new \Exception('No se encontró el usuario');
+            }
+
+            return $this->update($attributes, $userId);
+        });
+    }
 }

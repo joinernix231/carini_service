@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthAPIController;
 use App\Http\Controllers\Auth\MeController;
+use App\Http\Controllers\Auth\ProfileAPIController;
 use App\Http\Controllers\Client\ClientAPIController;
 use App\Http\Controllers\Client\InactiveClientAPIController;
 use App\Http\Controllers\Coordinator\CoordinatorAPIController;
@@ -23,6 +24,7 @@ Route::group([], function () {
 // Auth
 Route::post('/acceptPolicy', AuthAPIController::class . '@acceptPolicy');
 Route::get('/me', MeController::class . '@me');
+Route::put('/profile', ProfileAPIController::class . '@update');
 // Clients
 Route::apiResource('/clients', ClientAPIController::class);
     Route::put('/clients/{client}/status', InactiveClientAPIController::class);

@@ -111,4 +111,44 @@ class TechnicianRepository extends BaseRepository
         return $query->get();
     }
 
+    public function getTechnicianByUserId(int $userId): ?Technician
+    {
+        return $this->model
+            ->where('user_id', $userId)
+            ->first();
+    }
+
+    public function updateProfile(int $userId, array $attributes): Technician
+    {
+        return \DB::transaction(function () use ($userId, $attributes) {
+            $technician = $this->getTechnicianByUserId($userId);
+            
+            if (!$technician) {
+                throw new \Exception('No se encontró el perfil del técnico');
+            }
+
+            return $this->update($attributes, $technician->id);
+        });
+    }
+
+    public function updateFullProfile(int $userId, array $userAttributes, array $technicianAttributes): array
+    {
+        return \DB::transaction(function () use ($userId, $userAttributes, $technicianAttributes) {
+            $results = [];
+            
+            // Actualizar datos del usuario si hay atributos
+            if (!empty(array_filter($userAttributes))) {
+                $userRepo = app(\App\Repositories\User\UserRepository::class);
+                $results['user'] = $userRepo->updateProfile($userId, $userAttributes);
+            }
+            
+            // Actualizar datos del técnico si hay atributos
+            if (!empty(array_filter($technicianAttributes))) {
+                $results['technician'] = $this->updateProfile($userId, $technicianAttributes);
+            }
+            
+            return $results;
+        });
+    }
+
 }

@@ -72,4 +72,23 @@ class ClientRepository extends BaseRepository
 
         return $client;
     }
+
+    public function updateProfile(int $userId, array $attributes): Client
+    {
+        return \DB::transaction(function () use ($userId, $attributes) {
+            $client = $this->getClientByUserId($userId);
+            
+            if (!$client) {
+                throw new \Exception('No se encontró el perfil del cliente');
+            }
+
+            // Si se proporciona document, actualizar identifier
+            if (isset($attributes['document'])) {
+                $attributes['identifier'] = $attributes['document'];
+                unset($attributes['document']);
+            }
+
+            return $this->update($attributes, $client->id);
+        });
+    }
 }
