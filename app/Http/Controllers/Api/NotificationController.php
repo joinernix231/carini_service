@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\RegisterTokenRequest;
+use App\Http\Requests\API\RegisterTokenRequest;
 use App\Http\Requests\Api\SendNotificationRequest;
-use App\Models\NotificationToken;
-use App\Models\User;
 use App\Repositories\NotificationToken\NotificationTokenRepository;
 use App\Services\ExpoPushService;
 use App\Utils\Resources\ResponseUtil;
