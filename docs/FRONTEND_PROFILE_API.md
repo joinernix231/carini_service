@@ -33,6 +33,10 @@ Content-Type: application/json
   "phone": "string",          // Teléfono
   "address": "string",        // Dirección
   "city": "string",          // Ciudad
+  "department": "string",     // Departamento
+  "legal_representative": "string", // Representante legal (solo para tipo Jurídico)
+  "client_type": "string",    // Tipo de cliente: "Natural" o "Jurídico"
+  "document_type": "string",  // Tipo de documento: "CC", "CE", "CI", "PASS", "NIT"
   "document": "string"       // Documento (se guarda como identifier)
 }
 ```
@@ -45,6 +49,10 @@ Content-Type: application/json
   "phone": "3001234567",
   "address": "Calle 123 #45-67",
   "city": "Bogotá",
+  "department": "Cundinamarca",
+  "legal_representative": "María García",
+  "client_type": "Jurídico",
+  "document_type": "NIT",
   "document": "12345678"
 }
 ```
@@ -55,6 +63,10 @@ Content-Type: application/json
 - `phone`: string, máximo 20 caracteres
 - `address`: string, máximo 255 caracteres
 - `city`: string, máximo 255 caracteres
+- `department`: string, máximo 255 caracteres
+- `legal_representative`: string, máximo 255 caracteres
+- `client_type`: debe ser "Natural" o "Jurídico"
+- `document_type`: debe ser "CC", "CE", "CI", "PASS", o "NIT"
 - `document`: string, máximo 20 caracteres
 
 ---
@@ -435,6 +447,10 @@ export default ProfileForm;
 | `phone` | ✅ | ✅ | ✅ |
 | `address` | ✅ | ✅ | ✅ |
 | `city` | ✅ | ❌ | ❌ |
+| `department` | ✅ | ❌ | ❌ |
+| `legal_representative` | ✅ | ❌ | ❌ |
+| `client_type` | ✅ | ❌ | ❌ |
+| `document_type` | ✅ | ❌ | ❌ |
 | `document` | ✅ | ✅ | ❌ |
 | `identification` | ❌ | ❌ | ✅ |
 

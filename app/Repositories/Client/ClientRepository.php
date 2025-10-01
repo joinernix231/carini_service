@@ -5,6 +5,7 @@ namespace App\Repositories\Client;
 use App\Models\Client\Client;
 use App\Models\Client\Contact;
 use App\Repositories\BaseRepository;
+use App\Repositories\User\UserRepository;
 use Illuminate\Support\Arr;
 
 class ClientRepository extends BaseRepository
@@ -73,49 +74,4 @@ class ClientRepository extends BaseRepository
         return $client;
     }
 
-    public function updateProfile(int $userId, array $attributes): Client
-    {
-        return \DB::transaction(function () use ($userId, $attributes) {
-            $client = $this->getClientByUserId($userId);
-            
-            if (!$client) {
-                throw new \Exception('No se encontró el perfil del cliente');
-            }
-
-            // Separar datos del cliente y del usuario
-            $clientData = [];
-            $userData = [];
-
-            // Campos que van a la tabla clients
-            $clientFields = ['name', 'address', 'city', 'phone'];
-            foreach ($clientFields as $field) {
-                if (isset($attributes[$field])) {
-                    $clientData[$field] = $attributes[$field];
-                }
-            }
-
-            // Si se proporciona document, actualizar identifier
-            if (isset($attributes['document'])) {
-                $clientData['identifier'] = $attributes['document'];
-            }
-
-            // Campos que van a la tabla users
-            if (isset($attributes['email'])) {
-                $userData['email'] = $attributes['email'];
-            }
-
-            // Actualizar datos del usuario si hay cambios
-            if (!empty($userData)) {
-                $userRepo = app(\App\Repositories\User\UserRepository::class);
-                $userRepo->updateProfile($userId, $userData);
-            }
-
-            // Actualizar datos del cliente
-            if (!empty($clientData)) {
-                return $this->update($clientData, $client->id);
-            }
-
-            return $client;
-        });
-    }
 }
