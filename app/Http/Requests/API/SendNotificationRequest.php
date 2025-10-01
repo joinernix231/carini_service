@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Api;
+namespace App\Http\Requests\API;
 
 use App\Http\Requests\APIRequest;
 
