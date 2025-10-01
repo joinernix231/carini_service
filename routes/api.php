@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthAPIController;
 use App\Http\Controllers\Auth\MeController;
 use App\Http\Controllers\Auth\ProfileAPIController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Client\ClientAPIController;
 use App\Http\Controllers\Client\InactiveClientAPIController;
 use App\Http\Controllers\Coordinator\CoordinatorAPIController;
@@ -54,6 +55,18 @@ Route::put('/coordinators/{coordinator}', CoordinatorAPIController::class . '@up
 Route::get('/coordinators/{coordinator}', CoordinatorAPIController::class . '@show');
 Route::delete('/coordinators/{coordinator}', CoordinatorAPIController::class . '@destroy');
 Route::put('/coordinator/{coordinator}/status', InactiveCoordinatorAPIController::class);
+
+// Notificaciones Push
+Route::prefix('notifications')->group(function () {
+    Route::post('/register-token', [NotificationController::class, 'registerToken']);
+    Route::delete('/unregister-token', [NotificationController::class, 'unregisterToken']);
+    Route::post('/send', [NotificationController::class, 'sendNotification']);
+    Route::get('/user-notifications', [NotificationController::class, 'getUserNotifications']);
+    Route::put('/mark-as-read/{id}', [NotificationController::class, 'markAsRead']);
+    Route::put('/mark-all-as-read', [NotificationController::class, 'markAllAsRead']);
+    Route::get('/user-tokens', [NotificationController::class, 'getUserTokens']);
+    Route::post('/send-to-role', [NotificationController::class, 'sendToRole']);
+});
 });
 
 
