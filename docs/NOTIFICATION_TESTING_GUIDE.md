@@ -170,7 +170,7 @@ use App\Models\User;
 use App\Models\Maintenance;
 use App\Notifications\MantenimientoAsignado;
 use App\Notifications\MantenimientoCompletado;
-use App\Notifications\AlertaUrgente;
+use App\Notifications\MaintenanceCreated;
 
 // Obtener un usuario técnico
 $tecnico = User::where('role', 'tecnico')->first();
@@ -187,7 +187,7 @@ $cliente->notify(new MantenimientoCompletado($mantenimiento));
 
 // Probar alerta urgente (Solo Push)
 $coordinador = User::where('role', 'coordinador')->first();
-$coordinador->notify(new AlertaUrgente($mantenimiento, 'Mantenimiento crítico detectado'));
+$coordinador->notify(new MaintenanceCreated($mantenimiento, 'Mantenimiento crítico detectado'));
 ```
 
 ---

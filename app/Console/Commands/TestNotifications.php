@@ -6,7 +6,7 @@ use App\Models\Maintenance\Maintenance;
 use App\Models\User;
 use App\Notifications\MantenimientoAsignado;
 use App\Notifications\MantenimientoCompletado;
-use App\Notifications\AlertaUrgente;
+use App\Notifications\MaintenanceCreated;
 use App\Services\ExpoPushService;
 use Illuminate\Console\Command;
 
@@ -105,10 +105,10 @@ class TestNotifications extends Command
 
     private function testAlertaUrgente(User $user, Maintenance $maintenance)
     {
-        $this->info('🚨 Probando AlertaUrgente (Solo Push)...');
+        $this->info('🚨 Probando MaintenanceCreated (Solo Push)...');
 
         try {
-            $user->notify(new AlertaUrgente($maintenance, 'Mantenimiento crítico detectado - Prueba del sistema'));
+            $user->notify(new MaintenanceCreated($maintenance, 'Mantenimiento crítico detectado - Prueba del sistema'));
             $this->info('✅ Alerta urgente enviada correctamente');
         } catch (\Exception $e) {
             $this->error("❌ Error enviando alerta urgente: " . $e->getMessage());

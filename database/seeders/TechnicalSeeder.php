@@ -27,6 +27,16 @@ class TechnicalSeeder extends Seeder
                 'phone' => '3007654321',
                 'address' => 'Calle Técnico 456',
                 'status' => 'active',
+
+                'blood_type' => 'O+',
+                'photo' => 'tecnico',
+                'specialty' => 'Técnico en Lavandería Industrial',
+                'hire_date' => now()->subYear(),
+                'contract_type' => 'full_time',
+
+                'eps_pdf' => 'manual_equipo_1758606277245_rpvbcpa2ran',
+                'arl_pdf' => 'manual_equipo_1758606277245_rpvbcpa2ran',
+                'pension_pdf' => 'manual_equipo_1758606277245_rpvbcpa2ran',
             ]
         );
 

@@ -29,6 +29,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => bcrypt('saiz123'),
             'remember_token' => Str::random(10),
+            'role' => 'cliente', // Rol por defecto
         ];
     }
 
@@ -39,6 +40,36 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Crear un usuario con rol de cliente
+     */
+    public function cliente(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'cliente',
+        ]);
+    }
+
+    /**
+     * Crear un usuario con rol de técnico
+     */
+    public function tecnico(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'tecnico',
+        ]);
+    }
+
+    /**
+     * Crear un usuario con rol de coordinador
+     */
+    public function coordinador(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'coordinador',
         ]);
     }
 }

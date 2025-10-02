@@ -27,7 +27,7 @@ class ClientFactory extends Factory
             'city' => $this->faker->city,
             'department' => $this->faker->citySuffix,
             'phone' => $this->faker->phoneNumber,
-            'user_id' => User::factory(),
+            'user_id' => User::factory()->cliente(),
         ];
     }
 

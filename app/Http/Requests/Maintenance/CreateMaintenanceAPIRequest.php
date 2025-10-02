@@ -4,10 +4,8 @@ namespace App\Http\Requests\Maintenance;
 
 use App\Http\Requests\APIRequest;
 use App\Models\Maintenance\Maintenance;
-use App\Repositories\Technician\TechnicianRepository;
+use App\Rules\Maintenance\ClientDeviceOwnership;
 use App\Rules\Maintenance\UniquePendingMaintenance;
-use App\Rules\Technician\ValidateDateOfTechnician;
-use Illuminate\Validation\Rule;
 
 class CreateMaintenanceAPIRequest extends APIRequest
 {
@@ -25,7 +23,13 @@ class CreateMaintenanceAPIRequest extends APIRequest
 
         $rules = Maintenance::$rules;
 
-        $rules['client_device_id'] = ['integer', $this->existsRule('client_device'), new UniquePendingMaintenance()];
+        $rules['client_device_id'] = [
+            'required',
+            'integer', 
+            $this->existsRule('client_device'), 
+            new ClientDeviceOwnership(),
+            new UniquePendingMaintenance()
+        ];
 
         return $rules;
     }
@@ -35,6 +39,8 @@ class CreateMaintenanceAPIRequest extends APIRequest
         return [
             'maintenance_type_id.exists' => 'El tipo de mantenimiento seleccionado no existe.',
             'client_device_id.exists' => 'El equipo seleccionado no existe en la base de datos.',
+            'client_device_id.required' => 'Debes seleccionar un equipo para el mantenimiento.',
+            'client_device_id.integer' => 'El ID del equipo debe ser un número válido.',
         ];
     }
 

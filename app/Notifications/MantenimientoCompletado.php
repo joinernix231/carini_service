@@ -24,7 +24,7 @@ class MantenimientoCompletado extends Notification implements ShouldQueue
     {
         return [
             'title' => '✅ Mantenimiento Completado',
-            'body' => "El mantenimiento de {$this->mantenimiento->device->name} ha sido completado exitosamente",
+            'body' => "El mantenimiento creado el {$this->mantenimiento->created_at} ha sido completado exitosamente",
             'data' => [
                 'type' => 'maintenance_completed',
                 'maintenance_id' => $this->mantenimiento->id,

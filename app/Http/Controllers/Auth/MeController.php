@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Technician\TechnicianResource;
 use App\Models\User;
 use App\Utils\Resources\ResponseUtil;
 use Illuminate\Http\JsonResponse;
@@ -36,7 +37,7 @@ class MeController extends Controller
             case 'coordinador':
                 $data['coordinator_data'] = $this->getCoordinatorData($user);
                 break;
-    
+
         }
 
         return ResponseUtil::makeResponse('Usuario obtenido correctamente.', $data);
@@ -69,7 +70,7 @@ class MeController extends Controller
         ];
     }
 
-    private function getTechnicianData($user): array
+    private function getTechnicianData($user): array|TechnicianResource
     {
         $technician = $user->technician;
 
@@ -77,16 +78,7 @@ class MeController extends Controller
             return ['message' => 'No se encontraron datos del técnico'];
         }
 
-        return [
-            'document' => $technician->document,
-            'phone' => $technician->phone,
-            'address' => $technician->address,
-            'status' => $technician->status,
-            'created_at' => $technician->created_at,
-            'updated_at' => $technician->updated_at,
-            'maintenances_count' => $technician->maintenances()->count(),
-            'active_maintenances_count' => $technician->maintenances()->where('status', '!=', 'completed')->count()
-        ];
+        return new TechnicianResource($technician);
     }
 
     private function getCoordinatorData($user): array

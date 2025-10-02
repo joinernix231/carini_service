@@ -20,7 +20,7 @@ class ExpoChannel
     {
         try {
             $message = $notification->toExpo($notifiable);
-            
+
             // Obtener tokens activos del usuario
             $tokens = NotificationToken::where('user_id', $notifiable->id)
                 ->active()
@@ -32,7 +32,6 @@ class ExpoChannel
                 return;
             }
 
-            // Enviar notificación
             $result = $this->expoPushService->sendToTokens(
                 $tokens,
                 $message['title'],

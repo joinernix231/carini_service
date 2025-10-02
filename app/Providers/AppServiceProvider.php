@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Exceptions\Handler;
+use App\Broadcasting\ExpoChannel;
 use Illuminate\Foundation\Exceptions\Handler as BaseHandler;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -32,5 +34,10 @@ class AppServiceProvider extends ServiceProvider
         if (app()->environment('production')) {
             $this->app['request']->server->set('HTTPS', true);
         }
+
+        // Registrar canal Expo para notificaciones
+        Notification::extend('expo', function ($app) {
+            return $app->make(ExpoChannel::class);
+        });
     }
 }

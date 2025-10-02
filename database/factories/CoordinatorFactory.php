@@ -16,7 +16,7 @@ class CoordinatorFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
+            'user_id' => User::factory()->coordinador(),
             'identification' => $this->faker->unique()->numerify('##########'),
             'phone' => $this->faker->phoneNumber(),
             'address' => $this->faker->address(),

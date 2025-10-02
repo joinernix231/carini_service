@@ -45,7 +45,8 @@ class TechnicianAPIController extends Controller
 
         $user = $this->userRepository->createTechnician($input);
 
-        $technicianData = Arr::only($input, ['document','phone', 'address']);
+        $technicianData = Arr::only($input, ['document','phone', 'address','blood_type','photo_url',
+            'specialty','hire_date','contract_type','eps_document_url','arl_document_url','pension_document_url']);
         $technicianData['user_id'] = $user->id;
 
         $technician = $this->technicianRepository->create($technicianData);
