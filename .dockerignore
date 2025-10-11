@@ -1,0 +1,63 @@
+# Archivos de Git
+.git
+.gitignore
+.gitattributes
+
+# Archivos de Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Archivos de Node.js
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Archivos de PHP
+vendor
+composer.lock
+
+# Archivos de Laravel
+.env
+.env.*
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*
+
+# Archivos de desarrollo
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Archivos de testing
+tests
+phpunit.xml
+
+# Archivos de documentación
+README.md
+docs
+
+# Archivos de configuración local
+.env.local
+.env.testing
+
+# Archivos de backup
+*.bak
+*.backup
+
+# Archivos temporales
+*.tmp
+*.temp

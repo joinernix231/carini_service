@@ -1,0 +1,56 @@
+# Archivo de override para desarrollo local
+# Este archivo se carga automáticamente por docker-compose
+# Úsalo para personalizar la configuración en tu entorno local
+
+version: '3.8'
+
+services:
+  # Configuración adicional para desarrollo
+  app:
+    volumes:
+      # Montar código fuente para desarrollo en tiempo real
+      - .:/var/www/html
+      # Configuración de Xdebug (opcional)
+      - ./docker/app/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+    environment:
+      - XDEBUG_MODE=develop,debug
+      - XDEBUG_CONFIG=client_host=host.docker.internal client_port=9003
+
+  # Mailhog para testing de emails en desarrollo
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: carini_mailhog
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    networks:
+      - carini_network
+
+  # phpMyAdmin para administración de MySQL
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: carini_phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: carini_user
+      PMA_PASSWORD: carini_password
+    ports:
+      - "8080:80"
+    networks:
+      - carini_network
+    depends_on:
+      - mysql
+
+  # Redis Commander para administración de Redis
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: carini_redis_commander
+    environment:
+      REDIS_HOSTS: local:redis:6379
+    ports:
+      - "8081:8081"
+    networks:
+      - carini_network
+    depends_on:
+      - redis
