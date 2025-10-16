@@ -8,6 +8,7 @@ use App\Http\Requests\Maintenance\DeleteMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\ReadMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\ShowMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\UpdateMaintenanceAPIRequest;
+use App\Http\Requests\Maintenance\UpdateQuotationAPIRequest;
 use App\Http\Resources\Maintenance\MaintenanceResource;
 use App\Models\Maintenance\Maintenance;
 use App\Repositories\Maintenance\MaintenanceRepository;
@@ -17,10 +18,14 @@ use Illuminate\Http\JsonResponse;
 
 class MaintenanceAPIController extends Controller
 {
-    public function __construct(private readonly MaintenanceRepository $maintenanceRepository)
-    {}
+    private MaintenanceRepository $maintenanceRepository;
 
-    public function index(ReadMaintenanceAPIRequest $request): JsonResponse
+    public function __construct(MaintenanceRepository $maintenanceRepository)
+    {
+        $this->maintenanceRepository = $maintenanceRepository;
+    }
+
+    public function index(ReadMaintenanceAPIRequest $request)
     {
         $clientId = session('client_id');
 
@@ -28,9 +33,9 @@ class MaintenanceAPIController extends Controller
         $this->maintenanceRepository->pushCriteria(new OrderByCriteria('created_at','asc'));
 
         $maintenances = $request->has('unpaginated') ?
-            $this->maintenanceRepository->all($clientId) :
+            $this->maintenanceRepository->all() :
             $this->maintenanceRepository->paginate(20);
-        $maintenances->load(['clientDevice']);
+        $maintenances->load(['clientDevices.device', 'clientDevices.client']);
 
 
         return $this->makeResponseResource('Maintenances retrieved Successfully', MaintenanceResource::collection($maintenances));
@@ -40,13 +45,19 @@ class MaintenanceAPIController extends Controller
     public function store(CreateMaintenanceAPIRequest $request): JsonResponse
     {
         $input = $request->validated();
+
+        $clientDevices = $input['client_devices'];
+
         $maintenance = $this->maintenanceRepository->create($input);
+        $this->maintenanceRepository->AssociateMaintenanceDevice($clientDevices, $maintenance);
+
+        $maintenance->load('clientDevices.device', 'clientDevices.client');
 
         return $this->makeResponseResource('Maintenance Created Successfully', new MaintenanceResource($maintenance));
     }
     public function show(Maintenance $maintenance, ShowMaintenanceAPIRequest $request): JsonResponse
     {
-        $maintenance->load('clientDevice.device', 'technician.user', 'client');
+        $maintenance->load('clientDevices.device', 'clientDevices.client', 'technician.user');
 
         return $this->makeResponseResource('Maintenance retrieved Successfully', new MaintenanceResource($maintenance));
     }
@@ -66,5 +77,14 @@ class MaintenanceAPIController extends Controller
         $this->maintenanceRepository->delete($maintenance->id);
 
         return $this->makeResponse('Maintenance Deleted Successfully',[$maintenance->id]);
+    }
+
+    public function updateQuotation(Maintenance $maintenance, UpdateQuotationAPIRequest $request): JsonResponse
+    {
+        $input = $request->validated();
+
+        $maintenance = $this->maintenanceRepository->updateQuotation($input, $maintenance);
+
+        return $this->makeResponseResource('Maintenance price updated Successfully', new MaintenanceResource($maintenance));
     }
 }

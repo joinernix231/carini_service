@@ -34,18 +34,17 @@ class MaintenanceNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         $maintenance = $this->maintenance;
-        $clientDevice = $maintenance->clientDevice;
-        $client = $clientDevice->client;
-        $device = $clientDevice->device;
-
+        $firstClientDevice = $maintenance->clientDevices->first();
+        $client = $firstClientDevice ? $firstClientDevice->client : null;
+        $deviceCount = $maintenance->clientDevices->count();
 
         return (new MailMessage)
-            ->subject('Nuevo Mantenimiento Por Asignar - ' . $client->name)
+            ->subject('Nuevo Mantenimiento Por Asignar - ' . ($client ? $client->name : 'Cliente'))
             ->view('mail.maintenance.assigned', [
                 'maintenance' => $maintenance,
-                'clientDevice' => $clientDevice,
+                'clientDevices' => $maintenance->clientDevices,
                 'client' => $client,
-                'device' => $device,
+                'deviceCount' => $deviceCount,
                 'coordinator' => $notifiable,
             ]);
     }

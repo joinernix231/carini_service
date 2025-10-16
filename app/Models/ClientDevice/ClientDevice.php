@@ -4,10 +4,12 @@ namespace App\Models\ClientDevice;
 
 use App\Models\Client\Client;
 use App\Models\Device\Device;
+use App\Models\Maintenance\Maintenance;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ClientDevice extends Model
@@ -59,5 +61,17 @@ class ClientDevice extends Model
     public function linkedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'linked_by');
+    }
+
+    /**
+     * Relación con los mantenimientos (muchos a muchos).
+     *
+     * @return BelongsToMany<Maintenance, ClientDevice>
+     */
+    public function maintenances(): BelongsToMany
+    {
+        return $this->belongsToMany(Maintenance::class, 'maintenance_client_device')
+            ->withPivot('description')
+            ->withTimestamps();
     }
 }

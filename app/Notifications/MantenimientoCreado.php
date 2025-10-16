@@ -24,14 +24,23 @@ class MantenimientoCreado extends Notification implements ShouldQueue
 
     public function toExpo($notifiable): array
     {
+        $deviceCount = $this->maintenance->clientDevices->count();
+        $firstDevice = $this->maintenance->clientDevices->first();
+        $clientName = $firstDevice ? $firstDevice->client->name : 'Cliente';
+        
+        $body = $deviceCount === 1 
+            ? "Nuevo mantenimiento para {$clientName} - {$firstDevice->device->model}"
+            : "Nuevo mantenimiento para {$clientName} - {$deviceCount} equipos";
+
         return [
             'title' => '🔧 Nuevo Mantenimiento Creado',
-            'body' => "Nuevo mantenimiento para {$this->maintenance->clientDevice->client->name} - {$this->maintenance->clientDevice->device->name}",
+            'body' => $body,
             'data' => [
                 'type' => 'maintenance_created',
                 'maintenance_id' => $this->maintenance->id,
-                'client_id' => $this->maintenance->clientDevice->client_id,
-                'device_id' => $this->maintenance->clientDevice->device_id,
+                'client_id' => $firstDevice ? $firstDevice->client_id : null,
+                'device_count' => $deviceCount,
+                'device_ids' => $this->maintenance->clientDevices->pluck('id')->toArray(),
                 'screen' => 'MantenimientoDetail',
                 'priority' => 'normal'
             ],

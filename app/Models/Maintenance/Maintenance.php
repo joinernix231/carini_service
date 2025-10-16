@@ -9,7 +9,7 @@ use Database\Factories\MaintenanceFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 
@@ -35,7 +35,7 @@ use Illuminate\Support\Arr;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
  *
- * @property-read ClientDevice $clientDevice
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ClientDevice> $clientDevices
  * @property-read Technician $technician
  */
 class Maintenance extends Model
@@ -70,7 +70,6 @@ class Maintenance extends Model
      * @var array<string, string>
      */
     public static array $rules = [
-        'client_device_id' => 'required|integer',
         'type' => 'required|string',
         'date_maintenance' => 'nullable|date',
         'photo' => 'nullable|string',
@@ -107,13 +106,15 @@ class Maintenance extends Model
     }
 
     /**
-     * Relación con el dispositivo del cliente.
+     * Relación con los dispositivos del cliente (muchos a muchos).
      *
-     * @return BelongsTo<ClientDevice, Maintenance>
+     * @return BelongsToMany<ClientDevice, Maintenance>
      */
-    public function clientDevice(): BelongsTo
+    public function clientDevices(): BelongsToMany
     {
-        return $this->belongsTo(ClientDevice::class);
+        return $this->belongsToMany(ClientDevice::class, 'maintenance_client_device')
+            ->withPivot('description')
+            ->withTimestamps();
     }
 
     /**
@@ -127,21 +128,44 @@ class Maintenance extends Model
     }
 
     /**
-     * Relación directa con el cliente a través de clientDevice.
+     * Accesor para obtener el cliente asociado al mantenimiento.
+     * Este accessor obtiene el cliente del primer ClientDevice asociado.
      *
-     * @return HasOneThrough<Client, Maintenance>
+     * @return Client|null
      */
-    public function client(): HasOneThrough
+    public function getClientAttribute(): ?Client
     {
-        return $this->hasOneThrough(
-            Client::class,
-            ClientDevice::class,
-            'id', // Foreign key on ClientDevice table
-            'id', // Foreign key on Client table
-            'client_device_id', // Local key on Maintenance table
-            'client_id' // Local key on ClientDevice table
-        );
+        if ($this->relationLoaded('clientDevices') && $this->clientDevices->isNotEmpty()) {
+            return $this->clientDevices->first()->client;
+        }
+
+        return null;
     }
+
+    /**
+     * Sobrescribir el método para que el accessor client sea tratado como una relación cargable.
+     */
+    public function getRelationValue($key)
+    {
+        if ($key === 'client') {
+            return $this->getClientAttribute();
+        }
+
+        return parent::getRelationValue($key);
+    }
+
+    /**
+     * Sobrescribir el método para que Laravel reconozca client como una relación cargada.
+     */
+    public function relationLoaded($key)
+    {
+        if ($key === 'client') {
+            return $this->relationLoaded('clientDevices');
+        }
+
+        return parent::relationLoaded($key);
+    }
+
 
     /**
      * Accesor para obtener la URL completa de la foto.

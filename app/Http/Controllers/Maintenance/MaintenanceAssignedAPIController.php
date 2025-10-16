@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Maintenance;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Maintenance\AssignMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\ReadMaintenanceAssignedAPIRequest;
+use App\Http\Requests\Maintenance\UploadPriceMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\VerifyPaymentMaintenanceAPIRequest;
 use App\Http\Resources\Maintenance\MaintenanceResource;
 use App\Models\Maintenance\Maintenance;
@@ -27,8 +28,8 @@ class MaintenanceAssignedAPIController extends Controller
             $this->maintenanceRepository->all() :
             $this->maintenanceRepository->paginate(20);
         $maintenances->load([
-            'client',
-            'clientDevice.device'
+            'clientDevices.client',
+            'clientDevices.device'
         ]);
 
         return $this->makeResponseResource('Maintenances retrieved Successfully', MaintenanceResource::collection($maintenances));
@@ -39,7 +40,7 @@ class MaintenanceAssignedAPIController extends Controller
         $input = $request->validated();
 
         $maintenance = $this->maintenanceRepository->assignMaintenance($maintenance, $input);
-        $maintenance->load(['clientDevice']);
+        $maintenance->load(['clientDevices', 'technician']);
 
         return $this->makeResponseResource('Maintenance assigned Successfully', new MaintenanceResource($maintenance));
     }
@@ -47,6 +48,17 @@ class MaintenanceAssignedAPIController extends Controller
     {
         $maintenance = $this->maintenanceRepository->verifyPayment($maintenance);
 
-        return $this->makeResponseResource('Maintenance assigned Successfully', new MaintenanceResource($maintenance));
+        return $this->makeResponseResource(' Maintenance verify Successfully', new MaintenanceResource($maintenance));
+    }
+
+    public function uploadPrice(Maintenance $maintenance, UploadPriceMaintenanceAPIRequest $request ): JsonResponse
+    {
+        /**@var Maintenance $maintenance*/
+
+        $input = $request->validated();
+
+        $maintenance = $this->maintenanceRepository->uploadPrice($input, $maintenance);
+
+        return $this->makeResponseResource('Maintenance price Successfully', new MaintenanceResource($maintenance));
     }
 }

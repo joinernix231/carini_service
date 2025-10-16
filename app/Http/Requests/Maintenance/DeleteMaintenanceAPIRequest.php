@@ -29,9 +29,15 @@ class DeleteMaintenanceAPIRequest extends APIRequest
         /** @var Client $client */
         $client = session('client');
 
+        // Cargar la relación clientDevices si no está cargada
+        if (!$maintenance->relationLoaded('clientDevices')) {
+            $maintenance->load('clientDevices');
+        }
+
+        // Verificar que el mantenimiento tenga dispositivos y que al menos uno pertenezca al cliente
         return $maintenance
-            && $maintenance->clientDevice
-            && $maintenance->clientDevice->client_id === $client->id;
+            && $maintenance->clientDevices->isNotEmpty()
+            && $maintenance->clientDevices->contains('client_id', $client->id);
     }
 
     public function rules(): array

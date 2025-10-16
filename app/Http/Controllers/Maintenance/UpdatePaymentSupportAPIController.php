@@ -28,7 +28,7 @@ class UpdatePaymentSupportAPIController extends Controller
 
         $maintenance = $this->maintenanceRepository->updatePaymentSupport($maintenance, $fileName);
 
-        $maintenance->load(['clientDevice.device', 'technician.user', 'client']);
+        $maintenance->load(['clientDevices.device', 'technician.user', 'clientDevices.client']);
 
         return $this->makeResponseResource('Soporte de pago actualizado exitosamente', new MaintenanceResource($maintenance)
         );

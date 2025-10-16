@@ -26,7 +26,7 @@ class MaintenanceNotAssignedAPIController extends Controller
             $this->maintenanceRepository->paginate(20);
         $maintenances->load([
             'client',
-            'clientDevice.device'
+            'clientDevices.device'
         ]);
 
         return $this->makeResponseResource('Maintenances retrieved Successfully', MaintenanceResource::collection($maintenances));

@@ -37,7 +37,6 @@ class AssignMaintenanceAPIRequest extends ApiRequest
         ];
         $rules['date_maintenance'] = ['required', 'date_format:Y-m-d'];
         $rules['value'] = ['nullable', 'integer'];
-        $rules['spare_parts'] = ['required', 'array'];
         $rules['shift'] = ['required', 'string', 'in:AM,PM'];
         $rules['technician_id'] = ['required', 'integer', $this->existsRule('technicians'),
             new TechnicianAvailabilityRule($this->input('date_maintenance'), $this->input('shift'))

@@ -13,7 +13,6 @@ class MaintenanceFactory extends Factory
     public function definition(): array
     {
         return [
-            'client_device_id' => ClientDevice::factory(),
             'type' => $this->faker->randomElement(['preventive', 'corrective']),
             'description' => $this->faker->sentence(),
             'status' => 'pending',
@@ -48,5 +47,56 @@ class MaintenanceFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => 'completed',
         ]);
+    }
+
+    /**
+     * Configurar el factory para crear un mantenimiento con dispositivos específicos.
+     */
+    public function withDevices($clientDevices = null): static
+    {
+        return $this->afterCreating(function (Maintenance $maintenance) use ($clientDevices) {
+            if ($clientDevices === null) {
+                // Si no se especifican dispositivos, crear algunos aleatorios
+                $devices = ClientDevice::inRandomOrder()->take(rand(1, 3))->get();
+            } else {
+                // Asegurar que sea una colección
+                $devices = collect($clientDevices);
+            }
+
+            $pivotData = [];
+            foreach ($devices as $device) {
+                // Obtener el ID del dispositivo
+                $deviceId = $device->id;
+                $pivotData[$deviceId] = [
+                    'description' => $this->faker->optional()->sentence(),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+            }
+
+            $maintenance->clientDevices()->attach($pivotData);
+        });
+    }
+
+    /**
+     * Configurar el factory para crear un mantenimiento con un solo dispositivo.
+     */
+    public function withSingleDevice(ClientDevice $clientDevice = null): static
+    {
+        return $this->afterCreating(function (Maintenance $maintenance) use ($clientDevice) {
+            if ($clientDevice === null) {
+                $clientDevice = ClientDevice::inRandomOrder()->first();
+            }
+
+            if ($clientDevice) {
+                $maintenance->clientDevices()->attach([
+                    $clientDevice->id => [
+                        'description' => $this->faker->optional()->sentence(),
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]
+                ]);
+            }
+        });
     }
 }

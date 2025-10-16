@@ -2,8 +2,6 @@
 
 namespace App\Http\Requests\Maintenance;
 
-
-
 use App\Http\Requests\APIRequest;
 
 class ReadMaintenanceAPIRequest extends APIRequest
@@ -17,11 +15,4 @@ class ReadMaintenanceAPIRequest extends APIRequest
         return  in_array($user->role, $allowedRoles);
     }
 
-
-    public function rules(): array
-    {
-        return [
-            //
-        ];
-    }
 }

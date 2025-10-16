@@ -21,7 +21,7 @@ class NotifyCoordinatorMaintenanceListener
     public function handle(MaintenanceCreated $event): void
     {
         $maintenance = $event->maintenance;
-        $maintenance->load('clientDevice.client', 'clientDevice.device');
+        $maintenance->load('clientDevices.client', 'clientDevices.device');
 
         $coordinators = $this->userRepository->findWhere([
             'role' => 'coordinador',

@@ -11,7 +11,8 @@ use App\Repositories\BaseRepository;
 class MaintenanceRepository extends BaseRepository
 {
     protected $fieldSearchable = [
-        'created_at'
+        'created_at',
+        'status'
     ];
 
     public function getFieldsSearchable(): array
@@ -51,7 +52,7 @@ class MaintenanceRepository extends BaseRepository
         $maintenance->technician_id = $input['technician_id'];
         $maintenance->date_maintenance = $input['date_maintenance'];
         $maintenance->value = $input['value'] ?? null;
-        $maintenance->spare_parts = $input['spare_parts'];
+//        $maintenance->spare_parts = $input['spare_parts'];
         $maintenance->shift = $input['shift'];
 
         if (!empty($input['value'])) {
@@ -71,12 +72,75 @@ class MaintenanceRepository extends BaseRepository
         return $maintenance;
     }
 
+    public function uploadPrice($input, Maintenance $maintenance): Maintenance
+    {
+        $isPaid = $input['is_paid'] ?? null;
+        $value = $input['value'] ?? null;
+        $priceSupport = $input['price_support'] ?? null;
+
+        // Si no requiere pago
+        if (is_null($isPaid)) {
+            $maintenance->status = 'quoted';
+            $maintenance->save();
+            return $maintenance;
+        }
+
+        // Si requiere pago
+        $maintenance->status = 'quoted';
+        $maintenance->is_paid = $isPaid;
+        $maintenance->value = $value;
+        $maintenance->price_support = $priceSupport;
+        $maintenance->save();
+
+        return $maintenance;
+    }
+
     public function updatePaymentSupport(Maintenance $maintenance, string $paymentSupportFileName): Maintenance
     {
         $maintenance->payment_support = $paymentSupportFileName;
         $maintenance->save();
 
         return $maintenance;
+    }
+
+    public function updateQuotation(array $input, Maintenance $maintenance): Maintenance
+    {
+        $isPaid = $input['is_paid'] ?? null;
+        $value = $input['value'] ?? null;
+        $priceSupport = $input['price_support'] ?? null;
+
+        // Si no requiere pago
+        if (is_null($isPaid)) {
+            $maintenance->is_paid = null;
+            $maintenance->value = null;
+            $maintenance->price_support = null;
+            $maintenance->status = 'quoted';
+            $maintenance->save();
+            return $maintenance;
+        }
+
+        // Si requiere pago
+        $maintenance->is_paid = $isPaid;
+        $maintenance->value = $value;
+        $maintenance->price_support = $priceSupport;
+        $maintenance->status = 'quoted';
+        $maintenance->save();
+
+        return $maintenance;
+    }
+
+    public function AssociateMaintenanceDevice ($clientDevices, $maintenance): void
+    {
+        $pivotData = [];
+        foreach ($clientDevices as $device) {
+            $pivotData[$device['id']] = [
+                'description' => $device['description'] ?? null,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
+
+        $maintenance->clientDevices()->attach($pivotData);
     }
 
 }

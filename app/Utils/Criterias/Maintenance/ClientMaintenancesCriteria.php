@@ -26,7 +26,7 @@ class ClientMaintenancesCriteria implements CriteriaInterface
 
     public function apply($model, RepositoryInterface $repository): Builder|Model
     {
-        return $model->whereHas('clientDevice', function ($query) {
+        return $model->whereHas('clientDevices', function ($query) {
             $query->where('client_id', $this->clientId);
         });
     }

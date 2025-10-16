@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\ClientDevice\ClientDevice;
-use App\Models\Device\Device;
-use App\Models\Maintenance\MaintenanceType;
 use App\Models\Technician\Technician;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -18,18 +16,35 @@ return new class extends Migration
         Schema::create('maintenances', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignIdFor(ClientDevice::class)->constrained()->onDelete('cascade');
+            $table->foreignIdFor(ClientDevice::class)
+                ->constrained()
+                ->onDelete('cascade');
+
+            $table->foreignIdFor(Technician::class, 'technician_id')
+                ->nullable()
+                ->constrained()
+                ->onDelete('set null');
+
             $table->enum('type', ['preventive', 'corrective']);
             $table->date('date_maintenance')->nullable();
             $table->enum('shift', ['AM', 'PM'])->nullable();
-
-
             $table->string('photo')->nullable();
-            $table->string('description')->nullable();
+            $table->string('description')->nullable();$table->enum('status', [
+                'pending',
+                'quoted',
+                'payment_uploaded',
+                'assigned',
+                'in_progress',
+                'completed',
+                'cancelled'
+            ])->default('pending');
 
-            $table->enum('status', ['pending', 'assigned', 'in_progress', 'completed'])->default('pending');
-            $table->foreignIdFor(Technician::class, 'technician_id')->nullable()->constrained()->onDelete('set null');
+            $table->decimal('value', 10, 2)->nullable();
+            $table->boolean('is_paid')->nullable();
+            $table->string('payment_support')->nullable();
+            $table->string('price_support')->nullable();
 
+            $table->json('spare_parts')->nullable();
 
             $table->timestamps();
             $table->softDeletes();

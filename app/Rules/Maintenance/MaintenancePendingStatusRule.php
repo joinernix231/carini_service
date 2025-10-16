@@ -17,8 +17,8 @@ class MaintenancePendingStatusRule implements ValidationRule
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if ($this->maintenance->status !== 'pending') {
-            $fail('Solo se pueden asignar mantenimientos con estado pendiente.');
+        if ($this->maintenance->status !== 'quoted') {
+            $fail('Solo se pueden asignar mantenimientos con estado cotizado.');
         }
     }
 }

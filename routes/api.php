@@ -12,7 +12,10 @@ use App\Http\Controllers\Device\DeviceAPIController;
 use App\Http\Controllers\DeviceLink\DeviceLinkAPIController;
 use App\Http\Controllers\Maintenance\MaintenanceAPIController;
 use App\Http\Controllers\Maintenance\MaintenanceAssignedAPIController;
+use App\Http\Controllers\Maintenance\MaintenanceCoordinatorAPIController;
 use App\Http\Controllers\Maintenance\MaintenanceNotAssignedAPIController;
+use App\Http\Controllers\Maintenance\MaintenanceNotPriceAPIController;
+use App\Http\Controllers\Maintenance\MaintenancesByPaymentStatusAPIController;
 use App\Http\Controllers\Maintenance\UpdatePaymentSupportAPIController;
 use App\Http\Controllers\Other\ResourceAPIController;
 use App\Http\Controllers\Technician\AvailableTechnicianAPIController;
@@ -35,11 +38,17 @@ Route::apiResource('/linkDevices', DeviceLinkAPIController::class);
 Route::apiResource('/devices', DeviceAPIController::class);
 // Maintenance
 Route::apiResource('/maintenances', MaintenanceAPIController::class);
+    Route::apiResource('/maintenancesCoordinator', MaintenanceCoordinatorAPIController::class);
 Route::get('/maintenancesNotAssigned', MaintenanceNotAssignedAPIController::class);
 Route::get('/maintenancesAssigned', MaintenanceAssignedAPIController::class);
-Route::put('/assignMaintenance/{maintenance}', MaintenanceAssignedAPIController::class . '@assignMaintenance');
+Route::get('/maintenancesNotPrice', MaintenanceNotPriceAPIController::class);
+Route::get('/maintenancesByPaymentStatus', MaintenancesByPaymentStatusAPIController::class);
 Route::put('/verifyMaintenance/{maintenance}', MaintenanceAssignedAPIController::class . '@verifyPaymentOfMaintenance');
+Route::put('/assignMaintenance/{maintenance}', MaintenanceAssignedAPIController::class . '@assignMaintenance');
 Route::put('/maintenances/{maintenance}/payment-support', UpdatePaymentSupportAPIController::class);
+Route::put('/uploadPrice/{maintenance}', MaintenanceAssignedAPIController::class . '@uploadPrice');
+Route::put('/maintenance/{maintenance}/update-quotation', MaintenanceAPIController::class . '@updateQuotation');
+
 // Other
 Route::post('loadImage', ResourceAPIController::class . '@loadImage');
 Route::post('loadDoc', ResourceAPIController::class . '@loadDoc');

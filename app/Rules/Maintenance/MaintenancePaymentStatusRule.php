@@ -27,7 +27,7 @@ class MaintenancePaymentStatusRule implements ValidationRule
             return;
         }
 
-        if ($this->maintenance->status !== 'assigned') {
+        if ($this->maintenance->status !== 'quoted') {
             $fail('El pago solo puede aprobarse si el mantenimiento está asignado.');
         }
     }
