@@ -3,6 +3,9 @@
 namespace App\Repositories\Maintenance;
 
 use App\Events\Maintenance\MaintenanceCreated;
+use App\Events\Maintenance\UploadPriceMaintenance;
+use App\Events\Maintenance\UploadSupportPaymentMaintenance;
+use App\Events\Maintenance\VerifyPaymentMaintenance;
 use App\Models\Maintenance\Maintenance;
 use App\Models\Technician\Technician;
 use App\Repositories\BaseRepository;
@@ -69,6 +72,8 @@ class MaintenanceRepository extends BaseRepository
         $maintenance->is_paid = true;
         $maintenance->save();
 
+        event(new VerifyPaymentMaintenance($maintenance));
+
         return $maintenance;
     }
 
@@ -92,6 +97,8 @@ class MaintenanceRepository extends BaseRepository
         $maintenance->price_support = $priceSupport;
         $maintenance->save();
 
+        event(new UploadPriceMaintenance($maintenance));
+
         return $maintenance;
     }
 
@@ -99,6 +106,8 @@ class MaintenanceRepository extends BaseRepository
     {
         $maintenance->payment_support = $paymentSupportFileName;
         $maintenance->save();
+
+        event(new UploadSupportPaymentMaintenance($maintenance));
 
         return $maintenance;
     }
@@ -125,6 +134,8 @@ class MaintenanceRepository extends BaseRepository
         $maintenance->price_support = $priceSupport;
         $maintenance->status = 'quoted';
         $maintenance->save();
+
+        event(new UploadPriceMaintenance($maintenance));
 
         return $maintenance;
     }

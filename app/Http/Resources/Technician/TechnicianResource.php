@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Technician;
 
 use App\Http\Resources\User\UserResource;
+use App\Http\Resources\Maintenance\MaintenanceResource;
 use Illuminate\Http\Request;
 use App\Http\Resources\BaseJsonResource;
 
@@ -14,6 +15,7 @@ class TechnicianResource extends BaseJsonResource
             'id' => $this->resource->id,
             'user_id' => $this->resource->user_id,
             'user' => new UserResource($this->whenLoaded('user')),
+            'maintenances' => MaintenanceResource::collection($this->whenLoaded('maintenances')),
             'document' => $this->resource->document,
             'phone' => $this->resource->phone,
             'status' => $this->resource->status,

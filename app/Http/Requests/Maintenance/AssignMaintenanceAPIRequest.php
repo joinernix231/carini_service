@@ -4,7 +4,7 @@ namespace App\Http\Requests\Maintenance;
 
 use App\Http\Requests\APIRequest;
 use App\Models\Maintenance\Maintenance;
-use App\Rules\Maintenance\MaintenancePendingStatusRule;
+use App\Rules\Maintenance\MaintenanceReassignableStatusRule;
 use App\Rules\Maintenance\TechnicianAvailabilityRule;
 
 class AssignMaintenanceAPIRequest extends ApiRequest
@@ -33,7 +33,7 @@ class AssignMaintenanceAPIRequest extends ApiRequest
         $maintenance = $this->route('maintenance');
 
         $rules['maintenance_id'] = ['bail','required', $this->existsRule('maintenances'),
-            new MaintenancePendingStatusRule($maintenance)
+            new MaintenanceReassignableStatusRule($maintenance)
         ];
         $rules['date_maintenance'] = ['required', 'date_format:Y-m-d'];
         $rules['value'] = ['nullable', 'integer'];

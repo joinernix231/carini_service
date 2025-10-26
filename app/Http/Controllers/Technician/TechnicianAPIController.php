@@ -55,7 +55,7 @@ class TechnicianAPIController extends Controller
     }
     public function show(Technician $technical, ShowTechnicianAPIRequest $request): JsonResponse
     {
-        $technical->load('user');
+        $technical->load('user','maintenances');
 
         return $this->makeResponseResource('Technician retrieved Successfully', new TechnicianResource($technical));
     }

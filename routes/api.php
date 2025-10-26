@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminDeviceLinkAPIController;
 use App\Http\Controllers\Auth\AuthAPIController;
 use App\Http\Controllers\Auth\MeController;
 use App\Http\Controllers\Auth\ProfileAPIController;
@@ -34,6 +35,13 @@ Route::apiResource('/clients', ClientAPIController::class);
     Route::put('/clients/{client}/status', InactiveClientAPIController::class);
 // LinkDevices
 Route::apiResource('/linkDevices', DeviceLinkAPIController::class);
+// Admin LinkDevices
+Route::apiResource('/admin/clients/{client}/devices', AdminDeviceLinkAPIController::class)
+    ->only(['store', 'destroy'])
+    ->names([
+        'store' => 'admin.clients.devices.store',
+        'destroy' => 'admin.clients.devices.destroy'
+    ]);
 // Devices
 Route::apiResource('/devices', DeviceAPIController::class);
 // Maintenance

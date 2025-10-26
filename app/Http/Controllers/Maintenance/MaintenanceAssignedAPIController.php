@@ -48,7 +48,7 @@ class MaintenanceAssignedAPIController extends Controller
     {
         $maintenance = $this->maintenanceRepository->verifyPayment($maintenance);
 
-        return $this->makeResponseResource(' Maintenance verify Successfully', new MaintenanceResource($maintenance));
+        return $this->makeResponseResource('Maintenance verify Successfully', new MaintenanceResource($maintenance));
     }
 
     public function uploadPrice(Maintenance $maintenance, UploadPriceMaintenanceAPIRequest $request ): JsonResponse

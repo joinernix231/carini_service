@@ -27,13 +27,13 @@ class MantenimientoCreado extends Notification implements ShouldQueue
         $deviceCount = $this->maintenance->clientDevices->count();
         $firstDevice = $this->maintenance->clientDevices->first();
         $clientName = $firstDevice ? $firstDevice->client->name : 'Cliente';
-        
-        $body = $deviceCount === 1 
-            ? "Nuevo mantenimiento para {$clientName} - {$firstDevice->device->model}"
-            : "Nuevo mantenimiento para {$clientName} - {$deviceCount} equipos";
+
+        $body = $deviceCount === 1
+            ? "Mantenimiento para {$clientName} - {$firstDevice->device->model}"
+            : "Mantenimiento para {$clientName} - {$deviceCount} equipos";
 
         return [
-            'title' => '🔧 Nuevo Mantenimiento Creado',
+            'title' => 'Nuevo Mantenimiento Creado',
             'body' => $body,
             'data' => [
                 'type' => 'maintenance_created',

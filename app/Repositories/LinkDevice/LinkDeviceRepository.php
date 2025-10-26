@@ -29,6 +29,14 @@ class LinkDeviceRepository extends BaseRepository
         $input['client_id'] = session('client_id');
         $input['status'] = true;
 
+        return parent::create($input);
+    }
+
+    public function linkDeviceByAdmin(array $input)
+    {
+        $input['linked_by'] = session('user_id');
+        $input['status'] = true;
+        $input['source'] = 'admin';
 
         return parent::create($input);
     }
