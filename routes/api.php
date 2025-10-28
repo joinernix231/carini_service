@@ -17,6 +17,7 @@ use App\Http\Controllers\Maintenance\MaintenanceCoordinatorAPIController;
 use App\Http\Controllers\Maintenance\MaintenanceNotAssignedAPIController;
 use App\Http\Controllers\Maintenance\MaintenanceNotPriceAPIController;
 use App\Http\Controllers\Maintenance\MaintenancesByPaymentStatusAPIController;
+use App\Http\Controllers\Maintenance\TechnicianMaintenancesAPIController;
 use App\Http\Controllers\Maintenance\UpdatePaymentSupportAPIController;
 use App\Http\Controllers\Other\ResourceAPIController;
 use App\Http\Controllers\Technician\AvailableTechnicianAPIController;
@@ -65,6 +66,7 @@ Route::get('/availableDates', AvailableTechnicianController::class);
 Route::get('/availableTechnicians', AvailableTechnicianAPIController::class);
 Route::apiResource('/technical', TechnicianAPIController::class);
 Route::put('/technical/{technical}/status', InactiveTechnicianAPIController::class);
+Route::get('/technicianMaintenances', TechnicianMaintenancesAPIController::class . '@index');
 //Coordinators
 Route::post('/coordinators', CoordinatorAPIController::class . '@store');
 Route::get('/coordinators', CoordinatorAPIController::class . '@index');

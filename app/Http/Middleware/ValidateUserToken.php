@@ -7,6 +7,7 @@ use App\Models\Agent\Agent;
 use App\Models\Client\Client;
 use App\Models\User;
 use App\Repositories\Client\ClientRepository;
+use App\Repositories\Technician\TechnicianRepository;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +16,10 @@ use Symfony\Component\HttpFoundation\Response;
 readonly class ValidateUserToken
 {
 
-    public function __construct(protected readonly ClientRepository $clientRepository)
+    public function __construct(
+        protected readonly ClientRepository $clientRepository,
+        protected readonly TechnicianRepository $technicianRepository
+    )
     {}
 
     public function handle(Request $request, Closure $next)
@@ -32,12 +36,15 @@ readonly class ValidateUserToken
         }
 
         $client = $this->clientRepository->getClientByUserId($user->id);
+        $technician = $this->technicianRepository->getTechnicianByUserId($user->id);
 
         session([
-            'user_id'   => $user->id,
-            'user'      => $user,
-            'client'    => $client,
-            'client_id' => $client?->id,
+            'user_id'      => $user->id,
+            'user'         => $user,
+            'client'       => $client,
+            'client_id'    => $client?->id,
+            'technician'   => $technician,
+            'technician_id' => $technician?->id,
         ]);
 
 
