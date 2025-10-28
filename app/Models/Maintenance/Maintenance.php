@@ -192,4 +192,12 @@ class Maintenance extends Model
         }
         return null;
     }
+
+    public function getPriceSupportAttribute(): ?string
+    {
+        if ($paymentSupport = Arr::get($this->attributes, 'price_support')) {
+            return config('filesystems.disks.s3.url') . 'docs/pdfs/' . $paymentSupport;
+        }
+        return null;
+    }
 }
