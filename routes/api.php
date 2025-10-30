@@ -67,6 +67,15 @@ Route::get('/availableTechnicians', AvailableTechnicianAPIController::class);
 Route::apiResource('/technical', TechnicianAPIController::class);
 Route::put('/technical/{technical}/status', InactiveTechnicianAPIController::class);
 Route::get('/technicianMaintenances', TechnicianMaintenancesAPIController::class . '@index');
+Route::get('/technicianMaintenances/{maintenance}', TechnicianMaintenancesAPIController::class . '@show');
+Route::post('/technicianMaintenances/{maintenance}/photos', TechnicianMaintenancesAPIController::class . '@uploadPhoto');
+        Route::post('/technicianMaintenances/{maintenance}/start', TechnicianMaintenancesAPIController::class . '@startMaintenance');
+        Route::post('/technicianMaintenances/{maintenance}/pause', TechnicianMaintenancesAPIController::class . '@pauseMaintenance');
+        Route::post('/technicianMaintenances/{maintenance}/resume', TechnicianMaintenancesAPIController::class . '@resumeMaintenance');
+        Route::post('/technicianMaintenances/{maintenance}/progress', TechnicianMaintenancesAPIController::class . '@saveProgress');
+        Route::get('/technicianMaintenances/{maintenance}/progress', TechnicianMaintenancesAPIController::class . '@getProgress');
+        Route::post('/technicianMaintenances/{maintenance}/end', TechnicianMaintenancesAPIController::class . '@endMaintenance');
+        Route::get('/technician/activeMaintenance', TechnicianMaintenancesAPIController::class . '@activeMaintenance');
 //Coordinators
 Route::post('/coordinators', CoordinatorAPIController::class . '@store');
 Route::get('/coordinators', CoordinatorAPIController::class . '@index');

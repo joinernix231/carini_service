@@ -4,7 +4,9 @@
 
 Esta API permite a los técnicos obtener sus mantenimientos asignados con diferentes filtros opcionales. La API utiliza el criterio `TechnicianMaintenancesCriteria` para filtrar automáticamente por el técnico autenticado y permite filtros adicionales por estado y rango de fechas.
 
-## Endpoint
+## Endpoints
+
+### 1. Lista de Mantenimientos
 
 **URL:** `GET /api/technicianMaintenances`
 
@@ -12,13 +14,24 @@ Esta API permite a los técnicos obtener sus mantenimientos asignados con difere
 
 **Autenticación:** Requerida (JWT Token)
 
+### 2. Detalle de Mantenimiento
+
+**URL:** `GET /api/technicianMaintenances/{id}`
+
+**Método:** GET
+
+**Autenticación:** Requerida (JWT Token)
+
+**Parámetros de Ruta:**
+- `id`: ID del mantenimiento (requerido)
+
 ## Headers Requeridos
 
 - `Authorization: Bearer {token}`
 - `Content-Type: application/json`
 - `Accept: application/json`
 
-## Parámetros de Query (Opcionales)
+## Parámetros de Query (Solo para Lista de Mantenimientos)
 
 | Parámetro | Tipo | Descripción | Valores Válidos | Ejemplo |
 |-----------|------|-------------|-----------------|---------|
@@ -26,6 +39,8 @@ Esta API permite a los técnicos obtener sus mantenimientos asignados con difere
 | `date_from` | string | Fecha de inicio del rango | Formato: `YYYY-MM-DD` | `?date_from=2024-01-01` |
 | `date_to` | string | Fecha de fin del rango | Formato: `YYYY-MM-DD` | `?date_to=2024-01-31` |
 | `unpaginated` | boolean | Obtener todos los resultados sin paginación | `true`, `false` | `?unpaginated=true` |
+
+**Nota:** Los parámetros de query solo aplican para el endpoint de lista (`GET /api/technicianMaintenances`). El endpoint de detalle (`GET /api/technicianMaintenances/{id}`) no acepta parámetros de query.
 
 ## Ejemplos de Uso
 
@@ -66,9 +81,16 @@ GET /api/technicianMaintenances?date_to=2024-01-30
 GET /api/technicianMaintenances?status=assigned&date_from=2024-01-15&date_to=2024-01-30
 ```
 
-## Respuesta Exitosa
+### 8. Obtener detalle de un mantenimiento específico
+```
+GET /api/technicianMaintenances/123
+```
 
-### Estructura de la Respuesta
+## Respuestas
+
+### Respuesta Exitosa - Lista de Mantenimientos
+
+### Estructura de la Respuesta (Lista)
 
 ```json
 {
@@ -111,6 +133,68 @@ GET /api/technicianMaintenances?status=assigned&date_from=2024-01-15&date_to=202
 }
 ```
 
+### Respuesta Exitosa - Detalle de Mantenimiento
+
+```json
+{
+  "success": true,
+  "message": "Maintenance detail retrieved successfully",
+  "data": {
+    "id": 1,
+    "status": "assigned",
+    "date_maintenance": "2024-01-15",
+    "description": "Mantenimiento preventivo del dispositivo",
+    "created_at": "2024-01-10T10:00:00.000000Z",
+    "updated_at": "2024-01-10T10:00:00.000000Z",
+    "clientDevices": {
+      "client": {
+        "id": 1,
+        "name": "Cliente Ejemplo",
+        "email": "cliente@ejemplo.com",
+        "phone": "+1234567890",
+        "address": "Dirección del cliente"
+      },
+      "device": {
+        "id": 1,
+        "name": "Dispositivo Ejemplo",
+        "model": "Modelo XYZ",
+        "serial_number": "SN123456789"
+      }
+    },
+    "technician": {
+      "user": {
+        "id": 1,
+        "name": "Técnico Ejemplo",
+        "email": "tecnico@ejemplo.com"
+      }
+    },
+    "maintenanceItems": [
+      {
+        "id": 1,
+        "description": "Cambio de filtro",
+        "price": 25.50,
+        "quantity": 1
+      }
+    ],
+    "maintenanceImages": [
+      {
+        "id": 1,
+        "image_url": "https://example.com/image1.jpg",
+        "description": "Imagen antes del mantenimiento"
+      }
+    ],
+    "payments": [
+      {
+        "id": 1,
+        "amount": 100.00,
+        "status": "pending",
+        "payment_method": "cash"
+      }
+    ]
+  }
+}
+```
+
 ### Campos de la Respuesta
 
 #### Objeto Principal (Mantenimiento)
@@ -136,11 +220,17 @@ GET /api/technicianMaintenances?status=assigned&date_from=2024-01-15&date_to=202
   - `name`: Nombre del técnico
   - `email`: Email del técnico
 
-#### Objeto meta (Solo cuando está paginado)
+#### Objeto meta (Solo cuando está paginado - Lista)
 - `current_page`: Página actual
 - `per_page`: Elementos por página
 - `total`: Total de elementos
 - `last_page`: Última página
+
+#### Campos Adicionales (Solo en Detalle)
+- `description`: Descripción detallada del mantenimiento
+- `maintenanceItems`: Array de items/servicios realizados
+- `maintenanceImages`: Array de imágenes del mantenimiento
+- `payments`: Array de pagos relacionados
 
 ## Respuesta de Error
 
@@ -166,6 +256,14 @@ GET /api/technicianMaintenances?status=assigned&date_from=2024-01-15&date_to=202
 }
 ```
 
+### Error de Mantenimiento No Encontrado (404)
+```json
+{
+  "success": false,
+  "message": "Maintenance not found or not assigned to this technician"
+}
+```
+
 ### Error del Servidor (500)
 ```json
 {
@@ -181,6 +279,7 @@ GET /api/technicianMaintenances?status=assigned&date_from=2024-01-15&date_to=202
 |--------|-------------|
 | 200 | Éxito - Mantenimientos obtenidos correctamente |
 | 401 | No autorizado - Token inválido o faltante |
+| 404 | No encontrado - Mantenimiento no existe o no asignado al técnico |
 | 422 | Error de validación - Parámetros inválidos |
 | 500 | Error interno del servidor |
 
@@ -199,9 +298,19 @@ GET /api/technicianMaintenances?status=assigned&date_from=2024-01-15&date_to=202
 - Usar `unpaginated=true` para obtener todos los resultados
 
 ### Relaciones Incluidas
+
+#### Lista de Mantenimientos
 - `clientDevices.client`: Información del cliente
 - `clientDevices.device`: Información del dispositivo
 - `technician.user`: Información del técnico
+
+#### Detalle de Mantenimiento
+- `clientDevices.client`: Información completa del cliente
+- `clientDevices.device`: Información completa del dispositivo
+- `technician.user`: Información del técnico
+- `maintenanceItems`: Items/servicios del mantenimiento
+- `maintenanceImages`: Imágenes del mantenimiento
+- `payments`: Pagos relacionados
 
 ## Casos de Uso Comunes
 
@@ -220,6 +329,9 @@ Obtener todos los mantenimientos de un mes específico sin paginación.
 ### 5. Búsqueda Combinada
 Combinar filtros para encontrar mantenimientos específicos (ej: asignados en la última semana).
 
+### 6. Vista de Detalle
+Mostrar información completa de un mantenimiento específico incluyendo items, imágenes y pagos.
+
 ## Notas de Implementación
 
 - Todos los parámetros de fecha deben estar en formato ISO (YYYY-MM-DD)
@@ -227,10 +339,14 @@ Combinar filtros para encontrar mantenimientos específicos (ej: asignados en la
 - Los filtros de fecha son inclusivos (incluyen las fechas límite)
 - La paginación se aplica solo cuando no se especifica `unpaginated=true`
 - Los resultados siempre incluyen las relaciones necesarias para mostrar información completa
+- El endpoint de detalle verifica que el mantenimiento esté asignado al técnico autenticado
+- El endpoint de detalle incluye información adicional como items, imágenes y pagos
 
 ## Limitaciones
 
-- Solo técnicos autenticados pueden acceder a este endpoint
+- Solo técnicos autenticados pueden acceder a estos endpoints
 - Los filtros de fecha no pueden ser anteriores a la fecha de creación del mantenimiento
 - El parámetro `date_to` debe ser posterior o igual a `date_from`
 - Máximo 20 elementos por página en modo paginado
+- El endpoint de detalle solo muestra mantenimientos asignados al técnico autenticado
+- Los IDs de mantenimiento deben ser válidos y existir en la base de datos

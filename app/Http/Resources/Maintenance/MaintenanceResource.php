@@ -20,20 +20,22 @@ class MaintenanceResource extends JsonResource
     public function toArray(Request $request): array
     {
         $clientDevices = $this->whenLoaded('clientDevices');
+        $latestLocation = $this->getLatestLocation();
 
         return [
-          'id' => $this->resource->id,
-          'type' => $this->resource->type,
-          'date_maintenance' => $this->resource->date_maintenance,
-          'shift' => $this->resource->shift,
-          'status' => $this->resource->status,
-          'value' => $this->resource->value,
-//          'spare_parts' => $this->resource->spare_parts,
+          'id' => $this->id,
+          'type' => $this->type,
+          'date_maintenance' => $this->date_maintenance,
+          'shift' => $this->shift,
+          'status' => $this->status,
+          'value' => $this->value,
+//          'spare_parts' => $this->spare_parts,
           'device' => $this->whenLoaded('clientDevices', function () {
-              return $this->resource->clientDevices->map(function ($clientDevice) {
+              return $this->clientDevices->map(function ($clientDevice) {
                   return [
                       'id' => $clientDevice->device->id,
                       'model' => $clientDevice->device->model,
+                      'client_device_id' => $clientDevice->id,
                       'brand' => $clientDevice->device->brand,
                       'type' => $clientDevice->device->type,
                       'serial' => $clientDevice->serial,
@@ -44,12 +46,16 @@ class MaintenanceResource extends JsonResource
           }),
           'client' => new ClientResource($this->whenLoaded('client')),
           'technician' => new TechnicianResource($this->whenLoaded('technician')),
-          'description' => $this->resource->description,
-          'photo' => $this->resource->photo,
-          'is_paid' => $this->resource->is_paid,
-          'payment_support' => $this->resource->payment_support,
-          'price_support' => $this->resource->price_support,
-          'created_at' => $this->resource->created_at,
+          'latitude' => $latestLocation ? $latestLocation['latitude'] : null,
+          'longitude' => $latestLocation ? $latestLocation['longitude'] : null,
+          'started_at' => $this->started_at,
+          'total_pause_ms' => $this->started_at ? $this->getTotalPausedTimeMs() : 0,
+          'description' => $this->description,
+          'photo' => $this->photo,
+          'is_paid' => $this->is_paid,
+          'payment_support' => $this->payment_support,
+          'price_support' => $this->price_support,
+          'created_at' => $this->created_at,
         ];
     }
 }

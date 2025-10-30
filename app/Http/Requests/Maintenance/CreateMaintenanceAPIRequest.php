@@ -27,7 +27,7 @@ class CreateMaintenanceAPIRequest extends APIRequest
             'required',
             'array',
             'min:1',
-           // new UniquePendingMaintenanceForDevicesRule()
+            new UniquePendingMaintenanceForDevicesRule()
         ];
 
         $rules['client_devices.*.id'] = [

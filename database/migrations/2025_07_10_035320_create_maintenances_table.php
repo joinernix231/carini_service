@@ -27,9 +27,14 @@ return new class extends Migration
 
             $table->enum('type', ['preventive', 'corrective']);
             $table->date('date_maintenance')->nullable();
+            $table->timestamp('started_at')->nullable();
+            $table->date('ended_at')->nullable();
             $table->enum('shift', ['AM', 'PM'])->nullable();
             $table->string('photo')->nullable();
-            $table->string('description')->nullable();$table->enum('status', [
+            $table->string('signature_photo')->nullable();
+            $table->string('description')->nullable();
+
+            $table->enum('status', [
                 'pending',
                 'quoted',
                 'payment_uploaded',
@@ -43,6 +48,7 @@ return new class extends Migration
             $table->boolean('is_paid')->nullable();
             $table->string('payment_support')->nullable();
             $table->string('price_support')->nullable();
+            $table->string('observations')->nullable();
 
             $table->json('spare_parts')->nullable();
 

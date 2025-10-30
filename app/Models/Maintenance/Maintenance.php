@@ -4,12 +4,15 @@ namespace App\Models\Maintenance;
 
 use App\Models\Client\Client;
 use App\Models\ClientDevice\ClientDevice;
+use App\Models\Maintenance\MaintenancePhoto;
+use App\Models\Maintenance\MaintenanceActionLog;
 use App\Models\Technician\Technician;
 use Database\Factories\MaintenanceFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 
@@ -62,6 +65,14 @@ class Maintenance extends Model
         'is_paid',
         'payment_support',
         'spare_parts',
+        'started_at',
+    ];
+
+    protected $casts = [
+        'started_at' => 'datetime',
+        'date_maintenance' => 'datetime',
+        'spare_parts' => 'array',
+        'is_paid' => 'boolean',
     ];
 
     /**
@@ -113,7 +124,15 @@ class Maintenance extends Model
     public function clientDevices(): BelongsToMany
     {
         return $this->belongsToMany(ClientDevice::class, 'maintenance_client_device')
-            ->withPivot('description')
+            ->withPivot(
+                'description',
+                'progress_completed_indices',
+                'progress_completed_count',
+                'progress_total',
+                'progress_pct',
+                'progress_status',
+                'progress_updated_at'
+            )
             ->withTimestamps();
     }
 
@@ -128,6 +147,124 @@ class Maintenance extends Model
     }
 
     /**
+     * Relación con las fotos del mantenimiento.
+     *
+     * @return HasMany<MaintenancePhoto, Maintenance>
+     */
+    public function photos(): HasMany
+    {
+        return $this->hasMany(MaintenancePhoto::class);
+    }
+
+    /**
+     * Relación con los logs de acción del mantenimiento.
+     */
+    public function actionLogs(): HasMany
+    {
+        return $this->hasMany(MaintenanceActionLog::class);
+    }
+
+    /**
+     * Obtener el último log de acción del mantenimiento.
+     */
+    public function getLatestActionLog(): ?MaintenanceActionLog
+    {
+        return $this->actionLogs()->latest('timestamp')->first();
+    }
+
+    /**
+     * Obtener la última ubicación GPS del mantenimiento.
+     */
+    public function getLatestLocation(): ?array
+    {
+        $latestActionLog = $this->getLatestActionLog();
+        
+        return $latestActionLog && $latestActionLog->hasLocation() ? $latestActionLog->location : null;
+    }
+
+    /**
+     * Obtener logs de acción por tipo específico
+     */
+    public function getActionLogsByAction(string $action)
+    {
+        return $this->actionLogs()->where('action', $action)->get();
+    }
+
+    /**
+     * Verificar si el mantenimiento tiene una acción específica
+     */
+    public function hasAction(string $action): bool
+    {
+        return $this->actionLogs()->where('action', $action)->exists();
+    }
+
+    /**
+     * Obtener el tiempo total trabajado en el mantenimiento
+     */
+    public function getTotalWorkTime(): ?string
+    {
+        $startLog = $this->actionLogs()->where('action', 'start')->first();
+        $endLog = $this->actionLogs()->where('action', 'end')->first();
+
+        if (!$startLog || !$endLog) {
+            return null;
+        }
+
+        $duration = $startLog->timestamp->diff($endLog->timestamp);
+        return $duration->format('%H:%I:%S');
+    }
+
+    /**
+     * Calcular el tiempo total pausado acumulado en milisegundos
+     * Optimizado para no cargar relaciones innecesarias
+     */
+    public function getTotalPausedTimeMs(): int
+    {
+        // Solo obtener logs de pause/resume, ordenados
+        $logs = $this->actionLogs()
+            ->select('action', 'timestamp')
+            ->whereIn('action', ['pause', 'resume'])
+            ->orderBy('timestamp')
+            ->get();
+
+        if ($logs->isEmpty()) {
+            return 0;
+        }
+
+        $totalPausedMs = 0;
+        $pauseTimestamp = null;
+
+        foreach ($logs as $log) {
+            if ($log->action === 'pause') {
+                $pauseTimestamp = $log->timestamp;
+            } elseif ($log->action === 'resume' && $pauseTimestamp) {
+                // Sumar duración en milisegundos
+                $totalPausedMs += $pauseTimestamp->diffInMilliseconds($log->timestamp);
+                $pauseTimestamp = null;
+            }
+        }
+
+        // Si hay un pause sin resume (mantenimiento actualmente pausado)
+        // Sumar desde el pause hasta ahora
+        if ($pauseTimestamp) {
+            $totalPausedMs += $pauseTimestamp->diffInMilliseconds(now());
+        }
+
+        return $totalPausedMs;
+    }
+
+    /**
+     * Obtener el historial completo de acciones
+     */
+    public function getActionHistory()
+    {
+        return $this->actionLogs()
+            ->with('technician')
+            ->orderBy('timestamp')
+            ->get();
+    }
+
+    /**
      * Accesor para obtener el cliente asociado al mantenimiento.
      * Este accessor obtiene el cliente del primer ClientDevice asociado.
      *
@@ -137,6 +274,14 @@ class Maintenance extends Model
     {
         if ($this->relationLoaded('clientDevices') && $this->clientDevices->isNotEmpty()) {
             return $this->clientDevices->first()->client;
+        }
+
+        // Si no están cargadas las relaciones, cargarlas automáticamente
+        if (!$this->relationLoaded('clientDevices')) {
+            $this->load('clientDevices.client');
+            if ($this->clientDevices->isNotEmpty()) {
+                return $this->clientDevices->first()->client;
+            }
         }
 
         return null;
