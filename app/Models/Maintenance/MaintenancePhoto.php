@@ -16,19 +16,17 @@ class MaintenancePhoto extends Model
         'client_device_id',
         'photo',
         'photo_type',
-        'uploaded_at'
     ];
 
     protected $casts = [
-        'uploaded_at' => 'datetime'
+        //
     ];
 
     public static array $rules = [
         'maintenance_id' => 'required|exists:maintenances,id',
-        'client_device_id' => 'required|exists:client_devices,id',
+        'client_device_id' => 'required|exists:client_device,id',
         'photo' => 'required|string',
         'photo_type' => 'required|in:initial,final,part,other',
-        'uploaded_at' => 'required|date'
     ];
 
     /**

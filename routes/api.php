@@ -24,6 +24,7 @@ use App\Http\Controllers\Technician\AvailableTechnicianAPIController;
 use App\Http\Controllers\Technician\AvailableTechnicianController;
 use App\Http\Controllers\Technician\InactiveTechnicianAPIController;
 use App\Http\Controllers\Technician\TechnicianAPIController;
+use App\Http\Controllers\Technician\TechnicianMaintenancesDetailAPIController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([], function () {
@@ -68,6 +69,9 @@ Route::apiResource('/technical', TechnicianAPIController::class);
 Route::put('/technical/{technical}/status', InactiveTechnicianAPIController::class);
 Route::get('/technicianMaintenances', TechnicianMaintenancesAPIController::class . '@index');
 Route::get('/technicianMaintenances/{maintenance}', TechnicianMaintenancesAPIController::class . '@show');
+// Technician Maintenances Detail (for supervisors/coordinators)
+Route::get('/maintenancesTechnicians/{technician}', TechnicianMaintenancesDetailAPIController::class . '@index');
+Route::get('/maintenancesTechnicians/{technician}/maintenance/{maintenance}', TechnicianMaintenancesDetailAPIController::class . '@show');
 Route::post('/technicianMaintenances/{maintenance}/photos', TechnicianMaintenancesAPIController::class . '@uploadPhoto');
         Route::post('/technicianMaintenances/{maintenance}/start', TechnicianMaintenancesAPIController::class . '@startMaintenance');
         Route::post('/technicianMaintenances/{maintenance}/pause', TechnicianMaintenancesAPIController::class . '@pauseMaintenance');
@@ -75,6 +79,8 @@ Route::post('/technicianMaintenances/{maintenance}/photos', TechnicianMaintenanc
         Route::post('/technicianMaintenances/{maintenance}/progress', TechnicianMaintenancesAPIController::class . '@saveProgress');
         Route::get('/technicianMaintenances/{maintenance}/progress', TechnicianMaintenancesAPIController::class . '@getProgress');
         Route::post('/technicianMaintenances/{maintenance}/end', TechnicianMaintenancesAPIController::class . '@endMaintenance');
+        Route::post('/technicianMaintenances/{maintenance}/complete', TechnicianMaintenancesAPIController::class . '@completeMaintenance');
+        Route::post('/technicianMaintenances/{maintenance}/suggest-spare-part', TechnicianMaintenancesAPIController::class . '@suggestSparePart');
         Route::get('/technician/activeMaintenance', TechnicianMaintenancesAPIController::class . '@activeMaintenance');
 //Coordinators
 Route::post('/coordinators', CoordinatorAPIController::class . '@store');

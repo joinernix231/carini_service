@@ -6,6 +6,7 @@ use App\Models\Client\Client;
 use App\Models\ClientDevice\ClientDevice;
 use App\Models\Maintenance\MaintenancePhoto;
 use App\Models\Maintenance\MaintenanceActionLog;
+use App\Models\Maintenance\SparePartSuggestion;
 use App\Models\Technician\Technician;
 use Database\Factories\MaintenanceFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -66,6 +67,8 @@ class Maintenance extends Model
         'payment_support',
         'spare_parts',
         'started_at',
+        'observations',
+        'signature_photo',
     ];
 
     protected $casts = [
@@ -162,6 +165,14 @@ class Maintenance extends Model
     public function actionLogs(): HasMany
     {
         return $this->hasMany(MaintenanceActionLog::class);
+    }
+
+    /**
+     * Relación con las sugerencias de repuesto del mantenimiento.
+     */
+    public function sparePartSuggestions(): HasMany
+    {
+        return $this->hasMany(SparePartSuggestion::class);
     }
 
     /**

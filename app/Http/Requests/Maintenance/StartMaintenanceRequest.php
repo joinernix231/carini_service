@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Maintenance;
 
 use App\Http\Requests\APIRequest;
+use App\Models\Maintenance\Maintenance;
+use App\Rules\Maintenance\MaintenanceDateMatchRule;
 
 class StartMaintenanceRequest extends APIRequest
 {
@@ -29,8 +31,11 @@ class StartMaintenanceRequest extends APIRequest
 
     public function rules(): array
     {
+        /** @var Maintenance $maintenance */
+        $maintenance = $this->route('maintenance');
+
         return [
-            'latitude' => 'required|numeric|between:-90,90',
+            'latitude' => ['required', 'numeric', 'between:-90,90', new MaintenanceDateMatchRule($maintenance)],
             'longitude' => 'required|numeric|between:-180,180',
             'notes' => 'nullable|string|max:1000'
         ];

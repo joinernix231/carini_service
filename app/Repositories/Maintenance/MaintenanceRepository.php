@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Maintenance;
 
+use App\Events\Maintenance\MaintenanceAssigned;
 use App\Events\Maintenance\MaintenanceCreated;
 use App\Events\Maintenance\UploadPriceMaintenance;
 use App\Events\Maintenance\UploadSupportPaymentMaintenance;
@@ -46,6 +47,8 @@ class MaintenanceRepository extends BaseRepository
         $maintenance->status = 'assigned';
         $maintenance->save();
 
+        event(new MaintenanceAssigned($maintenance));
+
         return $maintenance;
     }
 
@@ -63,6 +66,8 @@ class MaintenanceRepository extends BaseRepository
         }
 
         $maintenance->save();
+
+        event(new MaintenanceAssigned($maintenance));
 
         return $maintenance;
     }

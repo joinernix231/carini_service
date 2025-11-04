@@ -56,6 +56,25 @@ class MaintenanceResource extends JsonResource
           'payment_support' => $this->payment_support,
           'price_support' => $this->price_support,
           'created_at' => $this->created_at,
+          'spare_part_suggestions' => $this->whenLoaded('sparePartSuggestions', function () {
+              return $this->sparePartSuggestions->map(function ($suggestion) {
+                  $device = $suggestion->clientDevice->device ?? null;
+                  return [
+                      'id' => $suggestion->id,
+                      'client_device_id' => $suggestion->client_device_id,
+                      'device' => [
+                          'id' => $suggestion->clientDevice->id,
+                          'brand' => $device?->brand ?? null,
+                          'model' => $device?->model ?? null,
+                          'serial' => $suggestion->clientDevice->serial,
+                      ],
+                      'description' => $suggestion->description,
+                      'photo' => $suggestion->photo,
+                      'created_at' => $suggestion->created_at->toISOString(),
+                      'updated_at' => $suggestion->updated_at->toISOString(),
+                  ];
+              });
+          }),
         ];
     }
 }

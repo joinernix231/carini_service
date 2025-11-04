@@ -11,7 +11,6 @@ class MaintenancePhotoRepository extends BaseRepository
         'maintenance_id',
         'client_device_id',
         'photo_type',
-        'uploaded_at'
     ];
 
     public function getFieldsSearchable(): array

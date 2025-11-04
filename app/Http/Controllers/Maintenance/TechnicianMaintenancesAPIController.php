@@ -4,19 +4,23 @@ namespace App\Http\Controllers\Maintenance;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Maintenance\ActiveMaintenanceRequest;
+use App\Http\Requests\Maintenance\CompleteMaintenanceRequest;
 use App\Http\Requests\Maintenance\PauseMaintenanceRequest;
 use App\Http\Requests\Maintenance\ResumeMaintenanceRequest;
 use App\Http\Requests\Maintenance\ShowTechnicianMaintenanceRequest;
 use App\Http\Requests\Maintenance\StartMaintenanceRequest;
 use App\Http\Requests\Maintenance\SaveProgressRequest;
+use App\Http\Requests\Maintenance\SuggestSparePartRequest;
 use App\Http\Requests\Maintenance\TechnicianMaintenancesAPIRequest;
 use App\Http\Requests\Maintenance\UploadMultiplePhotosRequest;
 use App\Http\Resources\Maintenance\MaintenancePhotoResource;
 use App\Http\Resources\Maintenance\MaintenanceResource;
+use App\Http\Resources\Maintenance\SparePartSuggestionResource;
 use App\Models\Maintenance\Maintenance;
 use App\Repositories\Maintenance\MaintenanceActionLogRepository;
 use App\Repositories\Maintenance\MaintenancePhotoRepository;
 use App\Repositories\Maintenance\MaintenanceRepository;
+use App\Repositories\Maintenance\SparePartSuggestionRepository;
 use App\Services\MaintenanceProgressService;
 use App\Utils\Criterias\BasicCriteria\OrderByCriteria;
 use App\Utils\Criterias\Maintenance\TechnicianMaintenancesCriteria;
@@ -29,17 +33,20 @@ class TechnicianMaintenancesAPIController extends Controller
     private MaintenancePhotoRepository $maintenancePhotoRepository;
     private MaintenanceActionLogRepository $maintenanceActionLogRepository;
     private ResourceService $resourceService;
+    private SparePartSuggestionRepository $sparePartSuggestionRepository;
 
     public function __construct(
         MaintenanceRepository $maintenanceRepository,
         MaintenancePhotoRepository $maintenancePhotoRepository,
         MaintenanceActionLogRepository $maintenanceActionLogRepository,
-        ResourceService $resourceService
+        ResourceService $resourceService,
+        SparePartSuggestionRepository $sparePartSuggestionRepository
     ) {
         $this->maintenanceRepository = $maintenanceRepository;
         $this->maintenancePhotoRepository = $maintenancePhotoRepository;
         $this->maintenanceActionLogRepository = $maintenanceActionLogRepository;
         $this->resourceService = $resourceService;
+        $this->sparePartSuggestionRepository = $sparePartSuggestionRepository;
     }
 
     public function index(TechnicianMaintenancesAPIRequest $request): JsonResponse
@@ -386,6 +393,97 @@ class TechnicianMaintenancesAPIController extends Controller
                 'avg_progress_pct' => $avg,
                 'all_completed' => (bool) $allCompleted,
             ],
+        ]);
+    }
+
+    /**
+     * Sugerir cambio de repuesto para un mantenimiento
+     *
+     * @param Maintenance $maintenance
+     * @param SuggestSparePartRequest $request
+     * @return JsonResponse
+     */
+    public function suggestSparePart(Maintenance $maintenance, SuggestSparePartRequest $request): JsonResponse
+    {
+        $input = $request->validated();
+
+        // Crear sugerencia
+        $suggestion = $this->sparePartSuggestionRepository->create([
+            'maintenance_id' => $maintenance->id,
+            'client_device_id' => $input['client_device_id'],
+            'description' => $input['description'],
+            'photo' => $input['photo'] ?? null,
+        ]);
+
+        // Cargar relaciones para el resource
+        $suggestion->load(['clientDevice.device']);
+
+        return $this->makeResponseResource(
+            'Sugerencia de cambio de repuesto registrada exitosamente',
+            new SparePartSuggestionResource($suggestion)
+        );
+    }
+
+    /**
+     * Completar un mantenimiento
+     *
+     * @param Maintenance $maintenance
+     * @param CompleteMaintenanceRequest $request
+     * @return JsonResponse
+     */
+    public function completeMaintenance(Maintenance $maintenance, CompleteMaintenanceRequest $request): JsonResponse
+    {
+        $input = $request->validated();
+
+        // Preparar datos para actualizar el mantenimiento
+        $updateData = [
+            'status' => 'completed',
+            'observations' => $input['final_observations'] ?? null,
+            'signature_photo' => $input['client_signature'] ?? null,
+        ];
+
+        // Actualizar estado del mantenimiento
+        $maintenance = $this->maintenanceRepository->update($updateData, $maintenance->id);
+
+        // Guardar fotos finales si vienen
+        $finalPhotos = [];
+        if (!empty($input['final_photos'])) {
+            $photosData = [];
+            foreach ($input['final_photos'] as $photoData) {
+                $photosData[] = [
+                    'client_device_id' => $photoData['client_device_id'],
+                    'photo' => $photoData['photo'],
+                    'photo_type' => 'final',
+                ];
+            }
+
+            $finalPhotos = $this->maintenancePhotoRepository->createMultiplePhotos($maintenance->id, $photosData);
+        }
+
+        // Registrar acción con ubicación
+        $this->maintenanceActionLogRepository->createActionLog(
+            $maintenance->id,
+            session('technician_id'),
+            'end',
+            null,
+            $input['latitude'],
+            $input['longitude']
+        );
+
+        // Cargar relaciones para el resource
+        $maintenance->load([
+            'clientDevices.client',
+            'clientDevices.device',
+            'technician.user',
+            'photos.clientDevice'
+        ]);
+
+        return $this->makeResponseResource('Maintenance completed successfully', [
+            'id' => $maintenance->id,
+            'status' => $maintenance->status,
+            'completed_at' => now(),
+            'total_work_time' => $maintenance->getTotalWorkTime(),
+            'final_photos' => MaintenancePhotoResource::collection($finalPhotos),
         ]);
     }
 }
