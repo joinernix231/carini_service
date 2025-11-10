@@ -16,9 +16,6 @@ class AuthAPIController extends Controller
         $credentials = $request->only(['email', 'password']);
 
         try {
-            // Configurar el token para que no expire
-            JWTAuth::setTTL(null);
-            
             if (!$token = JWTAuth::attempt($credentials)) {
                 return ResponseUtil::makeError('Credenciales inválidas', 401);
             }
