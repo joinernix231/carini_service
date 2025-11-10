@@ -24,7 +24,7 @@ class UpdateDeviceAPIRequest extends APIRequest
         $rules['serial'] = ['sometimes', 'string', 'max:100', $this->uniqueRule('devices', 'serial', $device)];
         $rules['model'] = ['sometimes', 'string', 'max:100'];
         $rules['brand'] = ['sometimes', 'string', 'max:100'];
-        $rules['description'] = ['sometimes', 'string'];
+        $rules['description'] = ['nullable', 'string'];
         $rules['type'] = ['sometimes', 'string', 'max:50'];
         $rules['photo'] = ['sometimes', 'string'];
         $rules['pdf_url'] = ['sometimes', 'nullable', 'string'];

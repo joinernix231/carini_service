@@ -12,12 +12,53 @@ class MaintenanceFactory extends Factory
 
     public function definition(): array
     {
+        $types = ['preventive', 'corrective'];
+        $type = $this->faker->randomElement($types);
+        
+        $descriptions = [
+            'preventive' => [
+                'Mantenimiento preventivo programado',
+                'Revisión general de componentes',
+                'Limpieza y lubricación de partes móviles',
+                'Verificación de sistemas eléctricos',
+                'Calibración de sensores y controles',
+                'Inspección de mangueras y conexiones',
+                'Revisión de filtros y sistemas de agua',
+            ],
+            'corrective' => [
+                'Reparación de motor defectuoso',
+                'Cambio de componentes desgastados',
+                'Corrección de falla en sistema eléctrico',
+                'Reparación de fuga en sistema hidráulico',
+                'Sustitución de piezas dañadas',
+                'Corrección de error en programación',
+                'Reparación de sistema de secado',
+            ],
+        ];
+
+        // Obtener un ClientDevice aleatorio para client_device_id (requerido por la migración)
+        $clientDevice = ClientDevice::inRandomOrder()->first();
+
         return [
-            'type' => $this->faker->randomElement(['preventive', 'corrective']),
-            'description' => $this->faker->sentence(),
+            'client_device_id' => $clientDevice ? $clientDevice->id : null,
+            'type' => $type,
+            'description' => $this->faker->randomElement($descriptions[$type]),
             'status' => 'pending',
-            'shift' => $this->faker->optional()->randomElement(['AM', 'PM']),
+            'date_maintenance' => $this->faker->dateTimeBetween('now', '+30 days'),
+            'shift' => $this->faker->randomElement(['AM', 'PM']),
             'photo' => 'equipo',
+            'value' => $this->faker->randomFloat(2, 50000, 500000),
+            'spare_parts' => $this->faker->optional(0.7)->randomElements([
+                'Filtro de agua',
+                'Manguera de entrada',
+                'Sensor de temperatura',
+                'Resistencia eléctrica',
+                'Bomba de agua',
+                'Correa de transmisión',
+                'Rodamiento',
+                'Válvula solenoide',
+            ], rand(1, 4)),
+            'observations' => $this->faker->optional(0.5)->sentence(),
         ];
     }
 
@@ -54,15 +95,21 @@ class MaintenanceFactory extends Factory
      */
     public function withDevices($clientDevices = null): static
     {
-        return $this->afterCreating(function (Maintenance $maintenance) use ($clientDevices) {
-            if ($clientDevices === null) {
-                // Si no se especifican dispositivos, crear algunos aleatorios
-                $devices = ClientDevice::inRandomOrder()->take(rand(1, 3))->get();
-            } else {
-                // Asegurar que sea una colección
-                $devices = collect($clientDevices);
+        // Normalizar los dispositivos una sola vez
+        if ($clientDevices === null) {
+            $devices = ClientDevice::inRandomOrder()->take(rand(1, 3))->get();
+        } else {
+            $devices = collect($clientDevices);
+        }
+
+        return $this->state(function (array $attributes) use ($devices) {
+            // Establecer client_device_id con el primer dispositivo (requerido por la migración)
+            if ($devices->isNotEmpty()) {
+                $attributes['client_device_id'] = $devices->first()->id;
             }
 
+            return $attributes;
+        })->afterCreating(function (Maintenance $maintenance) use ($devices) {
             $pivotData = [];
             foreach ($devices as $device) {
                 // Obtener el ID del dispositivo
@@ -83,11 +130,19 @@ class MaintenanceFactory extends Factory
      */
     public function withSingleDevice(ClientDevice $clientDevice = null): static
     {
-        return $this->afterCreating(function (Maintenance $maintenance) use ($clientDevice) {
-            if ($clientDevice === null) {
-                $clientDevice = ClientDevice::inRandomOrder()->first();
+        // Obtener el dispositivo una sola vez
+        if ($clientDevice === null) {
+            $clientDevice = ClientDevice::inRandomOrder()->first();
+        }
+
+        return $this->state(function (array $attributes) use ($clientDevice) {
+            // Establecer client_device_id (requerido por la migración)
+            if ($clientDevice) {
+                $attributes['client_device_id'] = $clientDevice->id;
             }
 
+            return $attributes;
+        })->afterCreating(function (Maintenance $maintenance) use ($clientDevice) {
             if ($clientDevice) {
                 $maintenance->clientDevices()->attach([
                     $clientDevice->id => [

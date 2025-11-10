@@ -10,43 +10,31 @@ class ClientSeeder extends Seeder
 {
     public function run(): void
     {
-        // Crear administrador específico
-        User::firstOrCreate(
-            ['email' => 'joinernix2@gmail.com'],
-            [
-                'name' => 'Joiner Administrador',
-                'password' => bcrypt('saiz123'),
-                'role' => 'administrador',
-            ]
-        );
+        // Obtener el usuario cliente específico (debe existir por UserSeeder)
+        $user = User::where('email', 'jo@gmail.com')->first();
 
-        // Crear cliente específico
-        $user = User::firstOrCreate(
-            ['email' => 'jo@gmail.com'],
-            [
-                'name' => 'Joiner Davila Cliente',
-                'password' => bcrypt('saiz123'),
-                'role' => 'cliente',
-            ]
-        );
+        if ($user) {
+            Client::firstOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'identifier' => '12345678',
+                    'name' => 'Joiner Davila Cliente',
+                    'client_type' => 'Natural',
+                    'document_type' => 'CC',
+                    'address' => 'Calle Siempre Viva 123',
+                    'city' => 'Bogotá',
+                    'department' => 'Cundinamarca',
+                    'phone' => '3001234567',
+                    'status' => 'active',
+                ]
+            );
+        }
 
-        Client::firstOrCreate(
-            ['user_id' => $user->id],
-            [
-                'identifier' => '12345678',
-                'name' => 'Joiner Davila Cliente',
-                'client_type' => 'Natural',
-                'document_type' => 'CC',
-                'address' => 'Calle Siempre Viva 123',
-                'city' => 'Bogotá',
-                'phone' => '3001234567',
-            ]
-        );
+        // Crear 8 clientes naturales y 7 clientes jurídicos para tener más datos
+        Client::factory(8)->natural()->create();
+        Client::factory(7)->juridico()->create();
 
-        // Crear 5 clientes naturales y 4 clientes jurídicos
-        Client::factory(5)->natural()->create();
-        Client::factory(4)->juridico()->create();
-
-        $this->command->info('✅ Administrador con email joinernix2@gmail.com, cliente fijo con email jo@gmail.com, 5 clientes naturales y 4 clientes jurídicos agregados correctamente.');
+        $totalClients = Client::count();
+        $this->command->info("✅ Cliente específico creado y {$totalClients} clientes totales en el sistema (8 naturales, 7 jurídicos).");
     }
 }

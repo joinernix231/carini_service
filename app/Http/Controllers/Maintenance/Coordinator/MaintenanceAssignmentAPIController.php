@@ -1,40 +1,32 @@
 <?php
 
-namespace App\Http\Controllers\Maintenance;
+namespace App\Http\Controllers\Maintenance\Coordinator;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Maintenance\AssignMaintenanceAPIRequest;
-use App\Http\Requests\Maintenance\ReadMaintenanceAssignedAPIRequest;
 use App\Http\Requests\Maintenance\UploadPriceMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\VerifyPaymentMaintenanceAPIRequest;
 use App\Http\Resources\Maintenance\MaintenanceResource;
 use App\Models\Maintenance\Maintenance;
 use App\Repositories\Maintenance\MaintenanceRepository;
-use App\Utils\Criterias\BasicCriteria\OrderByCriteria;
-use App\Utils\Criterias\BasicCriteria\WhereFieldCriteria;
 use Illuminate\Http\JsonResponse;
 
-class MaintenanceAssignedAPIController extends Controller
+class MaintenanceAssignmentAPIController extends Controller
 {
-    public function __construct(private readonly MaintenanceRepository $maintenanceRepository)
-    {}
+    private MaintenanceRepository $maintenanceRepository;
 
-    public function __invoke(ReadMaintenanceAssignedAPIRequest $request): JsonResponse
+    public function __construct(MaintenanceRepository $maintenanceRepository)
     {
-        $this->maintenanceRepository->pushCriteria(new WhereFieldCriteria('status', 'assigned'));
-        $this->maintenanceRepository->pushCriteria(new OrderByCriteria('created_at','asc'));
-
-        $maintenances = $request->has('unpaginated') ?
-            $this->maintenanceRepository->all() :
-            $this->maintenanceRepository->paginate(20);
-        $maintenances->load([
-            'clientDevices.client',
-            'clientDevices.device'
-        ]);
-
-        return $this->makeResponseResource('Maintenances retrieved Successfully', MaintenanceResource::collection($maintenances));
-
+        $this->maintenanceRepository = $maintenanceRepository;
     }
+
+    /**
+     * Asignar mantenimiento a un técnico
+     *
+     * @param Maintenance $maintenance
+     * @param AssignMaintenanceAPIRequest $request
+     * @return JsonResponse
+     */
     public function assignMaintenance(Maintenance $maintenance, AssignMaintenanceAPIRequest $request): JsonResponse
     {
         $input = $request->validated();
@@ -44,6 +36,14 @@ class MaintenanceAssignedAPIController extends Controller
 
         return $this->makeResponseResource('Maintenance assigned Successfully', new MaintenanceResource($maintenance));
     }
+
+    /**
+     * Verificar pago de un mantenimiento
+     *
+     * @param Maintenance $maintenance
+     * @param VerifyPaymentMaintenanceAPIRequest $request
+     * @return JsonResponse
+     */
     public function verifyPaymentOfMaintenance(Maintenance $maintenance, VerifyPaymentMaintenanceAPIRequest $request): JsonResponse
     {
         $maintenance = $this->maintenanceRepository->verifyPayment($maintenance);
@@ -51,10 +51,15 @@ class MaintenanceAssignedAPIController extends Controller
         return $this->makeResponseResource('Maintenance verify Successfully', new MaintenanceResource($maintenance));
     }
 
-    public function uploadPrice(Maintenance $maintenance, UploadPriceMaintenanceAPIRequest $request ): JsonResponse
+    /**
+     * Subir precio de un mantenimiento
+     *
+     * @param Maintenance $maintenance
+     * @param UploadPriceMaintenanceAPIRequest $request
+     * @return JsonResponse
+     */
+    public function uploadPrice(Maintenance $maintenance, UploadPriceMaintenanceAPIRequest $request): JsonResponse
     {
-        /**@var Maintenance $maintenance*/
-
         $input = $request->validated();
 
         $maintenance = $this->maintenanceRepository->uploadPrice($input, $maintenance);
@@ -62,3 +67,4 @@ class MaintenanceAssignedAPIController extends Controller
         return $this->makeResponseResource('Maintenance price Successfully', new MaintenanceResource($maintenance));
     }
 }
+

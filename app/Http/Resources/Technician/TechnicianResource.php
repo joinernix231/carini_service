@@ -32,7 +32,6 @@ class TechnicianResource extends BaseJsonResource
             'arl_pdf' => $this->resource->arl_pdf_url,
             'pension_pdf' => $this->resource->pension_pdf_url,
 
-
             'created_at' => $this->resource->created_at,
             'updated_at' => $this->resource->updated_at,
         ];

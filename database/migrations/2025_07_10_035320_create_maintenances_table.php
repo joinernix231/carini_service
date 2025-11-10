@@ -16,10 +16,6 @@ return new class extends Migration
         Schema::create('maintenances', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignIdFor(ClientDevice::class)
-                ->constrained()
-                ->onDelete('cascade');
-
             $table->foreignIdFor(Technician::class, 'technician_id')
                 ->nullable()
                 ->constrained()
@@ -27,9 +23,14 @@ return new class extends Migration
 
             $table->enum('type', ['preventive', 'corrective']);
             $table->date('date_maintenance')->nullable();
+            $table->timestamp('started_at')->nullable();
+            $table->date('ended_at')->nullable();
             $table->enum('shift', ['AM', 'PM'])->nullable();
             $table->string('photo')->nullable();
-            $table->string('description')->nullable();$table->enum('status', [
+            $table->string('signature_photo')->nullable();
+            $table->string('description')->nullable();
+
+            $table->enum('status', [
                 'pending',
                 'quoted',
                 'payment_uploaded',
@@ -39,10 +40,20 @@ return new class extends Migration
                 'cancelled'
             ])->default('pending');
 
+            // Campos de confirmación agregados posteriormente
+            $table->boolean('confirmation_required')->default(false);
+            $table->timestamp('confirmed_at')->nullable();
+            $table->timestamp('confirmation_deadline')->nullable();
+            $table->boolean('coordinator_notified')->default(false);
+            $table->timestamp('coordinator_notified_at')->nullable();
+            $table->boolean('coordinator_called')->default(false);
+            $table->timestamp('coordinator_called_at')->nullable();
+
             $table->decimal('value', 10, 2)->nullable();
             $table->boolean('is_paid')->nullable();
             $table->string('payment_support')->nullable();
             $table->string('price_support')->nullable();
+            $table->string('observations')->nullable();
 
             $table->json('spare_parts')->nullable();
 

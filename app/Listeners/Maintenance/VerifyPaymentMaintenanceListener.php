@@ -23,7 +23,12 @@ class VerifyPaymentMaintenanceListener
         $maintenance = $event->maintenance;
         $client = $maintenance->client;
 
-        $client->notify(new PagoMantenimientoVerificado($maintenance));
-
+        // Verificar que el cliente existe antes de enviar la notificación
+        if ($client) {
+            $client->notify(new PagoMantenimientoVerificado($maintenance));
+        } else {
+            // Log del error para debugging
+            \Log::warning('No se pudo enviar notificación de pago verificado: cliente no encontrado para mantenimiento ID: ' . $maintenance->id);
+        }
     }
 }

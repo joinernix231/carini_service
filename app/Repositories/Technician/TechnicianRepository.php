@@ -95,12 +95,22 @@ class TechnicianRepository extends BaseRepository
             return $query->get();
         }
 
-        // Obtener IDs de técnicos que tienen mantenimientos asignados para la fecha y turno específicos
-        $busyTechnicianIds = Maintenance::where('date_maintenance', $date)
+        // Obtener IDs de técnicos que tienen mantenimientos activos para la fecha y turno específicos
+        // Un técnico está ocupado si tiene un mantenimiento asignado para esa fecha/turno Y está activo
+        $maintenances = Maintenance::where('date_maintenance', $date)
             ->where('shift', $shift)
-            ->whereIn('status', ['assigned', 'in_progress'])
+            ->whereNotNull('technician_id')
+            ->with('actionLogs')
+            ->get();
+
+        // Filtrar mantenimientos activos (basado en action logs)
+        $busyTechnicianIds = $maintenances
+            ->filter(function ($maintenance) {
+                return $maintenance->isActive();
+            })
             ->pluck('technician_id')
             ->filter()
+            ->unique()
             ->toArray();
 
         // Excluir técnicos ocupados
@@ -118,6 +128,138 @@ class TechnicianRepository extends BaseRepository
             ->first();
     }
 
+    /**
+     * Obtener el mantenimiento actual (activo) del técnico
+     * Basado en el último action log, no en el status
+     */
+    public function getCurrentMaintenance(int $technicianId): ?Maintenance
+    {
+        $maintenances = Maintenance::where('technician_id', $technicianId)
+            ->with(['clientDevices', 'actionLogs'])
+            ->get();
 
+        // Buscar el mantenimiento activo basado en el último action log
+        return $maintenances->first(function ($maintenance) {
+            return $maintenance->isActive();
+        });
+    }
+
+    /**
+     * Obtener la última ubicación del técnico desde los logs
+     */
+    public function getLastLocation(int $technicianId): ?array
+    {
+        $lastLog = \App\Models\Maintenance\MaintenanceActionLog::where('technician_id', $technicianId)
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->orderBy('timestamp', 'desc')
+            ->first();
+
+        if (!$lastLog) {
+            return null;
+        }
+
+        return [
+            'latitude' => $lastLog->latitude,
+            'longitude' => $lastLog->longitude,
+            'timestamp' => $lastLog->timestamp,
+        ];
+    }
+
+    /**
+     * Calcular el tiempo que lleva el técnico en el mantenimiento actual
+     */
+    public function getCurrentMaintenanceTime(int $maintenanceId): ?array
+    {
+        $maintenance = Maintenance::find($maintenanceId);
+        if (!$maintenance) {
+            return null;
+        }
+
+        // Obtener el primer log de start
+        $startLog = \App\Models\Maintenance\MaintenanceActionLog::where('maintenance_id', $maintenanceId)
+            ->where('action', 'start')
+            ->orderBy('timestamp', 'asc')
+            ->first();
+
+        if (!$startLog) {
+            return null;
+        }
+
+        // Obtener el último log
+        $lastLog = \App\Models\Maintenance\MaintenanceActionLog::where('maintenance_id', $maintenanceId)
+            ->orderBy('timestamp', 'desc')
+            ->first();
+
+        if (!$lastLog) {
+            return null;
+        }
+
+        // Determinar el tiempo final
+        $endTime = $lastLog->action === 'end' ? $lastLog->timestamp : now();
+
+        // Calcular tiempo total desde el start hasta el tiempo final
+        $totalTimeMs = $startLog->timestamp->diffInMilliseconds($endTime);
+
+        // Restar el tiempo pausado total (el método getTotalPausedTimeMs ya maneja pausas activas)
+        $pausedTimeMs = $maintenance->getTotalPausedTimeMs();
+        $totalTimeMs -= $pausedTimeMs;
+
+        // Asegurar que el tiempo no sea negativo
+        if ($totalTimeMs < 0) {
+            $totalTimeMs = 0;
+        }
+
+        // Convertir milisegundos a formato legible
+        $seconds = floor($totalTimeMs / 1000);
+        $minutes = floor($seconds / 60);
+        $hours = floor($minutes / 60);
+        $seconds = $seconds % 60;
+        $minutes = $minutes % 60;
+
+        return [
+            'total_ms' => $totalTimeMs,
+            'formatted' => sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds),
+            'hours' => $hours,
+            'minutes' => $minutes,
+            'seconds' => $seconds,
+        ];
+    }
+
+    /**
+     * Obtener el porcentaje de completado del mantenimiento
+     */
+    public function getMaintenanceProgressPercentage(int $maintenanceId): float
+    {
+        $maintenance = Maintenance::find($maintenanceId);
+        if (!$maintenance) {
+            return 0.0;
+        }
+
+        $maintenance->load('clientDevices');
+        $clientDevices = $maintenance->clientDevices;
+
+        if ($clientDevices->isEmpty()) {
+            return 0.0;
+        }
+
+        // Calcular el promedio de los porcentajes de progreso de todos los dispositivos
+        $avg = round($clientDevices->avg(function ($cd) {
+            return (float) ($cd->pivot->progress_pct ?? 0);
+        }) ?? 0, 2);
+
+        return $avg;
+    }
+
+    /**
+     * Obtener todos los logs del técnico
+     */
+    public function getTechnicianLogs(int $technicianId)
+    {
+        return \App\Models\Maintenance\MaintenanceActionLog::where('technician_id', $technicianId)
+            ->with(['maintenance', 'technician'])
+            ->orderBy('timestamp', 'desc')
+            ->get();
+    }
 
 }

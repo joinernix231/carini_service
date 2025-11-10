@@ -27,7 +27,7 @@ class AdminDeviceLinkAPIController extends Controller
         return $this->makeResponseResource('ClientDevice created Successfully', new ClientDeviceResource($clientDevice));
     }
 
-    public function destroy(Client $client, ClientDevice $clientDevice, DeleteAdminClientDeviceAPIRequest $request): JsonResponse
+    public function destroy(ClientDevice $clientDevice, DeleteAdminClientDeviceAPIRequest $request): JsonResponse
     {
         $this->linkDeviceRepository->delete($clientDevice->id);
 

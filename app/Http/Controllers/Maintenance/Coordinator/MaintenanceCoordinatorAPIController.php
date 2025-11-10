@@ -1,21 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Maintenance;
+namespace App\Http\Controllers\Maintenance\Coordinator;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Maintenance\CreateMaintenanceAPIRequest;
-use App\Http\Requests\Maintenance\DeleteMaintenanceAPIRequest;
-use App\Http\Requests\Maintenance\ReadMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\ReadMaintenanceCoordinatorAPIRequest;
-use App\Http\Requests\Maintenance\ShowMaintenanceAPIRequest;
-use App\Http\Requests\Maintenance\UpdateMaintenanceAPIRequest;
-use App\Http\Requests\Maintenance\UpdateQuotationAPIRequest;
+use App\Http\Requests\Maintenance\ReadUnconfirmedMaintenancesAPIRequest;
 use App\Http\Resources\Maintenance\MaintenanceResource;
-use App\Models\Maintenance\Maintenance;
 use App\Repositories\Maintenance\MaintenanceRepository;
 use App\Utils\Criterias\BasicCriteria\FiltersCriteria;
 use App\Utils\Criterias\BasicCriteria\OrderByCriteria;
-use App\Utils\Criterias\Maintenance\ClientMaintenancesCriteria;
 use Illuminate\Http\JsonResponse;
 
 class MaintenanceCoordinatorAPIController extends Controller
@@ -42,6 +35,36 @@ class MaintenanceCoordinatorAPIController extends Controller
 
         return $this->makeResponseResource('Maintenances retrieved Successfully', MaintenanceResource::collection($maintenances));
 
+    }
+
+    /**
+     * Obtener mantenimientos sin confirmar por el cliente
+     */
+    public function unconfirmed(ReadUnconfirmedMaintenancesAPIRequest $request): JsonResponse
+    {
+        // Aplicar filtros de estado y confirmación
+        $this->maintenanceRepository->pushCriteria(new FiltersCriteria('status|is|assigned;confirmation_required|is|1;confirmed_at|is|null'));
+        $this->maintenanceRepository->pushCriteria(new OrderByCriteria('confirmation_deadline', 'asc'));
+
+        // Aplicar filtros adicionales si están disponibles
+        if ($request->has('filters')) {
+            $this->maintenanceRepository->pushCriteria(new FiltersCriteria($request->get('filters')));
+        }
+
+        $maintenances = $request->has('unpaginated') ?
+            $this->maintenanceRepository->all() :
+            $this->maintenanceRepository->paginate(20);
+
+        $maintenances->load([
+            'clientDevices.client',
+            'clientDevices.device',
+            'technician.user'
+        ]);
+
+        return $this->makeResponseResource(
+            'Unconfirmed maintenances retrieved successfully',
+            MaintenanceResource::collection($maintenances)
+        );
     }
 
 }

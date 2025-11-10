@@ -20,7 +20,14 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->string('address')->nullable();
             $table->string('city')->nullable();
+            $table->string('department')->nullable();
             $table->string('phone')->nullable();
+            
+            // Campos agregados posteriormente
+            $table->enum('client_type', ['Natural', 'Jurídico'])->nullable();
+            $table->enum('document_type', ['CC', 'CE', 'CI', 'PASS', 'NIT'])->nullable();
+            $table->string('legal_representative')->nullable();
+            $table->enum('status', ['active', 'inactive'])->default('active');
 
             $table->timestamps();
             $table->softDeletes();

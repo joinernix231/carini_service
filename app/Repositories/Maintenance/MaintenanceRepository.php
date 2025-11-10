@@ -2,6 +2,8 @@
 
 namespace App\Repositories\Maintenance;
 
+use App\Events\Maintenance\MaintenanceAssigned;
+use App\Events\Maintenance\MaintenanceConfirmed;
 use App\Events\Maintenance\MaintenanceCreated;
 use App\Events\Maintenance\UploadPriceMaintenance;
 use App\Events\Maintenance\UploadSupportPaymentMaintenance;
@@ -15,7 +17,8 @@ class MaintenanceRepository extends BaseRepository
 {
     protected $fieldSearchable = [
         'created_at',
-        'status'
+        'status',
+        'date_maintenance',
     ];
 
     public function getFieldsSearchable(): array
@@ -46,6 +49,8 @@ class MaintenanceRepository extends BaseRepository
         $maintenance->status = 'assigned';
         $maintenance->save();
 
+        event(new MaintenanceAssigned($maintenance));
+
         return $maintenance;
     }
 
@@ -62,7 +67,16 @@ class MaintenanceRepository extends BaseRepository
             $maintenance->is_paid = false;
         }
 
+        // Activar confirmación requerida
+        $maintenance->confirmation_required = true;
+        $maintenance->confirmation_deadline = now()->addHour();
+        $maintenance->confirmed_at = null;
+        $maintenance->coordinator_notified = false;
+        $maintenance->coordinator_notified_at = null;
+
         $maintenance->save();
+
+        event(new MaintenanceAssigned($maintenance));
 
         return $maintenance;
     }
@@ -152,6 +166,60 @@ class MaintenanceRepository extends BaseRepository
         }
 
         $maintenance->clientDevices()->attach($pivotData);
+    }
+
+    /**
+     * Confirmar mantenimiento por parte del cliente
+     * Actualiza el mantenimiento y dispara el evento MaintenanceConfirmed
+     */
+    public function confirm(Maintenance $maintenance): Maintenance
+    {
+        // Actualizar campos de confirmación
+        $maintenance->confirmed_at = now();
+        $maintenance->confirmation_required = false;
+        $maintenance->save();
+
+        // Disparar evento para que los listeners manejen las notificaciones
+        event(new MaintenanceConfirmed($maintenance));
+
+        return $maintenance;
+    }
+
+    /**
+     * Obtener mantenimientos sin confirmar que requieren notificación al coordinador
+     * Busca mantenimientos donde:
+     * - status = 'assigned'
+     * - confirmation_required = true
+     * - confirmed_at = null
+     * - confirmation_deadline <= now()
+     * - coordinator_notified = false
+     */
+    public function getUnconfirmedMaintenancesRequiringNotification()
+    {
+        return $this->model()
+            ->where('status', 'assigned')
+            ->where('confirmation_required', true)
+            ->whereNull('confirmed_at')
+            ->where('confirmation_deadline', '<=', now())
+            ->where('coordinator_notified', false)
+            ->with([
+                'clientDevices.client',
+                'clientDevices.device',
+                'technician.user'
+            ])
+            ->get();
+    }
+
+    /**
+     * Marcar mantenimiento como notificado al coordinador
+     */
+    public function markCoordinatorNotified(Maintenance $maintenance): Maintenance
+    {
+        $maintenance->coordinator_notified = true;
+        $maintenance->coordinator_notified_at = now();
+        $maintenance->save();
+
+        return $maintenance;
     }
 
 }
