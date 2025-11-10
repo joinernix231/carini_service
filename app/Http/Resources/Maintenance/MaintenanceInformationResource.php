@@ -40,6 +40,14 @@ class MaintenanceInformationResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
+            'confirmation_required' => $this->confirmation_required ?? false,
+            'confirmed_at' => $this->confirmed_at ? $this->confirmed_at->toISOString() : null,
+            'confirmation_deadline' => $this->confirmation_deadline ? $this->confirmation_deadline->toISOString() : null,
+            'coordinator_notified' => $this->coordinator_notified ?? false,
+            'coordinator_notified_at' => $this->coordinator_notified_at ? $this->coordinator_notified_at->toISOString() : null,
+            'coordinator_called' => $this->coordinator_called ?? false,
+            'coordinator_called_at' => $this->coordinator_called_at ? $this->coordinator_called_at->toISOString() : null,
+
             // Información de tiempo
             'total_work_time' => $totalWorkTime,
             'total_pause_ms' => $totalPausedTimeMs,

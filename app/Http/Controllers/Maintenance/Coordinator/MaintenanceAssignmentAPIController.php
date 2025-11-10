@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Maintenance\Coordinator;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Maintenance\AssignMaintenanceAPIRequest;
+use App\Http\Requests\Maintenance\CancelMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\UploadPriceMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\VerifyPaymentMaintenanceAPIRequest;
 use App\Http\Resources\Maintenance\MaintenanceResource;
@@ -65,6 +66,21 @@ class MaintenanceAssignmentAPIController extends Controller
         $maintenance = $this->maintenanceRepository->uploadPrice($input, $maintenance);
 
         return $this->makeResponseResource('Maintenance price Successfully', new MaintenanceResource($maintenance));
+    }
+
+    /**
+     * Cancelar mantenimiento y liberar técnico asignado
+     *
+     * @param Maintenance $maintenance
+     * @param CancelMaintenanceAPIRequest $request
+     * @return JsonResponse
+     */
+    public function cancelMaintenance(Maintenance $maintenance, CancelMaintenanceAPIRequest $request): JsonResponse
+    {
+        $maintenance = $this->maintenanceRepository->cancel($maintenance);
+        $maintenance->load(['clientDevices', 'technician']);
+
+        return $this->makeResponseResource('Mantenimiento cancelado exitosamente. El técnico ha sido liberado.', new MaintenanceResource($maintenance));
     }
 }
 

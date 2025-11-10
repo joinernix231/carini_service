@@ -8,8 +8,8 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote')->hourly();
 
-// Programar verificación de mantenimientos sin confirmar cada minuto
+// Programar verificación de mantenimientos sin confirmar cada 5 minutos
 Schedule::command('maintenances:check-unconfirmed')
-    ->everyMinute()
+    ->everyFiveMinutes()
     ->withoutOverlapping()
     ->onOneServer();
