@@ -16,12 +16,12 @@ class ContactFactory extends Factory
     public function definition(): array
     {
         return [
-            'client_id' => Client::inRandomOrder()->first()->id,
+            'client_id' => Client::factory(), // Se puede sobrescribir desde el seeder
             'nombre_contacto' => $this->faker->name(),
             'correo' => $this->faker->safeEmail(),
             'telefono' => $this->faker->phoneNumber(),
             'direccion' => $this->faker->address(),
-            'cargo' => $this->faker->randomElement(['Gerente','Asistente','Ventas','Soporte']),
+            'cargo' => $this->faker->randomElement(['Gerente','Asistente','Ventas','Soporte','Director','Coordinador','Supervisor']),
         ];
     }
 }

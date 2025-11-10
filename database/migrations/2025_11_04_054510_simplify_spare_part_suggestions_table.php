@@ -11,10 +11,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Eliminar la tabla si existe (para recrearla con la estructura simplificada)
-        Schema::dropIfExists('spare_part_suggestions');
-        
-        // Crear la tabla con la estructura simplificada
         Schema::create('spare_part_suggestions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('maintenance_id')->constrained('maintenances')->onDelete('cascade');

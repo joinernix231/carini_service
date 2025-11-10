@@ -20,9 +20,16 @@ class PauseMaintenanceRequest extends APIRequest
             return false;
         }
 
+        // Solo se puede pausar si está activo y la última acción es 'start' o 'resume'
+        // Cargar action logs para verificar
+        $maintenance->load('actionLogs');
+        if (!$maintenance->isActive()) {
+            return false;
+        }
 
-        // Solo se puede pausar si está en progreso
-        if ($maintenance->status !== 'in_progress') {
+        $lastLog = $maintenance->getLatestActionLog();
+        // Solo se puede pausar si la última acción es 'start' o 'resume' (no si ya está pausado)
+        if ($lastLog && !in_array($lastLog->action, ['start', 'resume'])) {
             return false;
         }
 

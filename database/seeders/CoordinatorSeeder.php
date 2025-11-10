@@ -10,29 +10,25 @@ class CoordinatorSeeder extends Seeder
 {
     public function run(): void
     {
-        // Crear coordinador específico
-        $user = User::firstOrCreate(
-            ['email' => 'mauricio@gmail.com'],
-            [
-                'name' => 'Mauricio Coordinador',
-                'password' => bcrypt('saiz123'),
-                'role' => 'coordinador',
-            ]
-        );
+        // Obtener el usuario coordinador específico (debe existir por UserSeeder)
+        $user = User::where('email', 'mauricio@gmail.com')->first();
 
-        Coordinator::firstOrCreate(
-            ['user_id' => $user->id],
-            [
-                'identification' => '12345678',
-                'address' => 'Calle Coordinador 123',
-                'phone' => '3001234567',
-                'status' => 'active',
-            ]
-        );
+        if ($user) {
+            Coordinator::firstOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'identification' => '12345678',
+                    'address' => 'Calle Coordinador 123',
+                    'phone' => '3001234567',
+                    'status' => 'active',
+                ]
+            );
+        }
 
-        // Crear 9 coordinadores adicionales de prueba
-        Coordinator::factory(9)->create();
+        // Crear 5 coordinadores adicionales
+        Coordinator::factory(5)->create();
 
-        $this->command->info('✅ Coordinador fijo con email mauricio@gmail.com y 9 coordinadores de prueba agregados correctamente.');
+        $totalCoordinators = Coordinator::count();
+        $this->command->info("✅ Coordinador específico creado y {$totalCoordinators} coordinadores totales en el sistema.");
     }
 }

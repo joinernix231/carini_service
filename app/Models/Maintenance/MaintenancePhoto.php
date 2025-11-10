@@ -54,7 +54,7 @@ class MaintenancePhoto extends Model
     public function getPhotoAttribute(): ?string
     {
         if ($photo = Arr::get($this->attributes, 'photo')) {
-            return config('filesystems.disks.s3.url') . 'images/maintenances/' . $photo . '.PNG';
+            return config('filesystems.disks.s3.url') . 'images/' . $photo . '.PNG';
         }
         return null;
     }

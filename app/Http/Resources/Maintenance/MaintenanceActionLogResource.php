@@ -18,6 +18,7 @@ class MaintenanceActionLogResource extends BaseJsonResource
             'reason' => $this->resource->reason,
             'latitude' => $this->resource->latitude,
             'longitude' => $this->resource->longitude,
+            'is_last' => $this->resource->is_last,
             'location' => $this->resource->location,
             'created_at' => $this->resource->created_at,
             'updated_at' => $this->resource->updated_at,

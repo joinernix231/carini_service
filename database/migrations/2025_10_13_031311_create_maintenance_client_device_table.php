@@ -18,6 +18,15 @@ return new class extends Migration
             $table->foreignIdFor(Maintenance::class)->constrained()->onDelete('cascade');
             $table->foreignIdFor(ClientDevice::class)->constrained()->onDelete('cascade');
             $table->text('description')->nullable();
+            
+            // Campos de progreso agregados posteriormente
+            $table->json('progress_completed_indices')->nullable();
+            $table->unsignedInteger('progress_completed_count')->nullable();
+            $table->unsignedInteger('progress_total')->nullable();
+            $table->decimal('progress_pct', 5, 2)->nullable();
+            $table->enum('progress_status', ['pending','in_progress','completed'])->nullable();
+            $table->timestamp('progress_updated_at')->nullable();
+            
             $table->timestamps();
         });
     }

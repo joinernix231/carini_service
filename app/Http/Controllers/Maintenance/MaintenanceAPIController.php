@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Maintenance;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ClientDevice\GetLinkDeviceMaintenancesAPIRequest;
 use App\Http\Requests\Maintenance\CreateMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\DeleteMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\ReadMaintenanceAPIRequest;
@@ -10,9 +11,11 @@ use App\Http\Requests\Maintenance\ShowMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\UpdateMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\UpdateQuotationAPIRequest;
 use App\Http\Resources\Maintenance\MaintenanceResource;
+use App\Models\ClientDevice\ClientDevice;
 use App\Models\Maintenance\Maintenance;
 use App\Repositories\Maintenance\MaintenanceRepository;
 use App\Utils\Criterias\BasicCriteria\OrderByCriteria;
+use App\Utils\Criterias\Maintenance\ClientDeviceMaintenancesCriteria;
 use App\Utils\Criterias\Maintenance\ClientMaintenancesCriteria;
 use Illuminate\Http\JsonResponse;
 
@@ -86,5 +89,34 @@ class MaintenanceAPIController extends Controller
         $maintenance = $this->maintenanceRepository->updateQuotation($input, $maintenance);
 
         return $this->makeResponseResource('Maintenance price updated Successfully', new MaintenanceResource($maintenance));
+    }
+
+
+    /**
+     * Obtener el historial de mantenimientos de un equipo vinculado (linkDevice)
+     *
+     * @param ClientDevice $linkDevice
+     * @param GetLinkDeviceMaintenancesAPIRequest $request
+     * @return JsonResponse
+     */
+    public function getLinkDeviceMaintenances(ClientDevice $linkDevice, GetLinkDeviceMaintenancesAPIRequest $request): JsonResponse
+    {
+        $this->maintenanceRepository->pushCriteria(new ClientDeviceMaintenancesCriteria($linkDevice->id));
+        $this->maintenanceRepository->pushCriteria(new OrderByCriteria('created_at', 'desc'));
+
+        $maintenances = $request->has('unpaginated') ?
+            $this->maintenanceRepository->all() :
+            $this->maintenanceRepository->paginate(8);
+
+        $maintenances->load([
+            'clientDevices.device',
+            'clientDevices.client',
+            'technician.user'
+        ]);
+
+        return $this->makeResponseResource(
+            'Maintenances retrieved successfully',
+            MaintenanceResource::collection($maintenances)
+        );
     }
 }

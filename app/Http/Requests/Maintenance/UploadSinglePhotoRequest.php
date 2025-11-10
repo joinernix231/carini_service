@@ -26,7 +26,7 @@ class UploadSinglePhotoRequest extends APIRequest
     public function rules(): array
     {
         return [
-            'client_device_id' => ['required', $this->existsRule('client_device')],
+            'client_device_id' => ['required', $this->existsRule('client_devices')],
             'photo' => 'required|string|max:255',
             'photo_type' => 'required|in:initial,final,part,other'
         ];

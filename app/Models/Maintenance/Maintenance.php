@@ -69,6 +69,13 @@ class Maintenance extends Model
         'started_at',
         'observations',
         'signature_photo',
+        'confirmation_required',
+        'confirmed_at',
+        'confirmation_deadline',
+        'coordinator_notified',
+        'coordinator_notified_at',
+        'coordinator_called',
+        'coordinator_called_at',
     ];
 
     protected $casts = [
@@ -76,6 +83,13 @@ class Maintenance extends Model
         'date_maintenance' => 'datetime',
         'spare_parts' => 'array',
         'is_paid' => 'boolean',
+        'confirmation_required' => 'boolean',
+        'confirmed_at' => 'datetime',
+        'confirmation_deadline' => 'datetime',
+        'coordinator_notified' => 'boolean',
+        'coordinator_notified_at' => 'datetime',
+        'coordinator_called' => 'boolean',
+        'coordinator_called_at' => 'datetime',
     ];
 
     /**
@@ -176,11 +190,61 @@ class Maintenance extends Model
     }
 
     /**
+     * Determinar si el mantenimiento está activo basado en el último action log.
+     * Un mantenimiento está activo si su último log es: on_the_way, start, pause, o resume
+     * (no está finalizado con 'end')
+     * 
+     * Nota: Este método incluye 'pause' porque un mantenimiento pausado sigue siendo
+     * técnicamente "activo" (no finalizado), aunque el técnico no esté trabajando.
+     */
+    public function isActive(): bool
+    {
+        $lastLog = $this->getLatestActionLog();
+        
+        if (!$lastLog) {
+            return false;
+        }
+
+        // Las acciones activas son las que indican que el mantenimiento no está finalizado
+        $activeActions = ['on_the_way', 'start', 'pause', 'resume'];
+        
+        return in_array($lastLog->action, $activeActions);
+    }
+
+    /**
+     * Determinar si el mantenimiento está en progreso (técnico trabajando activamente).
+     * Un mantenimiento está en progreso si su último log es: on_the_way, start, o resume
+     * (excluye 'pause' porque el técnico no está trabajando cuando está pausado)
+     */
+    public function isInProgress(): bool
+    {
+        $lastLog = $this->getLatestActionLog();
+        
+        if (!$lastLog) {
+            return false;
+        }
+
+        // Las acciones que indican que el técnico está trabajando activamente
+        $inProgressActions = ['on_the_way', 'start', 'resume'];
+        
+        return in_array($lastLog->action, $inProgressActions);
+    }
+
+    /**
      * Obtener el último log de acción del mantenimiento.
+     * Usa is_last para optimizar la búsqueda
      */
     public function getLatestActionLog(): ?MaintenanceActionLog
     {
-        return $this->actionLogs()->latest('timestamp')->first();
+        // Primero intentar usar is_last (más eficiente)
+        $lastLog = $this->actionLogs()->where('is_last', true)->first();
+        
+        // Si no hay log con is_last, usar timestamp como fallback
+        if (!$lastLog) {
+            $lastLog = $this->actionLogs()->latest('timestamp')->first();
+        }
+        
+        return $lastLog;
     }
 
     /**
@@ -189,7 +253,7 @@ class Maintenance extends Model
     public function getLatestLocation(): ?array
     {
         $latestActionLog = $this->getLatestActionLog();
-        
+
         return $latestActionLog && $latestActionLog->hasLocation() ? $latestActionLog->location : null;
     }
 
@@ -210,7 +274,7 @@ class Maintenance extends Model
     }
 
     /**
-     * Obtener el tiempo total trabajado en el mantenimiento
+     * Obtener el tiempo total trabajado en el mantenimiento (solo cuando está completado)
      */
     public function getTotalWorkTime(): ?string
     {
@@ -223,6 +287,66 @@ class Maintenance extends Model
 
         $duration = $startLog->timestamp->diff($endLog->timestamp);
         return $duration->format('%H:%I:%S');
+    }
+
+    /**
+     * Calcular el tiempo transcurrido trabajado en tiempo real (en milisegundos)
+     * Este método calcula el tiempo desde el inicio hasta ahora, restando las pausas.
+     * 
+     * Fórmula: Tiempo transcurrido = (Ahora - Inicio) - Tiempo pausado total
+     * 
+     * @return int Tiempo transcurrido en milisegundos
+     */
+    public function getElapsedWorkTimeMs(): int
+    {
+        $startLog = $this->actionLogs()->where('action', 'start')->first();
+        
+        if (!$startLog) {
+            return 0;
+        }
+
+        // Obtener el último log para determinar el tiempo final
+        $lastLog = $this->getLatestActionLog();
+        
+        // Si el mantenimiento está finalizado, usar el timestamp del end
+        // Si no, usar el tiempo actual
+        $endTime = ($lastLog && $lastLog->action === 'end') 
+            ? $lastLog->timestamp 
+            : now();
+
+        // Calcular tiempo total desde el start hasta el tiempo final
+        $totalTimeMs = $startLog->timestamp->diffInMilliseconds($endTime);
+
+        // Restar el tiempo pausado total (getTotalPausedTimeMs ya maneja pausas activas)
+        $pausedTimeMs = $this->getTotalPausedTimeMs();
+        $elapsedTimeMs = $totalTimeMs - $pausedTimeMs;
+
+        // Asegurar que el tiempo no sea negativo
+        return max(0, $elapsedTimeMs);
+    }
+
+    /**
+     * Obtener el tiempo transcurrido trabajado formateado
+     * 
+     * @return array{total_ms: int, formatted: string, hours: int, minutes: int, seconds: int}
+     */
+    public function getElapsedWorkTime(): array
+    {
+        $totalMs = $this->getElapsedWorkTimeMs();
+
+        // Convertir milisegundos a formato legible
+        $totalSeconds = floor($totalMs / 1000);
+        $hours = floor($totalSeconds / 3600);
+        $minutes = floor(($totalSeconds % 3600) / 60);
+        $seconds = $totalSeconds % 60;
+
+        return [
+            'total_ms' => $totalMs,
+            'formatted' => sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds),
+            'hours' => $hours,
+            'minutes' => $minutes,
+            'seconds' => $seconds,
+        ];
     }
 
     /**
@@ -299,12 +423,27 @@ class Maintenance extends Model
     }
 
     /**
+     * Accesor para obtener el último log de acción del mantenimiento.
+     * Nota: Este es un accessor, no una relación. Para usarlo, primero carga 'actionLogs':
+     * $maintenance->load('actionLogs');
+     * $lastLog = $maintenance->last_action_log; // o $maintenance->getLatestActionLog()
+     */
+    public function getLastActionLogAttribute(): ?MaintenanceActionLog
+    {
+        return $this->getLatestActionLog();
+    }
+
+    /**
      * Sobrescribir el método para que el accessor client sea tratado como una relación cargable.
      */
     public function getRelationValue($key)
     {
         if ($key === 'client') {
             return $this->getClientAttribute();
+        }
+
+        if ($key === 'last_action_log') {
+            return $this->getLastActionLogAttribute();
         }
 
         return parent::getRelationValue($key);
@@ -319,6 +458,10 @@ class Maintenance extends Model
             return $this->relationLoaded('clientDevices');
         }
 
+        if ($key === 'last_action_log') {
+            return $this->relationLoaded('actionLogs');
+        }
+
         return parent::relationLoaded($key);
     }
 
@@ -331,6 +474,14 @@ class Maintenance extends Model
     public function getPhotoAttribute(): ?string
     {
         if ($photo = Arr::get($this->attributes, 'photo')) {
+            return config('filesystems.disks.s3.url') . 'images/' . $photo . '.PNG';
+        }
+        return null;
+    }
+
+    public function getSignaturePhotoAttribute(): ?string
+    {
+        if ($photo = Arr::get($this->attributes, 'signature_photo')) {
             return config('filesystems.disks.s3.url') . 'images/' . $photo . '.PNG';
         }
         return null;

@@ -19,12 +19,14 @@ class MaintenanceActionLog extends Model
         'reason',
         'latitude',
         'longitude',
+        'is_last',
     ];
 
     protected $casts = [
         'timestamp' => 'datetime',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
+        'is_last' => 'boolean',
     ];
 
     // Acciones disponibles
@@ -34,16 +36,18 @@ class MaintenanceActionLog extends Model
         'pause' => 'Pausar',
         'resume' => 'Reanudar',
         'end' => 'Finalizar',
+        'on_the_way' => 'En Camino',
     ];
 
     public static array $rules = [
         'maintenance_id' => 'required|integer|exists:maintenances,id',
         'technician_id' => 'required|integer|exists:technicians,id',
-        'action' => 'required|in:assign,start,pause,resume,end',
+        'action' => 'required|in:assign,start,pause,resume,end,on_the_way',
         'timestamp' => 'required|date',
         'reason' => 'nullable|string|max:255',
         'latitude' => 'nullable|numeric|between:-90,90',
         'longitude' => 'nullable|numeric|between:-180,180',
+        'is_last' => 'nullable|boolean',
     ];
 
     public function maintenance(): BelongsTo
@@ -79,6 +83,17 @@ class MaintenanceActionLog extends Model
     public function scopeForTechnician($query, int $technicianId)
     {
         return $query->where('technician_id', $technicianId);
+    }
+
+    public function scopeIsLast($query)
+    {
+        return $query->where('is_last', true);
+    }
+
+    public function scopeForMaintenanceLast($query, int $maintenanceId)
+    {
+        return $query->where('maintenance_id', $maintenanceId)
+            ->where('is_last', true);
     }
 
     public function hasLocation(): bool

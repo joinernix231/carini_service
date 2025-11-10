@@ -70,4 +70,29 @@ class MaintenancePhotoRepository extends BaseRepository
             ->where('maintenance_id', $maintenanceId)
             ->delete() > 0;
     }
+
+    /**
+     * Crear fotos finales para un mantenimiento completado
+     *
+     * @param int $maintenanceId
+     * @param array $finalPhotos Array de fotos finales con estructura: [['client_device_id' => int, 'photo' => string], ...]
+     * @return array Array de fotos creadas
+     */
+    public function createFinalPhotos(int $maintenanceId, array $finalPhotos): array
+    {
+        if (empty($finalPhotos)) {
+            return [];
+        }
+
+        $photosData = [];
+        foreach ($finalPhotos as $photoData) {
+            $photosData[] = [
+                'client_device_id' => $photoData['client_device_id'],
+                'photo' => $photoData['photo'],
+                'photo_type' => 'final',
+            ];
+        }
+
+        return $this->createMultiplePhotos($maintenanceId, $photosData);
+    }
 }

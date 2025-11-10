@@ -5,24 +5,30 @@ namespace App\Http\Requests\Maintenance;
 use App\Http\Requests\APIRequest;
 use App\Models\Maintenance\Maintenance;
 use App\Rules\Maintenance\MaintenanceDateMatchRule;
+use App\Rules\Maintenance\MaintenanceStartableRule;
+use App\Utils\Resources\ResponseUtil;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StartMaintenanceRequest extends APIRequest
 {
+    public function validationData(): array
+    {
+        $maintenance = $this->route('maintenance');
+
+        $this->addParametersToRequest([
+            'maintenance_id' => $maintenance->id ?? null,
+            'maintenance' => $maintenance,
+        ]);
+
+        return $this->all();
+    }
+
     public function authorize(): bool
     {
         $allowedRoles = ['tecnico'];
         $user = session('user');
 
-        if (!in_array($user->role, $allowedRoles)) {
-            return false;
-        }
-
-        $maintenance = $this->route('maintenance');
-        if (!$maintenance || $maintenance->technician_id !== session('technician_id')) {
-            return false;
-        }
-
-        if ($maintenance->status !== 'assigned') {
+        if (!$user || !in_array($user->role, $allowedRoles)) {
             return false;
         }
 
@@ -34,11 +40,14 @@ class StartMaintenanceRequest extends APIRequest
         /** @var Maintenance $maintenance */
         $maintenance = $this->route('maintenance');
 
-        return [
-            'latitude' => ['required', 'numeric', 'between:-90,90', new MaintenanceDateMatchRule($maintenance)],
+        $rules = [
+            'maintenance_id' => ['bail', 'required', 'integer', $this->existsRule('maintenances')],
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => 'required|numeric|between:-180,180',
             'notes' => 'nullable|string|max:1000'
         ];
+
+        return $rules;
     }
 
     public function messages(): array

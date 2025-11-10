@@ -1,24 +1,33 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDeviceLinkAPIController;
+use App\Http\Controllers\Admin\AdminMaintenanceAPIController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Auth\AuthAPIController;
 use App\Http\Controllers\Auth\MeController;
 use App\Http\Controllers\Auth\ProfileAPIController;
-use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Client\ClientAPIController;
 use App\Http\Controllers\Client\InactiveClientAPIController;
 use App\Http\Controllers\Coordinator\CoordinatorAPIController;
 use App\Http\Controllers\Coordinator\InactiveCoordinatorAPIController;
 use App\Http\Controllers\Device\DeviceAPIController;
 use App\Http\Controllers\DeviceLink\DeviceLinkAPIController;
+use App\Http\Controllers\Maintenance\Client\MaintenanceConfirmationAPIController;
+use App\Http\Controllers\Maintenance\Client\MaintenanceInformationAPIController;
+use App\Http\Controllers\Maintenance\Coordinator\MaintenanceAssignmentAPIController;
+use App\Http\Controllers\Maintenance\Coordinator\MaintenanceCoordinatorActionsAPIController;
+use App\Http\Controllers\Maintenance\Coordinator\MaintenanceCoordinatorAPIController;
 use App\Http\Controllers\Maintenance\MaintenanceAPIController;
-use App\Http\Controllers\Maintenance\MaintenanceAssignedAPIController;
-use App\Http\Controllers\Maintenance\MaintenanceCoordinatorAPIController;
-use App\Http\Controllers\Maintenance\MaintenanceNotAssignedAPIController;
-use App\Http\Controllers\Maintenance\MaintenanceNotPriceAPIController;
-use App\Http\Controllers\Maintenance\MaintenancesByPaymentStatusAPIController;
-use App\Http\Controllers\Maintenance\TechnicianMaintenancesAPIController;
-use App\Http\Controllers\Maintenance\UpdatePaymentSupportAPIController;
+use App\Http\Controllers\Maintenance\Payment\MaintenancePaymentSupportAPIController;
+use App\Http\Controllers\Maintenance\Queries\MaintenanceAssignedListAPIController;
+use App\Http\Controllers\Maintenance\Queries\MaintenanceByPaymentStatusListAPIController;
+use App\Http\Controllers\Maintenance\Queries\MaintenanceNotAssignedListAPIController;
+use App\Http\Controllers\Maintenance\Queries\MaintenanceNotPriceListAPIController;
+use App\Http\Controllers\Maintenance\Technician\TechnicianMaintenanceActionsAPIController;
+use App\Http\Controllers\Maintenance\Technician\TechnicianMaintenancePhotosAPIController;
+use App\Http\Controllers\Maintenance\Technician\TechnicianMaintenanceProgressAPIController;
+use App\Http\Controllers\Maintenance\Technician\TechnicianMaintenancesAPIController;
+use App\Http\Controllers\Maintenance\Technician\TechnicianMaintenanceSparePartsAPIController;
 use App\Http\Controllers\Other\ResourceAPIController;
 use App\Http\Controllers\Technician\AvailableTechnicianAPIController;
 use App\Http\Controllers\Technician\AvailableTechnicianController;
@@ -37,27 +46,37 @@ Route::apiResource('/clients', ClientAPIController::class);
     Route::put('/clients/{client}/status', InactiveClientAPIController::class);
 // LinkDevices
 Route::apiResource('/linkDevices', DeviceLinkAPIController::class);
+Route::get('/linkDevices/{linkDevice}/maintenances', [MaintenanceAPIController::class, 'getLinkDeviceMaintenances'])->name('linkDevices.maintenances');
 // Admin LinkDevices
-Route::apiResource('/admin/clients/{client}/devices', AdminDeviceLinkAPIController::class)
-    ->only(['store', 'destroy'])
-    ->names([
-        'store' => 'admin.clients.devices.store',
-        'destroy' => 'admin.clients.devices.destroy'
-    ]);
+Route::post('/admin/clients/{client}/devices', [AdminDeviceLinkAPIController::class, 'store'])->name('admin.clients.devices.store');
+Route::delete('/admin/clients/devices/{clientDevice}', [AdminDeviceLinkAPIController::class, 'destroy'])->name('admin.clients.devices.destroy');
+// Admin Maintenances
+Route::apiResource('/admin/maintenances', AdminMaintenanceAPIController::class);
+Route::get('/admin/clients/devices/{clientDevice}/maintenances', [AdminMaintenanceAPIController::class, 'getClientDeviceMaintenances'])->name('admin.clients.devices.maintenances');
+Route::get('/admin/maintenances/{maintenance}/photos', [AdminMaintenanceAPIController::class, 'getMaintenancePhotos'])->name('admin.maintenances.photos');
 // Devices
 Route::apiResource('/devices', DeviceAPIController::class);
 // Maintenance
 Route::apiResource('/maintenances', MaintenanceAPIController::class);
     Route::apiResource('/maintenancesCoordinator', MaintenanceCoordinatorAPIController::class);
-Route::get('/maintenancesNotAssigned', MaintenanceNotAssignedAPIController::class);
-Route::get('/maintenancesAssigned', MaintenanceAssignedAPIController::class);
-Route::get('/maintenancesNotPrice', MaintenanceNotPriceAPIController::class);
-Route::get('/maintenancesByPaymentStatus', MaintenancesByPaymentStatusAPIController::class);
-Route::put('/verifyMaintenance/{maintenance}', MaintenanceAssignedAPIController::class . '@verifyPaymentOfMaintenance');
-Route::put('/assignMaintenance/{maintenance}', MaintenanceAssignedAPIController::class . '@assignMaintenance');
-Route::put('/maintenances/{maintenance}/payment-support', UpdatePaymentSupportAPIController::class);
-Route::put('/uploadPrice/{maintenance}', MaintenanceAssignedAPIController::class . '@uploadPrice');
+// Maintenance - Queries (Listados)
+Route::get('/maintenancesNotAssigned', MaintenanceNotAssignedListAPIController::class);
+Route::get('/maintenancesAssigned', MaintenanceAssignedListAPIController::class);
+Route::get('/maintenancesNotPrice', MaintenanceNotPriceListAPIController::class);
+Route::get('/maintenancesByPaymentStatus', MaintenanceByPaymentStatusListAPIController::class);
+// Maintenance - Coordinator actions (Asignación)
+Route::put('/assignMaintenance/{maintenance}', MaintenanceAssignmentAPIController::class . '@assignMaintenance');
+Route::put('/verifyMaintenance/{maintenance}', MaintenanceAssignmentAPIController::class . '@verifyPaymentOfMaintenance');
+Route::put('/uploadPrice/{maintenance}', MaintenanceAssignmentAPIController::class . '@uploadPrice');
+// Maintenance - Payment actions
+Route::put('/maintenances/{maintenance}/payment-support', MaintenancePaymentSupportAPIController::class);
 Route::put('/maintenance/{maintenance}/update-quotation', MaintenanceAPIController::class . '@updateQuotation');
+// Maintenance - Client actions
+Route::get('/maintenances/{maintenance}/information', MaintenanceInformationAPIController::class . '@maintenanceInformation');
+Route::post('/maintenances/{maintenance}/confirm', MaintenanceConfirmationAPIController::class . '@confirm');
+// Maintenance - Coordinator actions
+Route::post('/maintenances/{maintenance}/mark-as-called', MaintenanceCoordinatorActionsAPIController::class . '@markAsCalled');
+Route::get('/coordinator/maintenances/unconfirmed', MaintenanceCoordinatorAPIController::class . '@unconfirmed');
 
 // Other
 Route::post('loadImage', ResourceAPIController::class . '@loadImage');
@@ -67,21 +86,26 @@ Route::get('/availableDates', AvailableTechnicianController::class);
 Route::get('/availableTechnicians', AvailableTechnicianAPIController::class);
 Route::apiResource('/technical', TechnicianAPIController::class);
 Route::put('/technical/{technical}/status', InactiveTechnicianAPIController::class);
+// Technician Maintenances - Listado y detalle
 Route::get('/technicianMaintenances', TechnicianMaintenancesAPIController::class . '@index');
 Route::get('/technicianMaintenances/{maintenance}', TechnicianMaintenancesAPIController::class . '@show');
 // Technician Maintenances Detail (for supervisors/coordinators)
 Route::get('/maintenancesTechnicians/{technician}', TechnicianMaintenancesDetailAPIController::class . '@index');
 Route::get('/maintenancesTechnicians/{technician}/maintenance/{maintenance}', TechnicianMaintenancesDetailAPIController::class . '@show');
-Route::post('/technicianMaintenances/{maintenance}/photos', TechnicianMaintenancesAPIController::class . '@uploadPhoto');
-        Route::post('/technicianMaintenances/{maintenance}/start', TechnicianMaintenancesAPIController::class . '@startMaintenance');
-        Route::post('/technicianMaintenances/{maintenance}/pause', TechnicianMaintenancesAPIController::class . '@pauseMaintenance');
-        Route::post('/technicianMaintenances/{maintenance}/resume', TechnicianMaintenancesAPIController::class . '@resumeMaintenance');
-        Route::post('/technicianMaintenances/{maintenance}/progress', TechnicianMaintenancesAPIController::class . '@saveProgress');
-        Route::get('/technicianMaintenances/{maintenance}/progress', TechnicianMaintenancesAPIController::class . '@getProgress');
-        Route::post('/technicianMaintenances/{maintenance}/end', TechnicianMaintenancesAPIController::class . '@endMaintenance');
-        Route::post('/technicianMaintenances/{maintenance}/complete', TechnicianMaintenancesAPIController::class . '@completeMaintenance');
-        Route::post('/technicianMaintenances/{maintenance}/suggest-spare-part', TechnicianMaintenancesAPIController::class . '@suggestSparePart');
-        Route::get('/technician/activeMaintenance', TechnicianMaintenancesAPIController::class . '@activeMaintenance');
+// Technician Maintenances - Fotos
+Route::post('/technicianMaintenances/{maintenance}/photos', TechnicianMaintenancePhotosAPIController::class . '@uploadPhoto');
+// Technician Maintenances - Acciones
+Route::post('/technicianMaintenances/{maintenance}/onTheWay', TechnicianMaintenanceActionsAPIController::class . '@onTheWay');
+Route::post('/technicianMaintenances/{maintenance}/start', TechnicianMaintenanceActionsAPIController::class . '@startMaintenance');
+Route::post('/technicianMaintenances/{maintenance}/pause', TechnicianMaintenanceActionsAPIController::class . '@pauseMaintenance');
+Route::post('/technicianMaintenances/{maintenance}/resume', TechnicianMaintenanceActionsAPIController::class . '@resumeMaintenance');
+Route::post('/technicianMaintenances/{maintenance}/complete', TechnicianMaintenanceActionsAPIController::class . '@complete');
+Route::get('/technician/activeMaintenance', TechnicianMaintenanceActionsAPIController::class . '@activeMaintenance');
+// Technician Maintenances - Progreso
+Route::post('/technicianMaintenances/{maintenance}/progress', TechnicianMaintenanceProgressAPIController::class . '@saveProgress');
+Route::get('/technicianMaintenances/{maintenance}/progress', TechnicianMaintenanceProgressAPIController::class . '@getProgress');
+// Technician Maintenances - Repuestos
+Route::post('/technicianMaintenances/{maintenance}/suggest-spare-part', TechnicianMaintenanceSparePartsAPIController::class . '@suggestSparePart');
 //Coordinators
 Route::post('/coordinators', CoordinatorAPIController::class . '@store');
 Route::get('/coordinators', CoordinatorAPIController::class . '@index');

@@ -27,15 +27,22 @@ class MaintenanceActionLogRepository extends BaseRepository
 
     /**
      * Crear un log de acción para un mantenimiento
+     * Marca automáticamente los logs anteriores como is_last = false
+     * y el nuevo log como is_last = true
      */
-    public function createActionLog(
-        int $maintenanceId, 
-        int $technicianId, 
-        string $action, 
-        ?string $reason = null,
-        ?float $latitude = null,
-        ?float $longitude = null
-    ): MaintenanceActionLog {
+    public function createActionLog(int $maintenanceId, int $technicianId, string $action, ?string $reason = null, ?float $latitude = null, ?float $longitude = null): MaintenanceActionLog {
+
+
+        $previousLastLogs = $this->findWhere([
+            'maintenance_id' => $maintenanceId,
+            'is_last' => true
+        ]);
+
+        foreach ($previousLastLogs as $log) {
+            $log->is_last = false;
+            $log->save();
+        }
+
         return $this->create([
             'maintenance_id' => $maintenanceId,
             'technician_id' => $technicianId,
@@ -44,6 +51,7 @@ class MaintenanceActionLogRepository extends BaseRepository
             'reason' => $reason,
             'latitude' => $latitude,
             'longitude' => $longitude,
+            'is_last' => true,
         ]);
     }
 
@@ -76,8 +84,20 @@ class MaintenanceActionLogRepository extends BaseRepository
 
     /**
      * Obtener el último log de acción de un mantenimiento
+     * Usa is_last para optimizar la búsqueda
      */
     public function getLatestActionLog(int $maintenanceId): ?MaintenanceActionLog
+    {
+        return MaintenanceActionLog::where('maintenance_id', $maintenanceId)
+            ->where('is_last', true)
+            ->first();
+    }
+
+    /**
+     * Obtener el último log de acción de un mantenimiento (método alternativo usando timestamp)
+     * Útil como fallback si is_last no está configurado
+     */
+    public function getLatestActionLogByTimestamp(int $maintenanceId): ?MaintenanceActionLog
     {
         return $this->findWhere(['maintenance_id' => $maintenanceId])
             ->sortByDesc('timestamp')
@@ -101,7 +121,7 @@ class MaintenanceActionLogRepository extends BaseRepository
     public function getLatestLocation(int $maintenanceId): ?array
     {
         $latestLog = $this->getLatestActionLog($maintenanceId);
-        
+
         return $latestLog && $latestLog->hasLocation() ? $latestLog->location : null;
     }
 
@@ -132,7 +152,7 @@ class MaintenanceActionLogRepository extends BaseRepository
     public function getTechnicianStats(int $technicianId): array
     {
         $logs = $this->getActionLogsByTechnician($technicianId);
-        
+
         return [
             'total_actions' => $logs->count(),
             'actions_by_type' => $logs->groupBy('action')->map->count(),

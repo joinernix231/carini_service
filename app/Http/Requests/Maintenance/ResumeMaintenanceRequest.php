@@ -20,8 +20,11 @@ class ResumeMaintenanceRequest extends APIRequest
             return false;
         }
 
-        // Solo se puede reanudar si está asignado y fue iniciado antes
-        if ($maintenance->status !== 'assigned' || !$maintenance->started_at) {
+        // Solo se puede reanudar si la última acción es 'pause'
+        // Cargar action logs para verificar
+        $maintenance->load('actionLogs');
+        $lastLog = $maintenance->getLatestActionLog();
+        if (!$lastLog || $lastLog->action !== 'pause') {
             return false;
         }
 

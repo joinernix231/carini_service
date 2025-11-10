@@ -20,8 +20,10 @@ class CompleteMaintenanceRequest extends APIRequest
             return false;
         }
 
-        // Solo se puede completar si está en progreso
-        if ($maintenance->status !== 'in_progress') {
+        // Solo se puede completar si está activo (basado en action logs)
+        // Cargar action logs para verificar
+        $maintenance->load('actionLogs');
+        if (!$maintenance->isActive()) {
             return false;
         }
 

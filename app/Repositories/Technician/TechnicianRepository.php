@@ -95,12 +95,22 @@ class TechnicianRepository extends BaseRepository
             return $query->get();
         }
 
-        // Obtener IDs de técnicos que tienen mantenimientos asignados para la fecha y turno específicos
-        $busyTechnicianIds = Maintenance::where('date_maintenance', $date)
+        // Obtener IDs de técnicos que tienen mantenimientos activos para la fecha y turno específicos
+        // Un técnico está ocupado si tiene un mantenimiento asignado para esa fecha/turno Y está activo
+        $maintenances = Maintenance::where('date_maintenance', $date)
             ->where('shift', $shift)
-            ->whereIn('status', ['assigned', 'in_progress'])
+            ->whereNotNull('technician_id')
+            ->with('actionLogs')
+            ->get();
+
+        // Filtrar mantenimientos activos (basado en action logs)
+        $busyTechnicianIds = $maintenances
+            ->filter(function ($maintenance) {
+                return $maintenance->isActive();
+            })
             ->pluck('technician_id')
             ->filter()
+            ->unique()
             ->toArray();
 
         // Excluir técnicos ocupados
@@ -119,16 +129,19 @@ class TechnicianRepository extends BaseRepository
     }
 
     /**
-     * Obtener el mantenimiento actual (en progreso) del técnico
+     * Obtener el mantenimiento actual (activo) del técnico
+     * Basado en el último action log, no en el status
      */
     public function getCurrentMaintenance(int $technicianId): ?Maintenance
     {
-        return Maintenance::where('technician_id', $technicianId)
-            ->where('status', 'in_progress')
-            ->with(['clientDevices', 'actionLogs' => function ($query) {
-                $query->orderBy('timestamp', 'desc');
-            }])
-            ->first();
+        $maintenances = Maintenance::where('technician_id', $technicianId)
+            ->with(['clientDevices', 'actionLogs'])
+            ->get();
+
+        // Buscar el mantenimiento activo basado en el último action log
+        return $maintenances->first(function ($maintenance) {
+            return $maintenance->isActive();
+        });
     }
 
     /**

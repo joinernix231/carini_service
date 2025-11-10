@@ -16,10 +16,6 @@ return new class extends Migration
         Schema::create('maintenances', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignIdFor(ClientDevice::class)
-                ->constrained()
-                ->onDelete('cascade');
-
             $table->foreignIdFor(Technician::class, 'technician_id')
                 ->nullable()
                 ->constrained()
@@ -43,6 +39,15 @@ return new class extends Migration
                 'completed',
                 'cancelled'
             ])->default('pending');
+
+            // Campos de confirmación agregados posteriormente
+            $table->boolean('confirmation_required')->default(false);
+            $table->timestamp('confirmed_at')->nullable();
+            $table->timestamp('confirmation_deadline')->nullable();
+            $table->boolean('coordinator_notified')->default(false);
+            $table->timestamp('coordinator_notified_at')->nullable();
+            $table->boolean('coordinator_called')->default(false);
+            $table->timestamp('coordinator_called_at')->nullable();
 
             $table->decimal('value', 10, 2)->nullable();
             $table->boolean('is_paid')->nullable();
