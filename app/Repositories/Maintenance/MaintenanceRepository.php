@@ -3,6 +3,7 @@
 namespace App\Repositories\Maintenance;
 
 use App\Events\Maintenance\MaintenanceAssigned;
+use App\Events\Maintenance\MaintenanceCancelled;
 use App\Events\Maintenance\MaintenanceConfirmed;
 use App\Events\Maintenance\MaintenanceCreated;
 use App\Events\Maintenance\UploadPriceMaintenance;
@@ -196,7 +197,7 @@ class MaintenanceRepository extends BaseRepository
      */
     public function getUnconfirmedMaintenancesRequiringNotification()
     {
-        return $this->model()
+        return $this->model
             ->where('status', 'assigned')
             ->where('confirmation_required', true)
             ->whereNull('confirmed_at')
@@ -218,6 +219,40 @@ class MaintenanceRepository extends BaseRepository
         $maintenance->coordinator_notified = true;
         $maintenance->coordinator_notified_at = now();
         $maintenance->save();
+
+        return $maintenance;
+    }
+
+    /**
+     * Cancelar mantenimiento y liberar técnico asignado
+     * Cambia el status a 'cancelled' y libera el técnico
+     *
+     * @param Maintenance $maintenance
+     * @return Maintenance
+     */
+    public function cancel(Maintenance $maintenance): Maintenance
+    {
+        // Cambiar status a cancelled
+        $maintenance->status = 'cancelled';
+
+        // Liberar técnico asignado
+        $maintenance->technician_id = null;
+
+        // Limpiar campos relacionados con la asignación
+        $maintenance->date_maintenance = null;
+        $maintenance->shift = null;
+
+        // Limpiar campos de confirmación
+        $maintenance->confirmation_required = false;
+        $maintenance->confirmed_at = null;
+        $maintenance->confirmation_deadline = null;
+        $maintenance->coordinator_notified = false;
+        $maintenance->coordinator_notified_at = null;
+
+        $maintenance->save();
+
+        // Disparar evento para que los listeners manejen las notificaciones
+        event(new MaintenanceCancelled($maintenance));
 
         return $maintenance;
     }
