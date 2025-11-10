@@ -257,4 +257,23 @@ class MaintenanceRepository extends BaseRepository
         return $maintenance;
     }
 
+    /**
+     * Obtener el mantenimiento activo de un técnico
+     * Un mantenimiento se considera activo si su último estado (is_last = true)
+     * tiene la acción 'start' o 'resume'
+     *
+     * @param int $technicianId
+     * @return Maintenance|null
+     */
+    public function getActiveMaintenanceByTechnician(int $technicianId): ?Maintenance
+    {
+        return $this->model
+            ->where('technician_id', $technicianId)
+            ->whereHas('actionLogs', function ($query) {
+                $query->where('is_last', true)
+                      ->whereIn('action', ['start', 'resume']);
+            })
+            ->first();
+    }
+
 }
