@@ -105,10 +105,7 @@ class TechnicianMaintenanceActionsAPIController extends Controller
     {
         $technicianId = session('technician_id');
 
-        $activeMaintenance = $this->maintenanceRepository->findWhere([
-            'technician_id' => $technicianId,
-            'status' => 'in_progress'
-        ])->first();
+        $activeMaintenance = $this->maintenanceRepository->getActiveMaintenanceByTechnician($technicianId);
 
         $hasActiveMaintenance = $activeMaintenance !== null;
 
