@@ -19,6 +19,8 @@ class ClientDeviceFactory extends Factory
             'serial' => 'SER-' . $this->faker->unique()->numberBetween(100000, 999999),
             'status' => true,
             'address' => $this->faker->address(),
+            'latitude' => $this->faker->latitude(),
+            'longitude' => $this->faker->longitude(),
             'source' => $this->faker->randomElement(['qr', 'manual']),
         ];
     }

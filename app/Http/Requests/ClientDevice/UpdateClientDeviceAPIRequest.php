@@ -19,6 +19,8 @@ class UpdateClientDeviceAPIRequest extends APIRequest
 
         $rules['status'] = ['required','boolean'];
         $rules['address'] = ['required','string'];
+        $rules['latitude'] = ['nullable', 'numeric', 'between:-90,90'];
+        $rules['longitude'] = ['nullable', 'numeric', 'between:-180,180'];
 
         return $rules;
     }
