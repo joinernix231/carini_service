@@ -22,6 +22,8 @@ class CreateAdminClientDeviceAPIRequest extends APIRequest
         $rules = ClientDevice::$rules;
 
         $rules['device_id'] = ['required', 'integer', 'exists:devices,id'];
+        $rules['latitude'] = ['nullable', 'numeric', 'between:-90,90'];
+        $rules['longitude'] = ['nullable', 'numeric', 'between:-180,180'];
 
         return $rules;
     }

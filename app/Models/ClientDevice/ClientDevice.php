@@ -26,6 +26,8 @@ class ClientDevice extends Model
         'linked_at',
         'status',
         'address',
+        'latitude',
+        'longitude',
         'source',
     ];
 
@@ -40,8 +42,10 @@ class ClientDevice extends Model
     public static array $rules = [
         'client_id'  => 'integer|exists:clients,id',
         'device_id'  => 'integer|exists:devices,id',
-        'serial'     => 'required|string|max:100|unique:client_device,serial',
-        'address'     => 'required|string|regex:/^[a-zA-Z0-9\s\-\.,#]+$/',
+        'serial'     => 'string|max:100|unique:client_device,serial',
+        'address'     => 'string',
+        'latitude'   => 'nullable|numeric|between:-90,90',
+        'longitude'  => 'nullable|numeric|between:-180,180',
         'linked_by'  => 'nullable|exists:users,id',
         'linked_at'  => 'nullable|date',
         'notes'      => 'nullable|string',

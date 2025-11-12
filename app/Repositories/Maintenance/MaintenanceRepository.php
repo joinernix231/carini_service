@@ -3,6 +3,7 @@
 namespace App\Repositories\Maintenance;
 
 use App\Events\Maintenance\MaintenanceAssigned;
+use App\Events\Maintenance\MaintenanceCancelled;
 use App\Events\Maintenance\MaintenanceConfirmed;
 use App\Events\Maintenance\MaintenanceCreated;
 use App\Events\Maintenance\UploadPriceMaintenance;
@@ -196,7 +197,7 @@ class MaintenanceRepository extends BaseRepository
      */
     public function getUnconfirmedMaintenancesRequiringNotification()
     {
-        return $this->model()
+        return $this->model
             ->where('status', 'assigned')
             ->where('confirmation_required', true)
             ->whereNull('confirmed_at')
@@ -220,6 +221,59 @@ class MaintenanceRepository extends BaseRepository
         $maintenance->save();
 
         return $maintenance;
+    }
+
+    /**
+     * Cancelar mantenimiento y liberar técnico asignado
+     * Cambia el status a 'cancelled' y libera el técnico
+     *
+     * @param Maintenance $maintenance
+     * @return Maintenance
+     */
+    public function cancel(Maintenance $maintenance): Maintenance
+    {
+        // Cambiar status a cancelled
+        $maintenance->status = 'cancelled';
+
+        // Liberar técnico asignado
+        $maintenance->technician_id = null;
+
+        // Limpiar campos relacionados con la asignación
+        $maintenance->date_maintenance = null;
+        $maintenance->shift = null;
+
+        // Limpiar campos de confirmación
+        $maintenance->confirmation_required = false;
+        $maintenance->confirmed_at = null;
+        $maintenance->confirmation_deadline = null;
+        $maintenance->coordinator_notified = false;
+        $maintenance->coordinator_notified_at = null;
+
+        $maintenance->save();
+
+        // Disparar evento para que los listeners manejen las notificaciones
+        event(new MaintenanceCancelled($maintenance));
+
+        return $maintenance;
+    }
+
+    /**
+     * Obtener el mantenimiento activo de un técnico
+     * Un mantenimiento se considera activo si su último estado (is_last = true)
+     * tiene la acción 'start' o 'resume'
+     *
+     * @param int $technicianId
+     * @return Maintenance|null
+     */
+    public function getActiveMaintenanceByTechnician(int $technicianId): ?Maintenance
+    {
+        return $this->model
+            ->where('technician_id', $technicianId)
+            ->whereHas('actionLogs', function ($query) {
+                $query->where('is_last', true)
+                      ->whereIn('action', ['start', 'resume']);
+            })
+            ->first();
     }
 
 }
