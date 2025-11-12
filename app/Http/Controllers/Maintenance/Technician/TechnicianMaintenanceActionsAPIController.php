@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Maintenance\Technician;
 
+use App\Events\Maintenance\MaintenanceCompleted;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Maintenance\ActiveMaintenanceRequest;
 use App\Http\Requests\Maintenance\CompleteMaintenanceRequest;
@@ -214,6 +215,8 @@ class TechnicianMaintenanceActionsAPIController extends Controller
             'technician.user',
             'photos.clientDevice'
         ]);
+
+        event(new MaintenanceCompleted($maintenance));
 
         return $this->makeResponseResource('Maintenance completed successfully', [
             'id' => $maintenance->id,

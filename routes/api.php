@@ -107,6 +107,9 @@ Route::post('/technicianMaintenances/{maintenance}/progress', TechnicianMaintena
 Route::get('/technicianMaintenances/{maintenance}/progress', TechnicianMaintenanceProgressAPIController::class . '@getProgress');
 // Technician Maintenances - Repuestos
 Route::post('/technicianMaintenances/{maintenance}/suggest-spare-part', TechnicianMaintenanceSparePartsAPIController::class . '@suggestSparePart');
+// Technician Maintenances - Reporte de Servicio
+Route::post('/technicianMaintenances/{maintenance}/service-report', \App\Http\Controllers\Maintenance\Technician\TechnicianServiceReportAPIController::class . '@store');
+Route::get('/technicianMaintenances/{maintenance}/service-report', \App\Http\Controllers\Maintenance\Technician\TechnicianServiceReportAPIController::class . '@show');
 //Coordinators
 Route::post('/coordinators', CoordinatorAPIController::class . '@store');
 Route::get('/coordinators', CoordinatorAPIController::class . '@index');

@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 
@@ -69,6 +70,7 @@ class Maintenance extends Model
         'started_at',
         'observations',
         'signature_photo',
+        'pdf_url',
         'confirmation_required',
         'confirmed_at',
         'confirmation_deadline',
@@ -187,6 +189,14 @@ class Maintenance extends Model
     public function sparePartSuggestions(): HasMany
     {
         return $this->hasMany(SparePartSuggestion::class);
+    }
+
+    /**
+     * Relación con el reporte de servicio del mantenimiento.
+     */
+    public function serviceReport(): HasOne
+    {
+        return $this->hasOne(MaintenanceServiceReport::class);
     }
 
     /**
@@ -483,6 +493,19 @@ class Maintenance extends Model
     {
         if ($photo = Arr::get($this->attributes, 'signature_photo')) {
             return config('filesystems.disks.s3.url') . 'images/' . $photo . '.PNG';
+        }
+        return null;
+    }
+
+    /**
+     * Accesor para obtener la URL completa del PDF.
+     *
+     * @return string|null
+     */
+    public function getPdfUrlAttribute(): ?string
+    {
+        if ($pdf = Arr::get($this->attributes, 'pdf_url')) {
+            return config('filesystems.disks.s3.url') . 'docs/' . $pdf . '.pdf';
         }
         return null;
     }
