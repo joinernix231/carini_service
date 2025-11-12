@@ -80,6 +80,8 @@ class MaintenanceInformationResource extends JsonResource
                         ],
                         'serial' => $clientDevice->serial,
                         'address' => $clientDevice->address,
+                        'latitude' => $clientDevice->latitude,
+                        'longitude' => $clientDevice->longitude,
                         'pivot' => [
                             'description' => $clientDevice->pivot->description ?? null,
                             'progress_completed_indices' => $clientDevice->pivot->progress_completed_indices ?? null,
