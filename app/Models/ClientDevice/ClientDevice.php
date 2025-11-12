@@ -26,8 +26,6 @@ class ClientDevice extends Model
         'linked_at',
         'status',
         'address',
-        'latitude',
-        'longitude',
         'source',
     ];
 

@@ -17,8 +17,8 @@ class MaintenanceReassignableStatusRule implements ValidationRule
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $allowedStatuses = ['pending', 'quoted', 'assigned'];
-
+        $allowedStatuses = ['pending', 'quoted'];
+        
         if (!in_array($this->maintenance->status, $allowedStatuses)) {
             $fail('Solo se pueden reasignar mantenimientos con estado pendiente o cotizado.');
         }
