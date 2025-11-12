@@ -68,7 +68,6 @@ Route::get('/maintenancesByPaymentStatus', MaintenanceByPaymentStatusListAPICont
 Route::put('/assignMaintenance/{maintenance}', MaintenanceAssignmentAPIController::class . '@assignMaintenance');
 Route::put('/verifyMaintenance/{maintenance}', MaintenanceAssignmentAPIController::class . '@verifyPaymentOfMaintenance');
 Route::put('/uploadPrice/{maintenance}', MaintenanceAssignmentAPIController::class . '@uploadPrice');
-Route::put('/cancelMaintenance/{maintenance}', MaintenanceAssignmentAPIController::class . '@cancelMaintenance');
 // Maintenance - Payment actions
 Route::put('/maintenances/{maintenance}/payment-support', MaintenancePaymentSupportAPIController::class);
 Route::put('/maintenance/{maintenance}/update-quotation', MaintenanceAPIController::class . '@updateQuotation');
@@ -76,7 +75,7 @@ Route::put('/maintenance/{maintenance}/update-quotation', MaintenanceAPIControll
 Route::get('/maintenances/{maintenance}/information', MaintenanceInformationAPIController::class . '@maintenanceInformation');
 Route::post('/maintenances/{maintenance}/confirm', MaintenanceConfirmationAPIController::class . '@confirm');
 // Maintenance - Coordinator actions
-Route::put('/maintenances/{maintenance}/mark-as-called', MaintenanceCoordinatorActionsAPIController::class . '@markAsCalled');
+Route::post('/maintenances/{maintenance}/mark-as-called', MaintenanceCoordinatorActionsAPIController::class . '@markAsCalled');
 Route::get('/coordinator/maintenances/unconfirmed', MaintenanceCoordinatorAPIController::class . '@unconfirmed');
 
 // Other

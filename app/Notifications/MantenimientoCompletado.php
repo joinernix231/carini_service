@@ -17,26 +17,7 @@ class MantenimientoCompletado extends Notification implements ShouldQueue
 
     public function via($notifiable): array
     {
-        return ['database', 'expo'];
-    }
-
-    public function toArray($notifiable): array
-    {
-        return [
-            'title' => '✅ Mantenimiento Completado',
-            'body' => "El mantenimiento creado el {$this->mantenimiento->created_at} ha sido completado exitosamente",
-            'data' => [
-                'type' => 'maintenance_completed',
-                'maintenance_id' => $this->mantenimiento->id,
-                'device_id' => $this->mantenimiento->device_id,
-                'client_id' => $this->mantenimiento->client_id,
-                'screen' => 'MantenimientoDetail',
-                'priority' => 'normal'
-            ],
-            'sound' => 'default',
-            'badge' => 1,
-            'priority' => 'normal'
-        ];
+        return ['expo'];
     }
 
     public function toExpo($notifiable): array

@@ -25,8 +25,6 @@ class ClientDeviceResource extends Resource
             'linked_by' => $this->resource->linked_by,
             'status' => $this->resource->status,
             'address' => $this->resource->address,
-            'latitude' => $this->resource->latitude,
-            'longitude' => $this->resource->longitude,
             'device' => new DeviceResource($this->whenLoaded('device')),
             'client' => $this->when(
                 $this->resource->relationLoaded('client'),

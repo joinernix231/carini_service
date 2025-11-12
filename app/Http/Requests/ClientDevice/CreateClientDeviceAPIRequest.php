@@ -19,14 +19,13 @@ class CreateClientDeviceAPIRequest extends APIRequest
     }
     public function rules(): array
     {
+        $rules = [];
 
         $rules = ClientDevice::$rules;
 
-        $rules['address'] = ['required','string'];
-        $rules['latitude'] = ['required', 'numeric', 'between:-90,90'];
-        $rules['longitude'] = ['required', 'numeric', 'between:-180,180'];
+        
         $rules['device_id'] = ['required', 'integer'];
-
+        
         return $rules;
     }
 }

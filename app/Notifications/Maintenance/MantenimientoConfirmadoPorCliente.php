@@ -17,37 +17,7 @@ class MantenimientoConfirmadoPorCliente extends Notification implements ShouldQu
 
     public function via($notifiable): array
     {
-        return ['database', 'expo'];
-    }
-
-    public function toArray($notifiable): array
-    {
-        // Asegurar que las relaciones estén cargadas
-        if (!$this->mantenimiento->relationLoaded('clientDevices')) {
-            $this->mantenimiento->load('clientDevices.client', 'clientDevices.device');
-        }
-
-        $shiftText = $this->mantenimiento->shift === 'AM' ? 'Mañana' : ($this->mantenimiento->shift === 'PM' ? 'Tarde' : $this->mantenimiento->shift);
-        $dateFormatted = $this->mantenimiento->date_maintenance?->format('d/m/Y') ?? 'fecha pendiente';
-
-        $body = "El cliente ha confirmado el mantenimiento programado para {$dateFormatted} ({$shiftText}). Ya puedes iniciar.";
-
-        return [
-            'title' => '✅ Mantenimiento Confirmado',
-            'body' => $body,
-            'data' => [
-                'type' => 'maintenance_confirmed_by_client',
-                'maintenance_id' => $this->mantenimiento->id,
-                'date_maintenance' => $this->mantenimiento->date_maintenance?->format('Y-m-d'),
-                'shift' => $this->mantenimiento->shift,
-                'confirmed_at' => $this->mantenimiento->confirmed_at?->toISOString(),
-                'screen' => 'MantenimientoDetail',
-                'priority' => 'high'
-            ],
-            'sound' => 'default',
-            'badge' => 1,
-            'priority' => 'high'
-        ];
+        return ['expo'];
     }
 
     public function toExpo($notifiable): array
