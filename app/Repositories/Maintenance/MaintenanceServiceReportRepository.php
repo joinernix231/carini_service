@@ -2,13 +2,14 @@
 
 namespace App\Repositories\Maintenance;
 
+use App\Models\Maintenance\MaintenanceClientDevice;
 use App\Models\Maintenance\MaintenanceServiceReport;
 use App\Repositories\BaseRepository;
 
 class MaintenanceServiceReportRepository extends BaseRepository
 {
     protected $fieldSearchable = [
-        'maintenance_id',
+        'maintenance_client_device_id',
     ];
 
     public function getFieldsSearchable(): array
@@ -25,15 +26,19 @@ class MaintenanceServiceReportRepository extends BaseRepository
      * Crear o actualizar el reporte de servicio
      *
      * @param array $attributes
-     * @param int $maintenanceId
+     * @param int $maintenanceClientDeviceId
      * @return MaintenanceServiceReport
      */
-    public function createOrUpdate(array $attributes, int $maintenanceId): MaintenanceServiceReport
+    public function createOrUpdate(array $attributes, int $maintenanceClientDeviceId): MaintenanceServiceReport
     {
-        $attributes['maintenance_id'] = $maintenanceId;
+        // Obtener el MaintenanceClientDevice para sacar el maintenance_id
+        $maintenanceClientDevice = MaintenanceClientDevice::findOrFail($maintenanceClientDeviceId);
+        
+        $attributes['maintenance_client_device_id'] = $maintenanceClientDeviceId;
+        $attributes['maintenance_id'] = $maintenanceClientDevice->maintenance_id;
         
         return $this->model->updateOrCreate(
-            ['maintenance_id' => $maintenanceId],
+            ['maintenance_client_device_id' => $maintenanceClientDeviceId],
             $attributes
         );
     }

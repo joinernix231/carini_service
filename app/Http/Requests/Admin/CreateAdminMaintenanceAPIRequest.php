@@ -4,6 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use App\Http\Requests\APIRequest;
 use App\Models\Maintenance\Maintenance;
+use App\Rules\Maintenance\DevicesWithinRadiusRule;
 use App\Rules\Maintenance\UniquePendingMaintenanceForDevicesRule;
 
 class CreateAdminMaintenanceAPIRequest extends APIRequest
@@ -23,7 +24,8 @@ class CreateAdminMaintenanceAPIRequest extends APIRequest
             'required',
             'array',
             'min:1',
-            new UniquePendingMaintenanceForDevicesRule()
+            new UniquePendingMaintenanceForDevicesRule(),
+            new DevicesWithinRadiusRule()
         ];
 
         $rules['client_devices.*.id'] = [

@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Orden de Servicio #{{ $maintenance->id }}</title>
+    <title>Orden de Servicio #{{ $maintenance->id }} - Dispositivo {{ $device->brand ?? '' }} {{ $device->model ?? '' }}</title>
     <style>
         @page { margin: 1cm; size: letter; }
 
@@ -105,7 +105,9 @@
         </tr>
         <tr>
             <td class="label-cell">ORDEN #</td>
-            <td class="value-cell" colspan="3">{{ $maintenance->id }}</td>
+            <td class="value-cell">{{ $maintenance->id }}</td>
+            <td class="label-cell">DISPOSITIVO</td>
+            <td class="value-cell">{{ ($device->brand ?? '') . ' ' . ($device->model ?? '') . ' - ' . ($clientDevice->serial ?? '') }}</td>
         </tr>
     </table>
 
@@ -119,60 +121,69 @@
         </tr>
     </table>
 
-    <!-- REPUESTOS -->
+    <!-- REPUESTOS UTILIZADOS -->
     <table>
         <tr>
             <th style="width: 85%;">REPUESTOS UTILIZADOS</th>
             <th style="width: 15%;">CANTIDAD</th>
         </tr>
-        <tr>
-            <td style="height: 38px; vertical-align: top;">{{ $serviceReport->spare_parts_used ?? '' }}</td>
-            <td style="vertical-align: top; text-align: center;">{{ $serviceReport->spare_parts_quantity ?? 0 }}</td>
-        </tr>
+        @php
+            $usedSpareParts = $serviceReport->used_spare_parts ?? [];
+        @endphp
+        @forelse($usedSpareParts as $sparePart)
+            <tr>
+                <td style="vertical-align: top; padding: 3px 4px;">{{ $sparePart['description'] ?? '' }}</td>
+                <td style="vertical-align: top; text-align: center; padding: 3px 4px;">{{ $sparePart['quantity'] ?? 0 }}</td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="2" style="text-align: center; padding: 3px 4px; height: 38px;">No se utilizaron repuestos</td>
+            </tr>
+        @endforelse
     </table>
 
-    <!-- ESTADO DEL EQUIPO -->
-    <table>
-        <tr>
-            <th>ESTADO DEL EQUIPO</th>
-        </tr>
+   <!-- ESTADO DEL EQUIPO -->
+<table>
+    <tr>
+        <th>ESTADO DEL EQUIPO</th>
+    </tr>
         <tr>
             <td style="padding: 3px 4px;">
-                FUNCIONANDO {{ ($serviceReport && $serviceReport->equipment_status === 'FUNCIONANDO') ? '☑' : '☐' }}&nbsp;&nbsp;
-                EN REPARACIÓN {{ ($serviceReport && $serviceReport->equipment_status === 'EN_REPARACION') ? '☑' : '☐' }}&nbsp;&nbsp;
-                FUERA DE SERVICIO {{ ($serviceReport && $serviceReport->equipment_status === 'FUERA_DE_SERVICIO') ? '☑' : '☐' }}&nbsp;&nbsp;
-                OTRO {{ ($serviceReport && $serviceReport->equipment_status === 'OTRO') ? '☑' : '☐' }}
+                FUNCIONANDO [{{ ($serviceReport && $serviceReport->equipment_status === 'FUNCIONANDO') ? 'X' : ' ' }}]&nbsp;&nbsp;
+                EN REPARACIÓN [{{ ($serviceReport && $serviceReport->equipment_status === 'EN_REPARACION') ? 'X' : ' ' }}]&nbsp;&nbsp;
+                FUERA DE SERVICIO [{{ ($serviceReport && $serviceReport->equipment_status === 'FUERA_DE_SERVICIO') ? 'X' : ' ' }}]&nbsp;&nbsp;
+                OTRO [{{ ($serviceReport && $serviceReport->equipment_status === 'OTRO') ? 'X' : ' ' }}]
             </td>
         </tr>
-    </table>
+</table>
 
     <!-- FACTURACIÓN -->
     <table>
         <tr>
             <td style="width: 50%; padding: 3px 4px;">
                 FACTURAR EL SERVICIO: 
-                NO {{ ($serviceReport && !$serviceReport->bill_service) ? '☑' : '☐' }} 
-                SI {{ ($serviceReport && $serviceReport->bill_service) ? '☑' : '☐' }} 
-                ${{ $serviceReport && $serviceReport->service_amount ? number_format($serviceReport->service_amount, 2, ',', '.') : '' }}
+                NO [{{ ($serviceReport && !$serviceReport->bill_service) ? 'X' : ' ' }}] 
+                SI [{{ ($serviceReport && $serviceReport->bill_service) ? 'X' : ' ' }}] 
+                ${{ $serviceReport && $serviceReport->service_amount ? (fmod($serviceReport->service_amount, 1) == 0 ? number_format($serviceReport->service_amount, 0, ',', '.') : number_format($serviceReport->service_amount, 2, ',', '.')) : '' }}
             </td>
             <td style="width: 50%; padding: 3px 4px;">
                 FACTURAR VIATICOS: 
-                NO {{ ($serviceReport && !$serviceReport->bill_expenses) ? '☑' : '☐' }} 
-                SI {{ ($serviceReport && $serviceReport->bill_expenses) ? '☑' : '☐' }} 
-                ${{ $serviceReport && $serviceReport->expenses_amount ? number_format($serviceReport->expenses_amount, 2, ',', '.') : '' }}
+                NO [{{ ($serviceReport && !$serviceReport->bill_expenses) ? 'X' : ' ' }}] 
+                SI [{{ ($serviceReport && $serviceReport->bill_expenses) ? 'X' : ' ' }}] 
+                ${{ $serviceReport && $serviceReport->expenses_amount ? (fmod($serviceReport->expenses_amount, 1) == 0 ? number_format($serviceReport->expenses_amount, 0, ',', '.') : number_format($serviceReport->expenses_amount, 2, ',', '.')) : '' }}
             </td>
         </tr>
         <tr>
             <td style="padding: 3px 4px;">
                 VIATICOS RECIBIDOS: 
-                NO {{ ($serviceReport && !$serviceReport->expenses_received) ? '☑' : '☐' }} 
-                SI {{ ($serviceReport && $serviceReport->expenses_received) ? '☑' : '☐' }} 
-                ${{ $serviceReport && $serviceReport->expenses_amount_received ? number_format($serviceReport->expenses_amount_received, 2, ',', '.') : '' }}
+                NO [{{ ($serviceReport && !$serviceReport->expenses_received) ? 'X' : ' ' }}] 
+                SI [{{ ($serviceReport && $serviceReport->expenses_received) ? 'X' : ' ' }}] 
+                ${{ $serviceReport && $serviceReport->expenses_amount_received ? (fmod($serviceReport->expenses_amount_received, 1) == 0 ? number_format($serviceReport->expenses_amount_received, 0, ',', '.') : number_format($serviceReport->expenses_amount_received, 2, ',', '.')) : '' }}
             </td>
             <td style="padding: 3px 4px;">
-                ALIMENTACIÓN: NO {{ ($serviceReport && !$serviceReport->food) ? '☑' : '☐' }} SI {{ ($serviceReport && $serviceReport->food) ? '☑' : '☐' }}&nbsp;&nbsp;
-                HOSPEDAJE: NO {{ ($serviceReport && !$serviceReport->lodging) ? '☑' : '☐' }} SI {{ ($serviceReport && $serviceReport->lodging) ? '☑' : '☐' }}&nbsp;&nbsp;
-                TRANSPORTE: NO {{ ($serviceReport && !$serviceReport->transport) ? '☑' : '☐' }} SI {{ ($serviceReport && $serviceReport->transport) ? '☑' : '☐' }}
+                ALIMENTACIÓN: NO [{{ ($serviceReport && !$serviceReport->food) ? 'X' : ' ' }}] SI [{{ ($serviceReport && $serviceReport->food) ? 'X' : ' ' }}]&nbsp;&nbsp;
+                HOSPEDAJE: NO [{{ ($serviceReport && !$serviceReport->lodging) ? 'X' : ' ' }}] SI [{{ ($serviceReport && $serviceReport->lodging) ? 'X' : ' ' }}]&nbsp;&nbsp;
+                TRANSPORTE: NO [{{ ($serviceReport && !$serviceReport->transport) ? 'X' : ' ' }}] SI [{{ ($serviceReport && $serviceReport->transport) ? 'X' : ' ' }}]
             </td>
         </tr>
     </table>
@@ -183,7 +194,7 @@
             <th>RECOMENDACIONES / SERVICIOS PENDIENTES</th>
         </tr>
         <tr>
-            <td style="height: 38px; vertical-align: top;">{{ $maintenance->recommendations ?? '' }}</td>
+            <td style="height: 38px; vertical-align: top;">{{ $maintenance->observations ?? '' }}</td>
         </tr>
     </table>
 
@@ -193,11 +204,14 @@
             <th colspan="2">PARA SER DILIGENCIADO POR EL CLIENTE</th>
         </tr>
         <tr>
-            <td style="width: 50%; padding: 3px 4px;">REPRESENTANTE:</td>
-            <td style="width: 50%; padding: 3px 4px;">FECHA Y HORA DE LLEGADA:<br>FECHA Y HORA DE SALIDA:</td>
+            <td style="width: 50%; padding: 3px 4px;">REPRESENTANTE: {{ $client ? $client->name : '' }}</td>
+            <td style="width: 50%; padding: 3px 4px;">
+                FECHA Y HORA DE LLEGADA: {{ $arrivalLog ? $arrivalLog->timestamp->format('d/m/Y H:i') : '' }}<br>
+                FECHA Y HORA DE SALIDA: {{ $endLog ? $endLog->timestamp->format('d/m/Y H:i') : '' }}
+            </td>
         </tr>
         <tr>
-            <td style="padding: 3px 4px;">RECIBÍ A SATISFACCIÓN &nbsp; SI ☐ NO ☐</td>
+            <td style="padding: 3px 4px;">RECIBÍ A SATISFACCIÓN &nbsp; SI [X] NO [ ]</td>
             <td rowspan="2" style="height: 55px; vertical-align: top;"></td>
         </tr>
         <tr>
@@ -220,14 +234,14 @@
             </td>
         </tr>
         <tr>
-            <td style="width: 35%; padding: 3px 4px;">TECNICO ASIGNADO</td>
-            <td style="height: 35px;"></td>
-            <td style="width: 20%; padding: 3px 4px;">FECHA</td>
+            <td style="width: 35%; padding: 3px 4px;">TECNICO ASIGNADO:</td>
+            <td style="height: 35px;"> {{ $technician && $technician->user ? $technician->user->name : '' }}</td>
+            <td style="width: 20%; padding: 3px 4px;">FECHA: {{ $serviceReport ? $serviceReport->created_at->format('d/m/Y') : ($maintenance->updated_at ? $maintenance->updated_at->format('d/m/Y') : '') }}</td>
         </tr>
         <tr>
-            <td style="padding: 3px 4px;">AUTORIZADO POR</td>
-            <td style="height: 35px;"></td>
-            <td style="padding: 3px 4px;">FECHA</td>
+            <td style="padding: 3px 4px;">AUTORIZADO POR:</td>
+            <td style="height: 35px;">{{ $client ? $client->name : '' }}</td>
+            <td style="padding: 3px 4px;">FECHA: {{ $serviceReport ? $serviceReport->created_at->format('d/m/Y') : ($maintenance->updated_at ? $maintenance->updated_at->format('d/m/Y') : '') }}</td>
         </tr>
     </table>
 </body>

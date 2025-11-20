@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\ChangePasswordRequest;
 use App\Http\Requests\Auth\LoginWithEmailAPIRequest;
 use App\Utils\Resources\ResponseUtil;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -39,7 +41,8 @@ class AuthAPIController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'role' => $user->role,
-                'policy_accepted' => !is_null($user->policy_accepted_at)
+                'policy_accepted' => !is_null($user->policy_accepted_at),
+                'must_change_password' => $user->must_change_password
             ]
         ];
 
@@ -61,5 +64,34 @@ class AuthAPIController extends Controller
         ]);
 
         return ResponseUtil::makeResponse('Políticas aceptadas con éxito.');
+    }
+
+    /**
+     * Cambiar contraseña del usuario autenticado
+     *
+     * @param ChangePasswordRequest $request
+     * @return JsonResponse
+     */
+    public function changePassword(ChangePasswordRequest $request): JsonResponse
+    {
+        $user = auth()->user();
+
+        // Verificar que la contraseña actual sea correcta
+        if (!Hash::check($request->current_password, $user->password)) {
+            return ResponseUtil::makeError('La contraseña actual es incorrecta', 422);
+        }
+
+        // Verificar que la nueva contraseña sea diferente a la actual
+        if (Hash::check($request->new_password, $user->password)) {
+            return ResponseUtil::makeError('La nueva contraseña debe ser diferente a la actual', 422);
+        }
+
+        // Actualizar contraseña y marcar que ya no debe cambiarla
+        $user->update([
+            'password' => Hash::make($request->new_password),
+            'must_change_password' => false
+        ]);
+
+        return ResponseUtil::makeResponse('Contraseña cambiada exitosamente');
     }
 }

@@ -14,10 +14,10 @@ class MaintenanceServiceReport extends Model
 
     protected $fillable = [
         'maintenance_id',
+        'maintenance_client_device_id',
         'version',
         'activities_description',
-        'spare_parts_used',
-        'spare_parts_quantity',
+        'used_spare_parts',
         'equipment_status',
         'bill_service',
         'service_amount',
@@ -32,7 +32,7 @@ class MaintenanceServiceReport extends Model
     ];
 
     protected $casts = [
-        'spare_parts_quantity' => 'integer',
+        'used_spare_parts' => 'array',
         'bill_service' => 'boolean',
         'service_amount' => 'decimal:2',
         'expenses_received' => 'boolean',
@@ -45,11 +45,12 @@ class MaintenanceServiceReport extends Model
     ];
 
     public static array $rules = [
-        'maintenance_id' => 'required|exists:maintenances,id',
+        'maintenance_client_device_id' => 'required|exists:maintenance_client_device,id',
         'version' => 'nullable|string|max:10',
         'activities_description' => 'nullable|string|max:2000',
-        'spare_parts_used' => 'nullable|string|max:1000',
-        'spare_parts_quantity' => 'nullable|integer|min:0',
+        'used_spare_parts' => 'nullable|array',
+        'used_spare_parts.*.description' => 'required|string|max:500',
+        'used_spare_parts.*.quantity' => 'required|integer|min:1',
         'equipment_status' => 'nullable|in:FUNCIONANDO,EN_REPARACION,FUERA_DE_SERVICIO,OTRO',
         'bill_service' => 'nullable|boolean',
         'service_amount' => 'nullable|numeric|min:0',
@@ -64,13 +65,13 @@ class MaintenanceServiceReport extends Model
     ];
 
     /**
-     * Relación con el mantenimiento.
+     * Relación con el dispositivo del mantenimiento (pivot).
      *
-     * @return BelongsTo<Maintenance, MaintenanceServiceReport>
+     * @return BelongsTo<MaintenanceClientDevice, MaintenanceServiceReport>
      */
-    public function maintenance(): BelongsTo
+    public function maintenanceClientDevice(): BelongsTo
     {
-        return $this->belongsTo(Maintenance::class);
+        return $this->belongsTo(MaintenanceClientDevice::class);
     }
 }
 

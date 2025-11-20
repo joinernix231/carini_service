@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Maintenance;
 
 use App\Http\Controllers\Controller;
 use App\Models\Maintenance\Maintenance;
+use App\Models\Maintenance\MaintenanceClientDevice;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
@@ -17,7 +18,7 @@ class MaintenancePDFPreviewController extends Controller
      * @param int $id ID del mantenimiento
      * @return Response
      */
-    public function preview(int $id): Response
+    public function preview(int $id, ?int $deviceId = null): Response
     {
         // Buscar el mantenimiento y cargar todas las relaciones necesarias
         $maintenance = Maintenance::with([
@@ -27,17 +28,33 @@ class MaintenancePDFPreviewController extends Controller
             'photos.clientDevice',
             'sparePartSuggestions.clientDevice.device',
             'actionLogs.technician.user',
-            'serviceReport'
         ])->findOrFail($id);
 
+        // Si no se especifica dispositivo, usar el primero con reporte
+        if (!$deviceId) {
+            $maintenanceClientDevice = MaintenanceClientDevice::where('maintenance_id', $id)
+                ->whereHas('serviceReport')
+                ->with(['serviceReport', 'clientDevice.device', 'clientDevice.client'])
+                ->first();
+        } else {
+            $maintenanceClientDevice = MaintenanceClientDevice::where('maintenance_id', $id)
+                ->where('client_device_id', $deviceId)
+                ->with(['serviceReport', 'clientDevice.device', 'clientDevice.client'])
+                ->first();
+        }
+
+        if (!$maintenanceClientDevice || !$maintenanceClientDevice->serviceReport) {
+            abort(404, 'No se encontró reporte de servicio para este dispositivo');
+        }
+
         // Preparar datos para la vista del PDF
-        $data = $this->preparePdfData($maintenance);
+        $data = $this->preparePdfData($maintenance, $maintenanceClientDevice);
 
         // Generar el PDF
         $pdf = Pdf::loadView('pdfs.maintenance-service-order', $data);
 
         // Retornar el PDF para visualización en el navegador
-        return $pdf->stream('orden_servicio_' . $maintenance->id . '.pdf');
+        return $pdf->stream('orden_servicio_' . $maintenance->id . '_device_' . $maintenanceClientDevice->clientDevice->id . '.pdf');
     }
 
     /**
@@ -47,7 +64,7 @@ class MaintenancePDFPreviewController extends Controller
      * @param int $id ID del mantenimiento
      * @return Response
      */
-    public function download(int $id): Response
+    public function download(int $id, ?int $deviceId = null): Response
     {
         // Buscar el mantenimiento y cargar todas las relaciones necesarias
         $maintenance = Maintenance::with([
@@ -57,24 +74,43 @@ class MaintenancePDFPreviewController extends Controller
             'photos.clientDevice',
             'sparePartSuggestions.clientDevice.device',
             'actionLogs.technician.user',
-            'serviceReport'
         ])->findOrFail($id);
 
+        // Si no se especifica dispositivo, usar el primero con reporte
+        if (!$deviceId) {
+            $maintenanceClientDevice = MaintenanceClientDevice::where('maintenance_id', $id)
+                ->whereHas('serviceReport')
+                ->with(['serviceReport', 'clientDevice.device', 'clientDevice.client'])
+                ->first();
+        } else {
+            $maintenanceClientDevice = MaintenanceClientDevice::where('maintenance_id', $id)
+                ->where('client_device_id', $deviceId)
+                ->with(['serviceReport', 'clientDevice.device', 'clientDevice.client'])
+                ->first();
+        }
+
+        if (!$maintenanceClientDevice || !$maintenanceClientDevice->serviceReport) {
+            abort(404, 'No se encontró reporte de servicio para este dispositivo');
+        }
+
         // Preparar datos para la vista del PDF
-        $data = $this->preparePdfData($maintenance);
+        $data = $this->preparePdfData($maintenance, $maintenanceClientDevice);
 
         // Generar el PDF
         $pdf = Pdf::loadView('pdfs.maintenance-service-order', $data);
 
         // Retornar el PDF para descarga
-        return $pdf->download('orden_servicio_' . $maintenance->id . '.pdf');
+        return $pdf->download('orden_servicio_' . $maintenance->id . '_device_' . $maintenanceClientDevice->clientDevice->id . '.pdf');
     }
 
     /**
      * Preparar datos e imágenes para el PDF
      */
-    private function preparePdfData(Maintenance $maintenance): array
+    private function preparePdfData(Maintenance $maintenance, MaintenanceClientDevice $maintenanceClientDevice): array
     {
+        $clientDevice = $maintenanceClientDevice->clientDevice;
+        $serviceReport = $maintenanceClientDevice->serviceReport;
+
         // Preparar imágenes para el PDF (DomPDF necesita base64 o rutas locales)
         $logoBase64 = null;
         $signatureBase64 = null;
@@ -102,16 +138,26 @@ class MaintenancePDFPreviewController extends Controller
             }
         }
 
+        $arrivalLog = $maintenance->actionLogs->where('action', 'on_the_way')->first() 
+            ?? $maintenance->actionLogs->where('action', 'start')->first();
+
+        // Filtrar fotos y repuestos sugeridos para este dispositivo específico
+        $devicePhotos = $maintenance->photos->where('client_device_id', $clientDevice->id);
+        $deviceSparePartSuggestions = $maintenance->sparePartSuggestions->where('client_device_id', $clientDevice->id);
+
         return [
             'maintenance' => $maintenance,
-            'client' => $maintenance->client,
-            'devices' => $maintenance->clientDevices,
+            'maintenanceClientDevice' => $maintenanceClientDevice,
+            'clientDevice' => $clientDevice,
+            'client' => $clientDevice->client,
+            'device' => $clientDevice->device,
             'technician' => $maintenance->technician,
-            'spareParts' => $maintenance->sparePartSuggestions,
-            'photos' => $maintenance->photos,
+            'sparePartSuggestions' => $deviceSparePartSuggestions,
+            'photos' => $devicePhotos,
             'startLog' => $maintenance->actionLogs->where('action', 'start')->first(),
             'endLog' => $maintenance->actionLogs->where('action', 'end')->first(),
-            'serviceReport' => $maintenance->serviceReport,
+            'arrivalLog' => $arrivalLog,
+            'serviceReport' => $serviceReport,
             'logoBase64' => $logoBase64,
             'signatureBase64' => $signatureBase64,
         ];

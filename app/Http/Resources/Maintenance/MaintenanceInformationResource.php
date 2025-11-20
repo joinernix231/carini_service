@@ -32,6 +32,7 @@ class MaintenanceInformationResource extends JsonResource
             'observations' => $this->observations,
             'photo' => $this->photo,
             'signature_photo' => $this->signature_photo,
+            'pdf_url' => $this->pdf_url,
             'is_paid' => $this->is_paid,
             'payment_support' => $this->payment_support,
             'price_support' => $this->price_support,
@@ -82,6 +83,9 @@ class MaintenanceInformationResource extends JsonResource
                         'address' => $clientDevice->address,
                         'latitude' => $clientDevice->latitude,
                         'longitude' => $clientDevice->longitude,
+                        'pdf_url' => $clientDevice->pivot && $clientDevice->pivot->pdf_url 
+                            ? config('filesystems.disks.s3.url') . 'docs/' . $clientDevice->pivot->pdf_url . '.pdf'
+                            : null,
                         'pivot' => [
                             'description' => $clientDevice->pivot->description ?? null,
                             'progress_completed_indices' => $clientDevice->pivot->progress_completed_indices ?? null,

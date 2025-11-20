@@ -24,15 +24,26 @@ class PagoMantenimientoSubido extends Notification implements ShouldQueue
 
     public function toArray($notifiable): array
     {
+        // Asegurar que las relaciones estén cargadas
+        if (!$this->maintenance->relationLoaded('clientDevices')) {
+            $this->maintenance->load('clientDevices.client', 'clientDevices.device');
+        }
+
         $deviceCount = $this->maintenance->clientDevices->count();
         $firstDevice = $this->maintenance->clientDevices->first();
         $clientName = $firstDevice ? $firstDevice->client->name : 'Cliente';
+        
+        $deviceInfo = $deviceCount === 1 && $firstDevice && $firstDevice->device
+            ? "{$firstDevice->device->model}"
+            : "{$deviceCount} equipos";
+
+        $body = "El cliente {$clientName} ha subido el soporte de pago para el mantenimiento - {$deviceInfo}";
 
         return [
-            'title' => "Hola, {$clientName} tu pago del mantenimiento ha sido verificado",
-            'body' => "Mantenimiento verificado",
+            'title' => '💳 Soporte de Pago Subido',
+            'body' => $body,
             'data' => [
-                'type' => 'maintenance_verify',
+                'type' => 'maintenance_payment_uploaded',
                 'maintenance_id' => $this->maintenance->id,
                 'client_id' => $firstDevice ? $firstDevice->client_id : null,
                 'device_count' => $deviceCount,
@@ -46,16 +57,26 @@ class PagoMantenimientoSubido extends Notification implements ShouldQueue
 
     public function toExpo($notifiable): array
     {
+        // Asegurar que las relaciones estén cargadas
+        if (!$this->maintenance->relationLoaded('clientDevices')) {
+            $this->maintenance->load('clientDevices.client', 'clientDevices.device');
+        }
+
         $deviceCount = $this->maintenance->clientDevices->count();
         $firstDevice = $this->maintenance->clientDevices->first();
         $clientName = $firstDevice ? $firstDevice->client->name : 'Cliente';
+        
+        $deviceInfo = $deviceCount === 1 && $firstDevice && $firstDevice->device
+            ? "{$firstDevice->device->model}"
+            : "{$deviceCount} equipos";
 
+        $body = "El cliente {$clientName} ha subido el soporte de pago para el mantenimiento - {$deviceInfo}";
 
         return [
-            'title' => "Hola, {$clientName} tu pago del mantenimiento ha sido verificado",
-            'body' => "Mantenimiento verificado",
+            'title' => '💳 Soporte de Pago Subido',
+            'body' => $body,
             'data' => [
-                'type' => 'maintenance_verify',
+                'type' => 'maintenance_payment_uploaded',
                 'maintenance_id' => $this->maintenance->id,
                 'client_id' => $firstDevice ? $firstDevice->client_id : null,
                 'device_count' => $deviceCount,

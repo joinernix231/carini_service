@@ -150,7 +150,8 @@ class Maintenance extends Model
                 'progress_total',
                 'progress_pct',
                 'progress_status',
-                'progress_updated_at'
+                'progress_updated_at',
+                'pdf_url'
             )
             ->withTimestamps();
     }
@@ -191,13 +192,6 @@ class Maintenance extends Model
         return $this->hasMany(SparePartSuggestion::class);
     }
 
-    /**
-     * Relación con el reporte de servicio del mantenimiento.
-     */
-    public function serviceReport(): HasOne
-    {
-        return $this->hasOne(MaintenanceServiceReport::class);
-    }
 
     /**
      * Determinar si el mantenimiento está activo basado en el último action log.

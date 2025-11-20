@@ -18,7 +18,6 @@ class GenerateMaintenancePDFListener
             'photos.clientDevice',
             'sparePartSuggestions.clientDevice.device',
             'actionLogs.technician.user',
-            'serviceReport'
         ]);
 
         // Encolar el job en la queue 'PDFQueue_local'
