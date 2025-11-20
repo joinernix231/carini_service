@@ -11,9 +11,12 @@ class MantenimientoCompletado extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(
-        private readonly Maintenance $mantenimiento
-    ) {}
+    private Maintenance $maintenance;
+
+    public function __construct(Maintenance $maintenance)
+    {
+        $this->maintenance = $maintenance;
+    }
 
     public function via($notifiable): array
     {
@@ -22,16 +25,27 @@ class MantenimientoCompletado extends Notification implements ShouldQueue
 
     public function toArray($notifiable): array
     {
+        $deviceCount = $this->maintenance->clientDevices->count();
+        $firstDevice = $this->maintenance->clientDevices->first();
+        $clientName = $firstDevice ? $firstDevice->client->name : 'Cliente';
+        $technicianName = $this->maintenance->technician && $this->maintenance->technician->user
+            ? $this->maintenance->technician->user->name
+            : 'Técnico';
+
+        $deviceInfo = $deviceCount === 1 && $firstDevice && $firstDevice->device
+            ? "{$firstDevice->device->model}"
+            : "{$deviceCount} equipos";
+
         return [
-            'title' => '✅ Mantenimiento Completado',
-            'body' => "El mantenimiento creado el {$this->mantenimiento->created_at} ha sido completado exitosamente",
+            'title' => "✅ Mantenimiento Finalizado",
+            'body' => "El mantenimiento de {$deviceInfo} ha sido completado exitosamente por {$technicianName}",
             'data' => [
                 'type' => 'maintenance_completed',
-                'maintenance_id' => $this->mantenimiento->id,
-                'device_id' => $this->mantenimiento->device_id,
-                'client_id' => $this->mantenimiento->client_id,
+                'maintenance_id' => $this->maintenance->id,
+                'client_id' => $firstDevice ? $firstDevice->client_id : null,
+                'device_count' => $deviceCount,
+                'technician_name' => $technicianName,
                 'screen' => 'MantenimientoDetail',
-                'priority' => 'normal'
             ],
             'sound' => 'default',
             'badge' => 1,
@@ -41,21 +55,31 @@ class MantenimientoCompletado extends Notification implements ShouldQueue
 
     public function toExpo($notifiable): array
     {
+        $deviceCount = $this->maintenance->clientDevices->count();
+        $firstDevice = $this->maintenance->clientDevices->first();
+        $clientName = $firstDevice ? $firstDevice->client->name : 'Cliente';
+        $technicianName = $this->maintenance->technician && $this->maintenance->technician->user
+            ? $this->maintenance->technician->user->name
+            : 'Técnico';
+
+        $deviceInfo = $deviceCount === 1 && $firstDevice && $firstDevice->device
+            ? "{$firstDevice->device->model}"
+            : "{$deviceCount} equipos";
+
         return [
-            'title' => '✅ Mantenimiento Completado',
-            'body' => "El mantenimiento creado el {$this->mantenimiento->created_at} ha sido completado exitosamente",
+            'title' => "✅ Mantenimiento Finalizado",
+            'body' => "El mantenimiento de {$deviceInfo} ha sido completado exitosamente por {$technicianName}",
             'data' => [
                 'type' => 'maintenance_completed',
-                'maintenance_id' => $this->mantenimiento->id,
-                'device_id' => $this->mantenimiento->device_id,
-                'client_id' => $this->mantenimiento->client_id,
+                'maintenance_id' => $this->maintenance->id,
+                'client_id' => $firstDevice ? $firstDevice->client_id : null,
+                'device_count' => $deviceCount,
+                'technician_name' => $technicianName,
                 'screen' => 'MantenimientoDetail',
-                'priority' => 'normal'
             ],
             'sound' => 'default',
             'badge' => 1,
             'priority' => 'normal'
         ];
     }
-
 }
