@@ -100,6 +100,30 @@ class GenerateMaintenancePDFJob implements ShouldQueue
                 $devicePhotos = $this->maintenance->photos->where('client_device_id', $clientDevice->id);
                 $deviceSparePartSuggestions = $this->maintenance->sparePartSuggestions->where('client_device_id', $clientDevice->id);
 
+                // Preparar fotos en base64 para el PDF con información adicional (optimizadas)
+                $photosBase64 = [];
+                foreach ($devicePhotos as $photo) {
+                    try {
+                        $photoName = $photo->getAttributes()['photo'] ?? null;
+                        if ($photoName) {
+                            $s3Path = 'images/' . $photoName . '.PNG';
+                            if (Storage::disk('s3')->exists($s3Path)) {
+                                $photoContent = Storage::disk('s3')->get($s3Path);
+                                $optimizedBase64 = $this->optimizeImageForPdf($photoContent);
+                                if ($optimizedBase64) {
+                                    $photosBase64[] = [
+                                        'base64' => $optimizedBase64,
+                                        'type' => $photo->photo_type ?? 'other',
+                                        'created_at' => $photo->created_at ?? null,
+                                    ];
+                                }
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        Log::warning("No se pudo cargar la foto para el PDF: " . $e->getMessage());
+                    }
+                }
+
                 // Preparar datos para la vista del PDF
                 $data = [
                     'maintenance' => $this->maintenance,
@@ -110,6 +134,7 @@ class GenerateMaintenancePDFJob implements ShouldQueue
                     'technician' => $this->maintenance->technician,
                     'sparePartSuggestions' => $deviceSparePartSuggestions,
                     'photos' => $devicePhotos,
+                    'photosBase64' => $photosBase64,
                     'startLog' => $startLog,
                     'endLog' => $endLog,
                     'arrivalLog' => $arrivalLog,
@@ -158,6 +183,71 @@ class GenerateMaintenancePDFJob implements ShouldQueue
 
             // Re-lanzar la excepción para que el job falle y se pueda reintentar
             throw $e;
+        }
+    }
+
+    /**
+     * Optimiza una imagen para incluirla en el PDF
+     * Redimensiona a máximo 800px de ancho y convierte a JPEG con calidad 75%
+     *
+     * @param string $imageContent Contenido binario de la imagen
+     * @return string|null Base64 de la imagen optimizada o null si falla
+     */
+    private function optimizeImageForPdf(string $imageContent): ?string
+    {
+        try {
+            // Crear imagen desde el contenido
+            $sourceImage = @imagecreatefromstring($imageContent);
+            if (!$sourceImage) {
+                return null;
+            }
+
+            // Obtener dimensiones originales
+            $originalWidth = imagesx($sourceImage);
+            $originalHeight = imagesy($sourceImage);
+
+            // Calcular nuevas dimensiones (máximo 800px de ancho, mantener proporción)
+            $maxWidth = 800;
+            $maxHeight = 600;
+            
+            $ratio = min($maxWidth / $originalWidth, $maxHeight / $originalHeight, 1.0);
+            $newWidth = (int)($originalWidth * $ratio);
+            $newHeight = (int)($originalHeight * $ratio);
+
+            // Crear nueva imagen redimensionada
+            $optimizedImage = imagecreatetruecolor($newWidth, $newHeight);
+            
+            // Preservar transparencia si es PNG
+            imagealphablending($optimizedImage, false);
+            imagesavealpha($optimizedImage, true);
+            $transparent = imagecolorallocatealpha($optimizedImage, 255, 255, 255, 127);
+            imagefill($optimizedImage, 0, 0, $transparent);
+
+            // Redimensionar con mejor calidad
+            imagecopyresampled(
+                $optimizedImage,
+                $sourceImage,
+                0, 0, 0, 0,
+                $newWidth,
+                $newHeight,
+                $originalWidth,
+                $originalHeight
+            );
+
+            // Capturar como JPEG en memoria (más pequeño que PNG)
+            ob_start();
+            imagejpeg($optimizedImage, null, 75); // Calidad 75%
+            $optimizedContent = ob_get_clean();
+
+            // Limpiar recursos
+            imagedestroy($sourceImage);
+            imagedestroy($optimizedImage);
+
+            // Retornar base64
+            return 'data:image/jpeg;base64,' . base64_encode($optimizedContent);
+        } catch (\Exception $e) {
+            Log::warning("Error al optimizar imagen para PDF: " . $e->getMessage());
+            return null;
         }
     }
 }
