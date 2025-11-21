@@ -4,10 +4,12 @@ namespace App\Providers;
 
 use App\Events\Maintenance\MaintenanceCancelled;
 use App\Events\Maintenance\MaintenanceCompleted;
+use App\Events\Maintenance\MaintenanceCreated;
 use App\Events\Maintenance\VerifyPaymentMaintenance;
 use App\Listeners\Maintenance\NotifyAdminMaintenanceCancelledListener;
 use App\Listeners\Maintenance\NotifyAdminMaintenanceCompletedListener;
 use App\Listeners\Maintenance\NotifyAdminPaymentVerifiedListener;
+use App\Listeners\Maintenance\NotifyClientMaintenanceCreatedListener;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -23,6 +25,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         MaintenanceCompleted::class => [
             NotifyAdminMaintenanceCompletedListener::class,
+        ],
+        MaintenanceCreated::class => [
+            NotifyClientMaintenanceCreatedListener::class,
         ],
         VerifyPaymentMaintenance::class => [
             NotifyAdminPaymentVerifiedListener::class,
