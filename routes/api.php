@@ -29,6 +29,7 @@ use App\Http\Controllers\Maintenance\Technician\TechnicianMaintenancePhotosAPICo
 use App\Http\Controllers\Maintenance\Technician\TechnicianMaintenanceProgressAPIController;
 use App\Http\Controllers\Maintenance\Technician\TechnicianMaintenancesAPIController;
 use App\Http\Controllers\Maintenance\Technician\TechnicianMaintenanceSparePartsAPIController;
+use App\Http\Controllers\Maintenance\Technician\TechnicianServiceReportAPIController;
 use App\Http\Controllers\Other\ResourceAPIController;
 use App\Http\Controllers\Technician\AvailableTechnicianAPIController;
 use App\Http\Controllers\Technician\AvailableTechnicianController;
@@ -114,8 +115,8 @@ Route::get('/technicianMaintenances/{maintenance}/progress', TechnicianMaintenan
 // Technician Maintenances - Repuestos
 Route::post('/technicianMaintenances/{maintenance}/suggest-spare-part', TechnicianMaintenanceSparePartsAPIController::class . '@suggestSparePart');
 // Technician Maintenances - Reporte de Servicio
-Route::post('/technicianMaintenances/{maintenance}/devices/{clientDevice}/service-report', \App\Http\Controllers\Maintenance\Technician\TechnicianServiceReportAPIController::class . '@store');
-Route::get('/technicianMaintenances/{maintenance}/devices/{clientDevice}/service-report', \App\Http\Controllers\Maintenance\Technician\TechnicianServiceReportAPIController::class . '@show');
+Route::post('/technicianMaintenances/{maintenance}/devices/{clientDevice}/service-report', TechnicianServiceReportAPIController::class . '@store');
+Route::get('/technicianMaintenances/{maintenance}/devices/{clientDevice}/service-report', TechnicianServiceReportAPIController::class . '@show');
 //Coordinators
 Route::post('/coordinators', CoordinatorAPIController::class . '@store');
 Route::get('/coordinators', CoordinatorAPIController::class . '@index');
