@@ -8,14 +8,6 @@ use App\Rules\Maintenance\MaintenancePendingForDeletionRule;
 
 class DeleteAdminMaintenanceAPIRequest extends APIRequest
 {
-    public function authorize(): bool
-    {
-        $allowedRoles = ['coordinador', 'administrador'];
-        $user = session('user');
-
-        return $user && in_array($user->role, $allowedRoles);
-    }
-
     public function validationData(): array
     {
         $maintenance = $this->route('maintenance');
@@ -27,7 +19,12 @@ class DeleteAdminMaintenanceAPIRequest extends APIRequest
         return $this->all();
     }
 
+    public function authorize(): bool
+    {
+        $admin = session('user');
 
+        return $admin && $admin->role === 'administrador';
+    }
 
     public function rules(): array
     {
