@@ -9,6 +9,8 @@ use App\Http\Resources\Maintenance\MaintenanceResource;
 use App\Repositories\Maintenance\MaintenanceRepository;
 use App\Utils\Criterias\BasicCriteria\FiltersCriteria;
 use App\Utils\Criterias\BasicCriteria\OrderByCriteria;
+use App\Utils\Criterias\BasicCriteria\WhereFieldCriteria;
+use App\Utils\Criterias\BasicCriteria\WhereNullCriteria;
 use Illuminate\Http\JsonResponse;
 
 class MaintenanceCoordinatorAPIController extends Controller
@@ -42,8 +44,10 @@ class MaintenanceCoordinatorAPIController extends Controller
      */
     public function unconfirmed(ReadUnconfirmedMaintenancesAPIRequest $request): JsonResponse
     {
-        // Aplicar filtros de estado y confirmación
-        $this->maintenanceRepository->pushCriteria(new FiltersCriteria('status|is|assigned;confirmation_required|is|1;confirmed_at|is|null'));
+        // Aplicar filtros de estado y confirmación usando criterios específicos
+        $this->maintenanceRepository->pushCriteria(new WhereFieldCriteria('status', 'assigned'));
+        $this->maintenanceRepository->pushCriteria(new WhereFieldCriteria('confirmation_required', true));
+        $this->maintenanceRepository->pushCriteria(new WhereNullCriteria('confirmed_at'));
         $this->maintenanceRepository->pushCriteria(new OrderByCriteria('confirmation_deadline', 'asc'));
 
         // Aplicar filtros adicionales si están disponibles
