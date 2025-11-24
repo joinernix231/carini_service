@@ -36,7 +36,6 @@ class MantenimientoCotizado extends Notification implements ShouldQueue
             : "{$deviceCount} equipos";
 
         if ($requiresPayment) {
-            $value = $this->maintenance->value ? number_format($this->maintenance->value, 0, ',', '.') : '0';
             $body = "Mantenimiento cotizado para {$deviceInfo}. Requiere pago.";
         } else {
             $body = "Mantenimiento cotizado para {$deviceInfo}. No requiere pago";
@@ -51,7 +50,6 @@ class MantenimientoCotizado extends Notification implements ShouldQueue
                 'client_id' => $firstDevice ? $firstDevice->client_id : null,
                 'device_count' => $deviceCount,
                 'requires_payment' => $requiresPayment,
-                'value' => $this->maintenance->value,
                 'screen' => 'MantenimientoDetail',
             ],
             'sound' => 'default',
@@ -74,8 +72,7 @@ class MantenimientoCotizado extends Notification implements ShouldQueue
             : "{$deviceCount} equipos";
 
         if ($requiresPayment) {
-            $value = $this->maintenance->value ? number_format($this->maintenance->value, 0, ',', '.') : '0';
-            $body = "Mantenimiento cotizado para {$deviceInfo}. Requiere pago de \${$value}";
+            $body = "Mantenimiento cotizado para {$deviceInfo}. Requiere pago";
         } else {
             $body = "Mantenimiento cotizado para {$deviceInfo}. No requiere pago";
         }
