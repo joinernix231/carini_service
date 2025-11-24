@@ -73,6 +73,52 @@
         .value-cell {
             text-align: center;
         }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        .photo-card {
+            border: 1px solid #000;
+            padding: 6px;
+            text-align: center;
+            vertical-align: top;
+            background-color: #f9f9f9;
+        }
+
+        .photo-card img {
+            max-width: 100%;
+            max-height: 200px;
+            width: auto;
+            height: auto;
+            display: block;
+            margin: 0 auto 6px;
+            border: 1px solid #ccc;
+        }
+
+        .photo-info {
+            font-size: 9px;
+            margin-top: 4px;
+            line-height: 1.3;
+        }
+
+        .photo-type {
+            font-weight: bold;
+            color: #333;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .photo-date {
+            color: #666;
+            font-size: 8px;
+        }
+
+        .photo-number {
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 4px;
+        }
     </style>
 </head>
 
@@ -243,7 +289,7 @@
 <table>
     <tr><th>RECOMENDACIONES / SERVICIOS PENDIENTES</th></tr>
     <tr>
-        <td style="height: 38px; vertical-align: top;">
+        <td style="height: 25px; vertical-align: top;">
             {{ $maintenance->observations ?? '' }}
         </td>
     </tr>
@@ -274,7 +320,7 @@
     </tr>
 
     <tr>
-        <td colspan="2" style="height: 55px; vertical-align: top;">
+        <td colspan="2" style="height: 30px; vertical-align: top;">
             OBSERVACIONES: {{ $serviceReport->client_observations ?? '' }}
         </td>
     </tr>
@@ -305,6 +351,122 @@
         <td>FECHA: {{ $serviceReport ? $serviceReport->created_at->format('d/m/Y') : '' }}</td>
     </tr>
 </table>
+
+<!-- SEGUNDA PÁGINA: FOTOS DEL MANTENIMIENTO -->
+@if(!empty($photosBase64) && count($photosBase64) > 0)
+<div class="page-break"></div>
+
+<!-- CABECERA SEGUNDA PÁGINA -->
+<div class="header">
+    <div class="header-logo">
+        @if(!empty($logoBase64))
+            <img src="{{ $logoBase64 }}" alt="Carini Logo">
+        @else
+            <div style="color: #999;">Logo no disponible</div>
+        @endif
+    </div>
+
+    <div class="header-dept">
+        Departamento de Mantenimiento
+    </div>
+</div>
+
+<!-- INFORMACIÓN DEL MANTENIMIENTO -->
+<table>
+    <tr>
+        <th colspan="6">REGISTRO FOTOGRÁFICO - ORDEN DE SERVICIO #{{ $maintenance->id }}</th>
+    </tr>
+    <tr>
+        <td class="label-cell">CLIENTE</td>
+        <td class="value-cell" style="text-align: left;">{{ $client ? $client->name : '' }}</td>
+        <td class="label-cell">TÉCNICO</td>
+        <td class="value-cell" style="text-align: left;">{{ $technician && $technician->user ? $technician->user->name : '' }}</td>
+        <td class="label-cell">FECHA</td>
+        <td class="value-cell">{{ $maintenance->date_maintenance ? $maintenance->date_maintenance->format('d/m/Y') : now()->format('d/m/Y') }}</td>
+    </tr>
+    <tr>
+        <td class="label-cell">DISPOSITIVO</td>
+        <td class="value-cell" style="text-align: left;">{{ ($device->brand ?? '') . ' ' . ($device->model ?? '') }}</td>
+        <td class="label-cell">SERIAL</td>
+        <td class="value-cell" style="text-align: left;">{{ $clientDevice->serial ?? 'N/A' }}</td>
+        <td class="label-cell">UBICACIÓN</td>
+        <td class="value-cell" style="text-align: left;">{{ $clientDevice->address ?? '' }}</td>
+    </tr>
+    <tr>
+        <td class="label-cell">TIPO</td>
+        <td class="value-cell" style="text-align: left;">{{ $typeTranslated }}</td>
+        <td class="label-cell">TOTAL FOTOS</td>
+        <td class="value-cell" colspan="3" style="text-align: left;">{{ count($photosBase64) }} fotografía(s)</td>
+    </tr>
+</table>
+
+<!-- FOTOS ORGANIZADAS -->
+@php
+    $typeLabels = [
+        'initial' => 'FOTO INICIAL',
+        'final' => 'FOTO FINAL',
+        'part' => 'REPUESTO',
+        'other' => 'FOTO TECNICO'
+    ];
+    $photosChunks = array_chunk($photosBase64, 2);
+@endphp
+
+@foreach($photosChunks as $chunkIndex => $chunk)
+<table style="margin-top: 6px;">
+    <tr>
+        @foreach($chunk as $photoIndex => $photo)
+            <td class="photo-card" style="width: 50%;">
+                <div class="photo-number">
+                    FOTO {{ ($chunkIndex * 2) + $photoIndex + 1 }} de {{ count($photosBase64) }}
+                </div>
+                <img src="{{ $photo['base64'] }}" alt="Foto del mantenimiento">
+                <div class="photo-info">
+                    <div class="photo-type">
+                        {{ $typeLabels[$photo['type']] ?? 'OTRA' }}
+                    </div>
+                    @if($photo['created_at'])
+                        <div class="photo-date">
+                            Fecha: {{ $photo['created_at']->format('d/m/Y H:i') }}
+                        </div>
+                    @endif
+                </div>
+            </td>
+        @endforeach
+        @if(count($chunk) < 2)
+            <td class="photo-card" style="width: 50%;"></td>
+        @endif
+    </tr>
+</table>
+@endforeach
+
+<!-- RESUMEN POR TIPO -->
+@php
+    $photosByType = [];
+    foreach ($photosBase64 as $photo) {
+        $type = $photo['type'] ?? 'other';
+        if (!isset($photosByType[$type])) {
+            $photosByType[$type] = 0;
+        }
+        $photosByType[$type]++;
+    }
+@endphp
+
+@if(count($photosByType) > 0)
+<table style="margin-top: 6px;">
+    <tr>
+        <th colspan="4">RESUMEN DE FOTOGRAFÍAS POR TIPO</th>
+    </tr>
+    <tr>
+        @foreach($typeLabels as $typeKey => $typeLabel)
+            <td style="width: 25%; text-align: center;">
+                <strong>{{ $typeLabel }}:</strong> {{ $photosByType[$typeKey] ?? 0 }}
+            </td>
+        @endforeach
+    </tr>
+</table>
+@endif
+
+@endif
 
 </body>
 </html>
