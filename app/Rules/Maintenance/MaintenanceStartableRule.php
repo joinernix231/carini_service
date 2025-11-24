@@ -24,8 +24,8 @@ class MaintenanceStartableRule implements ValidationRule
         }
 
         // Validar que el mantenimiento tiene el estado correcto
-        if ($this->maintenance->status !== 'assigned') {
-            $fail('Solo se pueden iniciar mantenimientos con estado "assigned". El estado actual es: ' . $this->maintenance->status);
+        if ($this->maintenance->status == 'in_progress') {
+            $fail('Solo se pueden iniciar mantenimientos con estado "en progreso". El estado actual es: ' . $this->maintenance->status);
             return;
         }
 
