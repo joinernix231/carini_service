@@ -53,12 +53,7 @@ class UpdateQuotationAPIRequest extends APIRequest
                     }
                 }
             ],
-            'value' => [
-                'bail',
-                'nullable',
-                'numeric',
-                'min:0',
-            ],
+           
             'price_support' => [
                 'bail',
                 'nullable',
