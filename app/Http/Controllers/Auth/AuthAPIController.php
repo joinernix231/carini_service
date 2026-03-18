@@ -8,6 +8,7 @@ use App\Http\Requests\Auth\LoginWithEmailAPIRequest;
 use App\Utils\Resources\ResponseUtil;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -22,6 +23,10 @@ class AuthAPIController extends Controller
                 return ResponseUtil::makeError('Credenciales inválidas', 401);
             }
         } catch (JWTException $e) {
+            Log::error('JWTAuth::attempt failed', [
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+            ]);
             return ResponseUtil::makeError('No se pudo crear el token', 500);
         }
 
