@@ -137,14 +137,23 @@ class MaintenanceAPIController extends Controller
             ], 422);
         }
 
-        GenerateMaintenancePDFJob::dispatch($maintenance->id)
-            ->onQueue(config('maintenance_pdf.queue'));
+        $maintenance->load([
+            'clientDevices.client.user',
+            'clientDevices.device',
+            'technician.user',
+            'photos.clientDevice',
+            'sparePartSuggestions.clientDevice.device',
+            'actionLogs.technician.user',
+        ]);
+
+        GenerateMaintenancePDFJob::dispatch($maintenance)
+            ->onQueue('PDFQueue_local');
 
         return response()->json([
             'success' => true,
             'data' => [
                 'maintenance_id' => $maintenance->id,
-                    'queue' => config('maintenance_pdf.queue'),
+                    'queue' => 'PDFQueue_local',
                 'devices_with_report' => $devicesWithReport,
             ],
             'message' => 'La generación del PDF fue encolada correctamente.',
