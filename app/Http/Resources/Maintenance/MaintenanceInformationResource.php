@@ -83,9 +83,9 @@ class MaintenanceInformationResource extends JsonResource
                         'address' => $clientDevice->address,
                         'latitude' => $clientDevice->latitude,
                         'longitude' => $clientDevice->longitude,
-                        'pdf_url' => $clientDevice->pivot && $clientDevice->pivot->pdf_url 
-                            ? config('filesystems.disks.s3.url') . 'docs/' . $clientDevice->pivot->pdf_url . '.pdf'
-                            : null,
+                        // Nota: $clientDevice->pivot (MaintenanceClientDevice) tiene accessor getPdfUrlAttribute()
+                        // que ya retorna la URL completa.
+                        'pdf_url' => $clientDevice->pivot ? $clientDevice->pivot->pdf_url : null,
                         'pivot' => [
                             'description' => $clientDevice->pivot->description ?? null,
                             'progress_completed_indices' => $clientDevice->pivot->progress_completed_indices ?? null,
@@ -94,6 +94,8 @@ class MaintenanceInformationResource extends JsonResource
                             'progress_pct' => $clientDevice->pivot->progress_pct ?? null,
                             'progress_status' => $clientDevice->pivot->progress_status ?? null,
                             'progress_updated_at' => $clientDevice->pivot->progress_updated_at ?? null,
+                            // Valor guardado en BD (sin prefijos), útil para depurar
+                            'pdf_key' => $clientDevice->pivot ? $clientDevice->pivot->getRawOriginal('pdf_url') : null,
                         ],
                     ];
                 });
