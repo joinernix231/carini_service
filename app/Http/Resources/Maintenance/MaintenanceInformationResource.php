@@ -85,7 +85,8 @@ class MaintenanceInformationResource extends JsonResource
                         'longitude' => $clientDevice->longitude,
                         // Nota: $clientDevice->pivot (MaintenanceClientDevice) tiene accessor getPdfUrlAttribute()
                         // que ya retorna la URL completa.
-                        'pdf_url' => $clientDevice->pivot ? $clientDevice->pivot->pdf_url : null,
+                        'pdf_url' => $clientDevice->pivot && $clientDevice->pivot->getRawOriginal('pdf_url')
+                        ? config('filesystems.disks.s3.url') . 'docs/' . $clientDevice->pivot->getRawOriginal('pdf_url') . '.pdf' : null,
                         'pivot' => [
                             'description' => $clientDevice->pivot->description ?? null,
                             'progress_completed_indices' => $clientDevice->pivot->progress_completed_indices ?? null,
