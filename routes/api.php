@@ -64,7 +64,8 @@ Route::put('/admin/technicians/{technician}/reset-password', [AdminPasswordReset
 // Devices
 Route::apiResource('/devices', DeviceAPIController::class);
 // Maintenance
-Route::apiResource('/maintenances', MaintenanceAPIController::class);
+Route::apiResource('/maintenances', MaintenanceAPIController::class)
+    ->names('carini.maintenances');
     Route::apiResource('/maintenancesCoordinator', MaintenanceCoordinatorAPIController::class);
 // Maintenance - Queries (Listados)
 Route::get('/maintenancesNotAssigned', MaintenanceNotAssignedListAPIController::class);
