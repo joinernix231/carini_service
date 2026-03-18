@@ -125,15 +125,6 @@ class MaintenanceAPIController extends Controller
 
     public function generatePdf(Maintenance $maintenance, GenerateMaintenancePDFAPIRequest $request): JsonResponse
     {
-        $maintenance->load([
-            'clientDevices.client.user',
-            'clientDevices.device',
-            'technician.user',
-            'photos.clientDevice',
-            'sparePartSuggestions.clientDevice.device',
-            'actionLogs.technician.user',
-        ]);
-
         $devicesWithReport = MaintenanceClientDevice::query()
             ->where('maintenance_id', $maintenance->id)
             ->whereHas('serviceReport')
@@ -146,14 +137,14 @@ class MaintenanceAPIController extends Controller
             ], 422);
         }
 
-        GenerateMaintenancePDFJob::dispatch($maintenance)
-            ->onQueue(env('MAINTENANCE_PDF_QUEUE', 'PDFQueue_local'));
+        GenerateMaintenancePDFJob::dispatch($maintenance->id)
+            ->onQueue(config('maintenance_pdf.queue'));
 
         return response()->json([
             'success' => true,
             'data' => [
                 'maintenance_id' => $maintenance->id,
-                'queue' => env('MAINTENANCE_PDF_QUEUE', 'PDFQueue_local'),
+                    'queue' => config('maintenance_pdf.queue'),
                 'devices_with_report' => $devicesWithReport,
             ],
             'message' => 'La generación del PDF fue encolada correctamente.',
