@@ -198,15 +198,19 @@ class MaintenancePDFPreviewController extends Controller
     private function optimizeImageForPdf(string $imageContent): ?string
     {
         try {
+            if (!function_exists('imagecreatefromstring')) {
+                return $this->buildBase64ImageData($imageContent);
+            }
+
             // Crear imagen desde el contenido
-            $sourceImage = @imagecreatefromstring($imageContent);
+            $sourceImage = @\imagecreatefromstring($imageContent);
             if (!$sourceImage) {
-                return null;
+                return $this->buildBase64ImageData($imageContent);
             }
 
             // Obtener dimensiones originales
-            $originalWidth = imagesx($sourceImage);
-            $originalHeight = imagesy($sourceImage);
+            $originalWidth = \imagesx($sourceImage);
+            $originalHeight = \imagesy($sourceImage);
 
             // Calcular nuevas dimensiones (máximo 800px de ancho, mantener proporción)
             $maxWidth = 800;
@@ -217,16 +221,16 @@ class MaintenancePDFPreviewController extends Controller
             $newHeight = (int)($originalHeight * $ratio);
 
             // Crear nueva imagen redimensionada
-            $optimizedImage = imagecreatetruecolor($newWidth, $newHeight);
+            $optimizedImage = \imagecreatetruecolor($newWidth, $newHeight);
             
             // Preservar transparencia si es PNG
-            imagealphablending($optimizedImage, false);
-            imagesavealpha($optimizedImage, true);
-            $transparent = imagecolorallocatealpha($optimizedImage, 255, 255, 255, 127);
-            imagefill($optimizedImage, 0, 0, $transparent);
+            \imagealphablending($optimizedImage, false);
+            \imagesavealpha($optimizedImage, true);
+            $transparent = \imagecolorallocatealpha($optimizedImage, 255, 255, 255, 127);
+            \imagefill($optimizedImage, 0, 0, $transparent);
 
             // Redimensionar con mejor calidad
-            imagecopyresampled(
+            \imagecopyresampled(
                 $optimizedImage,
                 $sourceImage,
                 0, 0, 0, 0,
@@ -238,18 +242,31 @@ class MaintenancePDFPreviewController extends Controller
 
             // Capturar como JPEG en memoria (más pequeño que PNG)
             ob_start();
-            imagejpeg($optimizedImage, null, 75); // Calidad 75%
+            \imagejpeg($optimizedImage, null, 75); // Calidad 75%
             $optimizedContent = ob_get_clean();
 
             // Limpiar recursos
-            imagedestroy($sourceImage);
-            imagedestroy($optimizedImage);
+            \imagedestroy($sourceImage);
+            \imagedestroy($optimizedImage);
 
             // Retornar base64
             return 'data:image/jpeg;base64,' . base64_encode($optimizedContent);
-        } catch (\Exception $e) {
-            return null;
+        } catch (\Throwable $e) {
+            return $this->buildBase64ImageData($imageContent);
         }
+    }
+
+    private function buildBase64ImageData(string $imageContent): ?string
+    {
+        $mimeType = function_exists('finfo_buffer')
+            ? @finfo_buffer(finfo_open(FILEINFO_MIME_TYPE), $imageContent)
+            : null;
+
+        if (!is_string($mimeType) || strpos($mimeType, 'image/') !== 0) {
+            $mimeType = 'image/png';
+        }
+
+        return 'data:' . $mimeType . ';base64,' . base64_encode($imageContent);
     }
 }
 
