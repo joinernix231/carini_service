@@ -32,6 +32,7 @@ class MaintenanceInformationResource extends JsonResource
             'observations' => $this->observations,
             'photo' => $this->photo,
             'signature_photo' => $this->signature_photo,
+            'pdf_url' => $this->pdf_url,
             'is_paid' => $this->is_paid,
             'payment_support' => $this->payment_support,
             'price_support' => $this->price_support,
@@ -80,6 +81,12 @@ class MaintenanceInformationResource extends JsonResource
                         ],
                         'serial' => $clientDevice->serial,
                         'address' => $clientDevice->address,
+                        'latitude' => $clientDevice->latitude,
+                        'longitude' => $clientDevice->longitude,
+                        // Nota: $clientDevice->pivot (MaintenanceClientDevice) tiene accessor getPdfUrlAttribute()
+                        // que ya retorna la URL completa.
+                        'pdf_url' => $clientDevice->pivot && $clientDevice->pivot->getRawOriginal('pdf_url')
+                        ? config('filesystems.disks.s3.url') . 'docs/' . $clientDevice->pivot->getRawOriginal('pdf_url') . '.pdf' : null,
                         'pivot' => [
                             'description' => $clientDevice->pivot->description ?? null,
                             'progress_completed_indices' => $clientDevice->pivot->progress_completed_indices ?? null,
@@ -88,6 +95,8 @@ class MaintenanceInformationResource extends JsonResource
                             'progress_pct' => $clientDevice->pivot->progress_pct ?? null,
                             'progress_status' => $clientDevice->pivot->progress_status ?? null,
                             'progress_updated_at' => $clientDevice->pivot->progress_updated_at ?? null,
+                            // Valor guardado en BD (sin prefijos), útil para depurar
+                            'pdf_key' => $clientDevice->pivot ? $clientDevice->pivot->getRawOriginal('pdf_url') : null,
                         ],
                     ];
                 });

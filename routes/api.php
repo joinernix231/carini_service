@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminDeviceLinkAPIController;
 use App\Http\Controllers\Admin\AdminMaintenanceAPIController;
+use App\Http\Controllers\Admin\AdminPasswordResetController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Auth\AuthAPIController;
 use App\Http\Controllers\Auth\MeController;
@@ -28,6 +29,7 @@ use App\Http\Controllers\Maintenance\Technician\TechnicianMaintenancePhotosAPICo
 use App\Http\Controllers\Maintenance\Technician\TechnicianMaintenanceProgressAPIController;
 use App\Http\Controllers\Maintenance\Technician\TechnicianMaintenancesAPIController;
 use App\Http\Controllers\Maintenance\Technician\TechnicianMaintenanceSparePartsAPIController;
+use App\Http\Controllers\Maintenance\Technician\TechnicianServiceReportAPIController;
 use App\Http\Controllers\Other\ResourceAPIController;
 use App\Http\Controllers\Technician\AvailableTechnicianAPIController;
 use App\Http\Controllers\Technician\AvailableTechnicianController;
@@ -39,6 +41,7 @@ use Illuminate\Support\Facades\Route;
 Route::group([], function () {
 // Auth
 Route::post('/acceptPolicy', AuthAPIController::class . '@acceptPolicy');
+Route::post('/change-password', AuthAPIController::class . '@changePassword');
 Route::get('/me', MeController::class . '@me');
 Route::put('/profile', ProfileAPIController::class . '@update');
 // Clients
@@ -54,10 +57,15 @@ Route::delete('/admin/clients/devices/{clientDevice}', [AdminDeviceLinkAPIContro
 Route::apiResource('/admin/maintenances', AdminMaintenanceAPIController::class);
 Route::get('/admin/clients/devices/{clientDevice}/maintenances', [AdminMaintenanceAPIController::class, 'getClientDeviceMaintenances'])->name('admin.clients.devices.maintenances');
 Route::get('/admin/maintenances/{maintenance}/photos', [AdminMaintenanceAPIController::class, 'getMaintenancePhotos'])->name('admin.maintenances.photos');
+// Admin Password Reset
+Route::put('/admin/clients/{client}/reset-password', [AdminPasswordResetController::class, 'resetClientPassword'])->name('admin.clients.reset-password');
+Route::put('/admin/coordinators/{coordinator}/reset-password', [AdminPasswordResetController::class, 'resetCoordinatorPassword'])->name('admin.coordinators.reset-password');
+Route::put('/admin/technicians/{technician}/reset-password', [AdminPasswordResetController::class, 'resetTechnicianPassword'])->name('admin.technicians.reset-password');
 // Devices
 Route::apiResource('/devices', DeviceAPIController::class);
 // Maintenance
-Route::apiResource('/maintenances', MaintenanceAPIController::class);
+Route::apiResource('/maintenances', MaintenanceAPIController::class)
+    ->names('carini.maintenances');
     Route::apiResource('/maintenancesCoordinator', MaintenanceCoordinatorAPIController::class);
 // Maintenance - Queries (Listados)
 Route::get('/maintenancesNotAssigned', MaintenanceNotAssignedListAPIController::class);
@@ -72,6 +80,7 @@ Route::put('/cancelMaintenance/{maintenance}', MaintenanceAssignmentAPIControlle
 // Maintenance - Payment actions
 Route::put('/maintenances/{maintenance}/payment-support', MaintenancePaymentSupportAPIController::class);
 Route::put('/maintenance/{maintenance}/update-quotation', MaintenanceAPIController::class . '@updateQuotation');
+Route::post('/maintenances/{maintenance}/generate-pdf', MaintenanceAPIController::class . '@generatePdf');
 // Maintenance - Client actions
 Route::get('/maintenances/{maintenance}/information', MaintenanceInformationAPIController::class . '@maintenanceInformation');
 Route::post('/maintenances/{maintenance}/confirm', MaintenanceConfirmationAPIController::class . '@confirm');
@@ -107,6 +116,9 @@ Route::post('/technicianMaintenances/{maintenance}/progress', TechnicianMaintena
 Route::get('/technicianMaintenances/{maintenance}/progress', TechnicianMaintenanceProgressAPIController::class . '@getProgress');
 // Technician Maintenances - Repuestos
 Route::post('/technicianMaintenances/{maintenance}/suggest-spare-part', TechnicianMaintenanceSparePartsAPIController::class . '@suggestSparePart');
+// Technician Maintenances - Reporte de Servicio
+Route::post('/technicianMaintenances/{maintenance}/devices/{clientDevice}/service-report', TechnicianServiceReportAPIController::class . '@store');
+Route::get('/technicianMaintenances/{maintenance}/devices/{clientDevice}/service-report', TechnicianServiceReportAPIController::class . '@show');
 //Coordinators
 Route::post('/coordinators', CoordinatorAPIController::class . '@store');
 Route::get('/coordinators', CoordinatorAPIController::class . '@index');

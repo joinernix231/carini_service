@@ -15,7 +15,7 @@ class LoginWithEmailAPIRequest extends APIRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email', 'max:255', $this->existsRule('users', 'email')],
+            'email' => ['required', 'string', 'email', 'max:255'],
             'password' => 'required|string|min:6',
         ];
     }

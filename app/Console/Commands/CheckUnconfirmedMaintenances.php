@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Listeners\Maintenance\NotifyAdminMaintenanceUnconfirmedListener;
 use App\Notifications\Maintenance\ClienteNoConfirmoMantenimiento;
 use App\Repositories\Maintenance\MaintenanceRepository;
 use App\Repositories\User\UserRepository;
@@ -65,6 +66,9 @@ class CheckUnconfirmedMaintenances extends Command
 
         $notifiedCount = 0;
 
+        // Listener para notificar administradores
+        $adminListener = new NotifyAdminMaintenanceUnconfirmedListener($this->userRepository);
+
         foreach ($unconfirmedMaintenances as $maintenance) {
             // Marcar como notificado usando el repositorio
             $this->maintenanceRepository->markCoordinatorNotified($maintenance);
@@ -83,7 +87,17 @@ class CheckUnconfirmedMaintenances extends Command
                 }
             }
 
-            $this->info("Mantenimiento #{$maintenance->id} notificado a coordinadores.");
+            // Notificar a administradores
+            try {
+                $adminListener->handle($maintenance);
+            } catch (\Exception $e) {
+                Log::error('Error al notificar administrador sobre mantenimiento sin confirmar', [
+                    'maintenance_id' => $maintenance->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            $this->info("Mantenimiento #{$maintenance->id} notificado a coordinadores y administradores.");
         }
 
         $this->info("Se enviaron {$notifiedCount} notificación(es) a coordinadores.");

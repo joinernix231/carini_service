@@ -77,7 +77,11 @@ class MaintenanceAssignmentAPIController extends Controller
      */
     public function cancelMaintenance(Maintenance $maintenance, CancelMaintenanceAPIRequest $request): JsonResponse
     {
-        $maintenance = $this->maintenanceRepository->cancel($maintenance);
+        $input = $request->validated();
+        $maintenance = $this->maintenanceRepository->cancel(
+            $maintenance,
+            $input['cancellation_reason'] ?? null
+        );
         $maintenance->load(['clientDevices', 'technician']);
 
         return $this->makeResponseResource('Mantenimiento cancelado exitosamente. El técnico ha sido liberado.', new MaintenanceResource($maintenance));

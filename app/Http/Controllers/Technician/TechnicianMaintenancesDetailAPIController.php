@@ -25,8 +25,8 @@ class TechnicianMaintenancesDetailAPIController extends Controller
 
     public function index(Technician $technician, TechnicianMaintenancesListRequest $request): JsonResponse
     {
-        // Construir filtros
-        $filters = ['technician_id|is|' . $technician->id];
+        // Construir filtros - usar '=' en lugar de 'is' para IDs numéricos
+        $filters = ['technician_id|=|' . $technician->id];
 
         // Aplicar filtros adicionales si existen
         if ($request->has('status')) {

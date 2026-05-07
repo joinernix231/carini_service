@@ -28,9 +28,18 @@ class MantenimientoCotizado extends Notification implements ShouldQueue
         $firstDevice = $this->maintenance->clientDevices->first();
         $clientName = $firstDevice ? $firstDevice->client->name : 'Cliente';
 
-        $body = $deviceCount === 1
-            ? "Mantenimiento cotizado para {$firstDevice->device->model}"
-            : "Mantenimiento cotizado para {$deviceCount} equipos";
+        // Determinar si requiere pago o no
+        $requiresPayment = !is_null($this->maintenance->is_paid);
+        
+        $deviceInfo = $deviceCount === 1 && $firstDevice && $firstDevice->device
+            ? "{$firstDevice->device->model}"
+            : "{$deviceCount} equipos";
+
+        if ($requiresPayment) {
+            $body = "Mantenimiento cotizado para {$deviceInfo}. Requiere pago.";
+        } else {
+            $body = "Mantenimiento cotizado para {$deviceInfo}. No requiere pago";
+        }
 
         return [
             'title' => "Hola, {$clientName} Mantenimiento Cotizado",
@@ -40,6 +49,7 @@ class MantenimientoCotizado extends Notification implements ShouldQueue
                 'maintenance_id' => $this->maintenance->id,
                 'client_id' => $firstDevice ? $firstDevice->client_id : null,
                 'device_count' => $deviceCount,
+                'requires_payment' => $requiresPayment,
                 'screen' => 'MantenimientoDetail',
             ],
             'sound' => 'default',
@@ -54,9 +64,18 @@ class MantenimientoCotizado extends Notification implements ShouldQueue
         $firstDevice = $this->maintenance->clientDevices->first();
         $clientName = $firstDevice ? $firstDevice->client->name : 'Cliente';
 
-        $body = $deviceCount === 1
-            ? "Mantenimiento cotizado para {$firstDevice->device->model}"
-            : "Mantenimiento cotizado para {$deviceCount} equipos";
+        // Determinar si requiere pago o no
+        $requiresPayment = !is_null($this->maintenance->is_paid);
+        
+        $deviceInfo = $deviceCount === 1 && $firstDevice && $firstDevice->device
+            ? "{$firstDevice->device->model}"
+            : "{$deviceCount} equipos";
+
+        if ($requiresPayment) {
+            $body = "Mantenimiento cotizado para {$deviceInfo}. Requiere pago";
+        } else {
+            $body = "Mantenimiento cotizado para {$deviceInfo}. No requiere pago";
+        }
 
         return [
             'title' => "Hola, {$clientName} Mantenimiento Cotizado",
@@ -66,6 +85,8 @@ class MantenimientoCotizado extends Notification implements ShouldQueue
                 'maintenance_id' => $this->maintenance->id,
                 'client_id' => $firstDevice ? $firstDevice->client_id : null,
                 'device_count' => $deviceCount,
+                'requires_payment' => $requiresPayment,
+                'value' => $this->maintenance->value,
                 'screen' => 'MantenimientoDetail',
             ],
             'sound' => 'default',
