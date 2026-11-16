@@ -19,7 +19,7 @@ class UpdateClientAPIRequest extends APIRequest
 
         $client = $this->route('client');
 
-        return $client !== null && $client->user_id === $this->currentUser()?->id;
+        return $client !== null && (int) $client->user_id === (int) $this->currentUser()?->id;
     }
 
     public function rules(): array

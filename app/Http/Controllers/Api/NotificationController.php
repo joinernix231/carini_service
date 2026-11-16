@@ -158,7 +158,7 @@ class NotificationController extends Controller
         }
 
         $request->validate([
-            'role' => 'required|string|in:cliente,tecnico,coordinador,admin',
+            'role' => 'required|string|in:cliente,tecnico,coordinador,administrador',
             'title' => 'required|string|max:255',
             'body' => 'required|string|max:500',
             'data' => 'sometimes|array'
