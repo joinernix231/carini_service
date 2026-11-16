@@ -4,5 +4,5 @@ use App\Http\Controllers\Auth\AuthAPIController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::post('/login', [AuthAPIController::class, 'login']);
+Route::post('/login', [AuthAPIController::class, 'login'])->middleware('throttle:10,1');
 

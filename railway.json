@@ -3,7 +3,6 @@
         "env": {},
         "commands": [
             "composer install",
-            "composer require laravel/telescope",
             "npm install",
             "npm run prod",
             "php artisan config:cache",

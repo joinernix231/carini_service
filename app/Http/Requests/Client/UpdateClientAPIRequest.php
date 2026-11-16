@@ -2,15 +2,24 @@
 
 namespace App\Http\Requests\Client;
 
+use App\Http\Requests\Concerns\AuthorizesRoles;
 use App\Http\Requests\APIRequest;
 use App\Models\Client\Client;
 use Illuminate\Validation\Rule;
 
 class UpdateClientAPIRequest extends APIRequest
 {
+    use AuthorizesRoles;
+
     public function authorize(): bool
     {
-        return true;
+        if ($this->userHasRole('administrador')) {
+            return true;
+        }
+
+        $client = $this->route('client');
+
+        return $client !== null && $client->user_id === $this->currentUser()?->id;
     }
 
     public function rules(): array
