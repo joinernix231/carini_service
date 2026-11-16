@@ -152,8 +152,13 @@ class NotificationController extends Controller
      */
     public function sendToRole(Request $request): JsonResponse
     {
+        $user = session('user');
+        if (!$user || !in_array($user->role, ['administrador', 'coordinador'], true)) {
+            return ResponseUtil::makeError('Este usuario no tiene permiso para realizar esta acción.', 403);
+        }
+
         $request->validate([
-            'role' => 'required|string|in:cliente,tecnico,coordinador,admin',
+            'role' => 'required|string|in:cliente,tecnico,coordinador,administrador',
             'title' => 'required|string|max:255',
             'body' => 'required|string|max:500',
             'data' => 'sometimes|array'

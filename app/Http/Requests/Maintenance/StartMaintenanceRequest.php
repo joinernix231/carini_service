@@ -32,7 +32,12 @@ class StartMaintenanceRequest extends APIRequest
             return false;
         }
 
-        return true;
+        // Un técnico solo puede iniciar mantenimientos asignados a él.
+        $maintenance = $this->route('maintenance');
+
+        return $maintenance !== null
+            && session('technician_id') !== null
+            && (int) $maintenance->technician_id === (int) session('technician_id');
     }
 
     public function rules(): array
