@@ -10,7 +10,10 @@ class UpdateClientAPIRequest extends APIRequest
 {
     public function authorize(): bool
     {
-        return true;
+        $allowedRoles = ['coordinador', 'administrador'];
+        $user = session('user');
+
+        return $user && in_array($user->role, $allowedRoles);
     }
 
     public function rules(): array

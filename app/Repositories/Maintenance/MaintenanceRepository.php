@@ -20,6 +20,8 @@ class MaintenanceRepository extends BaseRepository
         'created_at',
         'status',
         'date_maintenance',
+        'is_paid',
+        'technician_id',
     ];
 
     public function getFieldsSearchable(): array
@@ -102,6 +104,10 @@ class MaintenanceRepository extends BaseRepository
         if (is_null($isPaid)) {
             $maintenance->status = 'quoted';
             $maintenance->save();
+
+            // Disparar evento para notificar al cliente
+            event(new UploadPriceMaintenance($maintenance));
+
             return $maintenance;
         }
 
@@ -140,6 +146,10 @@ class MaintenanceRepository extends BaseRepository
             $maintenance->price_support = null;
             $maintenance->status = 'quoted';
             $maintenance->save();
+
+            // Disparar evento para notificar al cliente
+            event(new UploadPriceMaintenance($maintenance));
+
             return $maintenance;
         }
 
@@ -228,9 +238,10 @@ class MaintenanceRepository extends BaseRepository
      * Cambia el status a 'cancelled' y libera el técnico
      *
      * @param Maintenance $maintenance
+     * @param string|null $cancellationReason Razón de cancelación proporcionada por el coordinador
      * @return Maintenance
      */
-    public function cancel(Maintenance $maintenance): Maintenance
+    public function cancel(Maintenance $maintenance, ?string $cancellationReason = null): Maintenance
     {
         // Cambiar status a cancelled
         $maintenance->status = 'cancelled';
@@ -250,6 +261,18 @@ class MaintenanceRepository extends BaseRepository
         $maintenance->coordinator_notified_at = null;
 
         $maintenance->save();
+
+        // Registrar la acción de cancelación en el log
+        // technician_id es null porque la cancelación es una acción administrativa del coordinador
+        $actionLogRepo = app(\App\Repositories\Maintenance\MaintenanceActionLogRepository::class);
+        $actionLogRepo->createActionLog(
+            $maintenance->id,
+            null, // technician_id es null para acciones del coordinador
+            'cancel',
+            $cancellationReason,
+            null, // latitude
+            null  // longitude
+        );
 
         // Disparar evento para que los listeners manejen las notificaciones
         event(new MaintenanceCancelled($maintenance));

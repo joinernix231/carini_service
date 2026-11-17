@@ -41,7 +41,14 @@ class StartMaintenanceRequest extends APIRequest
         $maintenance = $this->route('maintenance');
 
         $rules = [
-            'maintenance_id' => ['bail', 'required', 'integer', $this->existsRule('maintenances')],
+            'maintenance_id' => [
+                'bail',
+                'required',
+                'integer',
+                $this->existsRule('maintenances'),
+                new MaintenanceStartableRule($maintenance),
+                new MaintenanceDateMatchRule($maintenance),
+            ],
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => 'required|numeric|between:-180,180',
             'notes' => 'nullable|string|max:1000'

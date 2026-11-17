@@ -5,6 +5,7 @@ namespace App\Http\Requests\Maintenance;
 use App\Http\Requests\APIRequest;
 use App\Models\Maintenance\Maintenance;
 use App\Rules\Maintenance\ClientDeviceOwnership;
+use App\Rules\Maintenance\DevicesWithinRadiusRule;
 use App\Rules\Maintenance\UniquePendingMaintenanceForDevicesRule;
 
 class CreateMaintenanceAPIRequest extends APIRequest
@@ -27,7 +28,8 @@ class CreateMaintenanceAPIRequest extends APIRequest
             'required',
             'array',
             'min:1',
-            new UniquePendingMaintenanceForDevicesRule()
+            new UniquePendingMaintenanceForDevicesRule(),
+            new DevicesWithinRadiusRule()
         ];
 
         $rules['client_devices.*.id'] = [

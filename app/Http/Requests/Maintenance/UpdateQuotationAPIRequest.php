@@ -53,13 +53,7 @@ class UpdateQuotationAPIRequest extends APIRequest
                     }
                 }
             ],
-            'value' => [
-                'bail',
-                'nullable',
-                'numeric',
-                'min:0',
-                'required_if:is_paid,false'
-            ],
+           
             'price_support' => [
                 'bail',
                 'nullable',
@@ -77,7 +71,6 @@ class UpdateQuotationAPIRequest extends APIRequest
             'is_paid.boolean' => 'El campo is_paid debe ser un valor booleano.',
             'value.numeric' => 'El valor debe ser un número.',
             'value.min' => 'El valor debe ser mayor o igual a 0.',
-            'value.required_if' => 'El valor es requerido cuando el mantenimiento requiere pago.',
             'price_support.string' => 'El soporte de precio debe ser una cadena de texto.',
             'price_support.required_if' => 'El soporte de precio es requerido cuando el mantenimiento requiere pago.',
         ];

@@ -22,6 +22,7 @@ class MeController extends Controller
             'email' => $user->email,
             'role' => $user->role,
             'policy_accepted' => !is_null($user->policy_accepted_at),
+            'must_change_password' => $user->must_change_password,
             'created_at' => $user->created_at,
             'updated_at' => $user->updated_at
         ];

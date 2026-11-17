@@ -2,27 +2,35 @@
 
 namespace App\Listeners\Maintenance;
 
-use App\Models\Maintenance\Maintenance;
-use App\Notifications\PagoMantenimientoVerificado;
-use App\Repositories\User\UserRepository;
+use App\Events\Maintenance\UploadPriceMaintenance;
+use App\Notifications\MantenimientoCotizado;
 
 class NoctifyPriceMaintenanceListener
 {
-    protected $userRepository;
-
-
-    public function __construct(UserRepository $userRepository)
+    public function handle(UploadPriceMaintenance $event): void
     {
-        $this->userRepository = $userRepository;
-    }
-
-    public function handle(NoctifyPriceMaintenanceListener $event): void
-    {
-        /**@var Maintenance $maintenance*/
         $maintenance = $event->maintenance;
-        $client = $maintenance->client;
+        
+        // Cargar todas las relaciones necesarias
+        $maintenance->load([
+            'clientDevices.client.user',
+            'clientDevices.device'
+        ]);
 
-        $client->notify(new PagoMantenimientoVerificado($maintenance));
+        // Verificar que el mantenimiento tenga clientDevices
+        if ($maintenance->clientDevices->isEmpty()) {
+            return;
+        }
 
+        // Obtener el cliente del primer dispositivo (asumiendo que todos los dispositivos pertenecen al mismo cliente)
+        $firstDevice = $maintenance->clientDevices->first();
+        $client = $firstDevice->client ?? null;
+
+        if (!$client || !$client->user) {
+            return;
+        }
+
+        // Notificar al usuario del cliente cuando un coordinador sube una cotización
+        $client->user->notify(new MantenimientoCotizado($maintenance));
     }
 }
