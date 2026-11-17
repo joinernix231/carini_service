@@ -20,8 +20,11 @@ return new class extends Migration
             $table->text('reason')->nullable()->change();
         });
         
-        // Agregar 'cancel' al enum de acciones
-        DB::statement("ALTER TABLE maintenance_action_logs MODIFY COLUMN action ENUM('assign', 'on_the_way', 'start', 'pause', 'resume', 'end', 'cancel')");
+        // Agregar 'cancel' al enum de acciones (MODIFY COLUMN solo existe en MySQL/MariaDB;
+        // en SQLite de pruebas se omite)
+        if (in_array(DB::getDriverName(), ['mysql', 'mariadb'], true)) {
+            DB::statement("ALTER TABLE maintenance_action_logs MODIFY COLUMN action ENUM('assign', 'on_the_way', 'start', 'pause', 'resume', 'end', 'cancel')");
+        }
     }
 
     /**
@@ -34,6 +37,8 @@ return new class extends Migration
             $table->string('reason', 255)->nullable()->change();
         });
         
-        DB::statement("ALTER TABLE maintenance_action_logs MODIFY COLUMN action ENUM('assign', 'on_the_way', 'start', 'pause', 'resume', 'end')");
+        if (in_array(DB::getDriverName(), ['mysql', 'mariadb'], true)) {
+            DB::statement("ALTER TABLE maintenance_action_logs MODIFY COLUMN action ENUM('assign', 'on_the_way', 'start', 'pause', 'resume', 'end')");
+        }
     }
 };

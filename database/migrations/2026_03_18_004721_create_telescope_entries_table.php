@@ -21,6 +21,12 @@ return new class extends Migration
     {
         $schema = Schema::connection($this->getConnection());
 
+        // Una migración anterior de Telescope (ya borrada del repo) pudo haber
+        // creado estas tablas en producción; no fallar si ya existen.
+        if ($schema->hasTable('telescope_entries')) {
+            return;
+        }
+
         $schema->create('telescope_entries', function (Blueprint $table) {
             $table->bigIncrements('sequence');
             $table->uuid('uuid');
