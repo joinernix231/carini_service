@@ -21,7 +21,8 @@ class MaintenanceByPaymentStatusListAPIController extends Controller
 
     public function __invoke(ReadMaintenancesByPaymentStatusAPIRequest $request): JsonResponse
     {
-        $this->maintenanceRepository->pushCriteria(new WhereFieldCriteria('status', 'quoted'));
+        // quoted: espera el pago. payment_uploaded: el cliente ya envió el comprobante.
+        $this->maintenanceRepository->pushCriteria(new WhereFieldCriteria('status', ['quoted', 'payment_uploaded'], 'in'));
         $this->maintenanceRepository->pushCriteria(new OrderByCriteria('created_at','asc'));
 
         $maintenances = $request->has('unpaginated') ?

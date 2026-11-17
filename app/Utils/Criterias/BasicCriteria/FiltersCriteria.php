@@ -85,7 +85,13 @@ class FiltersCriteria implements CriteriaInterface
                 $this->model = $this->model->whereNotNull($field);
                 break;
             case 'is':
-                $value = $value == 'true' ? true : false;
+                // true/false siguen siendo booleanos. El resto se compara como texto
+                // (por ejemplo status|is|quoted). Antes cualquier otro valor quedaba en false.
+                if ($value === 'true') {
+                    $value = true;
+                } elseif ($value === 'false') {
+                    $value = false;
+                }
                 $this->model = $this->model->where($field, $value);
                 break;
             case 'in':
@@ -122,7 +128,11 @@ class FiltersCriteria implements CriteriaInterface
                 $query->whereNotNull($fieldName);
                 break;
             case 'is':
-                $value = $value == 'true' ? true : false;
+                if ($value === 'true') {
+                    $value = true;
+                } elseif ($value === 'false') {
+                    $value = false;
+                }
                 $query->where($fieldName, $value);
                 break;
             case 'in':

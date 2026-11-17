@@ -8,6 +8,8 @@ use App\Http\Resources\Maintenance\MaintenanceResource;
 use App\Repositories\Maintenance\MaintenanceRepository;
 use App\Utils\Criterias\BasicCriteria\OrderByCriteria;
 use App\Utils\Criterias\BasicCriteria\WhereFieldCriteria;
+use App\Utils\Criterias\BasicCriteria\WhereNullCriteria;
+use App\Utils\Criterias\BasicCriteria\WhereNullOrValueCriteria;
 use Illuminate\Http\JsonResponse;
 
 class MaintenanceNotAssignedListAPIController extends Controller
@@ -21,7 +23,11 @@ class MaintenanceNotAssignedListAPIController extends Controller
 
     public function __invoke(ReadMaintenanceNotAssignedAPIRequest $request): JsonResponse
     {
-        $this->maintenanceRepository->pushCriteria(new WhereFieldCriteria('status', 'pending'));
+        // Listos para asignar: cotizados, sin técnico, y con el pago aprobado o sin cobro.
+        // Antes esta lista pedía status pending, así que un servicio ya cotizado no aparecía.
+        $this->maintenanceRepository->pushCriteria(new WhereFieldCriteria('status', 'quoted'));
+        $this->maintenanceRepository->pushCriteria(new WhereNullCriteria('technician_id'));
+        $this->maintenanceRepository->pushCriteria(new WhereNullOrValueCriteria('is_paid', true));
         $this->maintenanceRepository->pushCriteria(new OrderByCriteria('created_at','asc'));
 
         $maintenances = $request->has('unpaginated') ?
@@ -29,8 +35,8 @@ class MaintenanceNotAssignedListAPIController extends Controller
             $this->maintenanceRepository->paginate(20);
         
         $maintenances->load([
-            'client',
-            'clientDevices.device'
+            'clientDevices.client',
+            'clientDevices.device',
         ]);
 
         return $this->makeResponseResource('Maintenances retrieved Successfully', MaintenanceResource::collection($maintenances));
