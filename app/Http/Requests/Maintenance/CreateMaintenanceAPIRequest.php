@@ -23,6 +23,17 @@ class CreateMaintenanceAPIRequest extends APIRequest
     {
         $rules = Maintenance::$rules;
 
+        // El cliente no puede fijar estado, técnico, precio ni pago al crear la
+        // solicitud: esos campos los gestionan coordinación/administración.
+        unset(
+            $rules['status'],
+            $rules['technician_id'],
+            $rules['value'],
+            $rules['is_paid'],
+            $rules['payment_support'],
+            $rules['spare_parts'],
+        );
+
 
         $rules['client_devices'] = [
             'required',

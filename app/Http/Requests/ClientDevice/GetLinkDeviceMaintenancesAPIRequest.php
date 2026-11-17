@@ -3,11 +3,14 @@
 namespace App\Http\Requests\ClientDevice;
 
 use App\Http\Requests\APIRequest;
+use App\Http\Requests\Concerns\AuthorizesRoles;
 use App\Models\Client\Client;
 use App\Rules\DeviceClient\DeviceBelongsToClientRule;
 
 class GetLinkDeviceMaintenancesAPIRequest extends APIRequest
 {
+    use AuthorizesRoles;
+
     public function validationData()
     {
         $linkDevice = $this->route('linkDevice');
@@ -20,7 +23,9 @@ class GetLinkDeviceMaintenancesAPIRequest extends APIRequest
 
     public function authorize(): bool
     {
-        return true;
+        // Solo el cliente dueño del equipo (antes un no-cliente provocaba un 500).
+        return $this->userHasRole('cliente')
+            && $this->isClientDeviceOwner($this->route('linkDevice'));
     }
 
     public function rules(): array
