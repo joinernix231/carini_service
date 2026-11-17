@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminDeviceLinkAPIController;
 use App\Http\Controllers\Admin\AdminMaintenanceAPIController;
 use App\Http\Controllers\Admin\AdminPasswordResetController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\WebPushSubscriptionController;
 use App\Http\Controllers\Auth\AuthAPIController;
 use App\Http\Controllers\Auth\MeController;
 use App\Http\Controllers\Auth\ProfileAPIController;
@@ -138,6 +139,11 @@ Route::prefix('notifications')->group(function () {
     Route::put('/mark-all-as-read', [NotificationController::class, 'markAllAsRead']);
     Route::get('/user-tokens', [NotificationController::class, 'getUserTokens']);
     Route::post('/send-to-role', [NotificationController::class, 'sendToRole']);
+
+    // Web Push (PWA en el navegador)
+    Route::get('/web-push/public-key', [WebPushSubscriptionController::class, 'publicKey']);
+    Route::post('/web-push/subscribe', [WebPushSubscriptionController::class, 'store']);
+    Route::delete('/web-push/unsubscribe', [WebPushSubscriptionController::class, 'destroy']);
 });
 });
 
