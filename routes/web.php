@@ -5,7 +5,7 @@ use App\Http\Controllers\Maintenance\MaintenancePDFPreviewController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::post('/login', [AuthAPIController::class, 'login'])->middleware('throttle:10,1');
+Route::post('/login', [AuthAPIController::class, 'login'])->middleware('throttle:login');
 
 // PDFs de la orden de servicio. No pasan por ValidateUserToken (se abren en el
 // navegador sin el token JWT), así que exigen una URL firmada y con vencimiento:
