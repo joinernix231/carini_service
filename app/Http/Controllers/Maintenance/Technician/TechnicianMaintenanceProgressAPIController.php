@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Maintenance\Technician;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Maintenance\GetProgressRequest;
 use App\Http\Requests\Maintenance\SaveProgressRequest;
 use App\Models\Maintenance\Maintenance;
 use App\Services\MaintenanceProgressService;
@@ -108,9 +109,10 @@ class TechnicianMaintenanceProgressAPIController extends Controller
      * Obtener progreso para hidratar la pantalla
      *
      * @param Maintenance $maintenance
+     * @param GetProgressRequest $request
      * @return JsonResponse
      */
-    public function getProgress(Maintenance $maintenance): JsonResponse
+    public function getProgress(Maintenance $maintenance, GetProgressRequest $request): JsonResponse
     {
         $maintenance->load('clientDevices');
         $devicesOut = $maintenance->clientDevices->map(function ($cd) {
