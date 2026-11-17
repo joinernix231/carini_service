@@ -42,7 +42,7 @@ class MaintenanceAPIController extends Controller
         $this->maintenanceRepository->pushCriteria(new OrderByCriteria('created_at','asc'));
 
         $maintenances = $request->has('unpaginated') ?
-            $this->maintenanceRepository->all() :
+            $this->maintenanceRepository->allCapped() :
             $this->maintenanceRepository->paginate(20);
         $maintenances->load(['clientDevices.device', 'clientDevices.client']);
 
@@ -111,7 +111,7 @@ class MaintenanceAPIController extends Controller
         $this->maintenanceRepository->pushCriteria(new OrderByCriteria('created_at', 'desc'));
 
         $maintenances = $request->has('unpaginated') ?
-            $this->maintenanceRepository->all() :
+            $this->maintenanceRepository->allCapped() :
             $this->maintenanceRepository->paginate(8);
 
         $maintenances->load([

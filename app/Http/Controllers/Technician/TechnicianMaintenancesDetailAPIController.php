@@ -50,7 +50,7 @@ class TechnicianMaintenancesDetailAPIController extends Controller
 
         // Obtener mantenimientos
         $maintenances = $request->has('unpaginated') ?
-            $this->maintenanceRepository->all() :
+            $this->maintenanceRepository->allCapped() :
             $this->maintenanceRepository->paginate(20);
 
         // Cargar relaciones necesarias

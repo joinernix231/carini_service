@@ -28,7 +28,7 @@ class DeviceLinkAPIController extends Controller
         $this->linkDeviceRepository->pushCriteria(new WhereFieldCriteria('client_id', session('client_id')));
 
         $clientDevice = $request->has('unpaginated') ?
-            $this->linkDeviceRepository->all() :
+            $this->linkDeviceRepository->allCapped() :
             $this->linkDeviceRepository->paginate(20);
         $clientDevice->load(['client','device']);
 

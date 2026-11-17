@@ -65,6 +65,27 @@ abstract class BaseRepository extends InfyomBaseRepository
         return $model;
     }
 
+    /**
+     * all() con tope de filas para los listados con ?unpaginated.
+     * Antes devolvían la tabla entera (con N+1 en los Resources); el tope se
+     * configura con UNPAGINATED_MAX (por defecto 500).
+     */
+    public function allCapped(?int $max = null)
+    {
+        $max = $max ?? (int) config('app.unpaginated_max', 500);
+
+        $results = $this->scopeQuery(fn ($query) => $query->limit($max))->all();
+
+        if ($results->count() >= $max) {
+            \Illuminate\Support\Facades\Log::warning('Listado unpaginated truncado al tope', [
+                'repository' => static::class,
+                'max' => $max,
+            ]);
+        }
+
+        return $results;
+    }
+
     public function getDataByField($field, $value, $withTrashed = false)
     {
         $model = $this->model;

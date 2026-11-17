@@ -67,6 +67,9 @@ return [
 
     'timezone' => env('APP_TIMEZONE', 'UTC'),
 
+    // Tope de filas para los listados con ?unpaginated (ver BaseRepository::allCapped).
+    'unpaginated_max' => (int) env('UNPAGINATED_MAX', 500),
+
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration
