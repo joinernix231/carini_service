@@ -24,8 +24,8 @@ class LoadImageAPIRequest extends APIRequest
             // (maintenances/..., devices/...); evita escribir fuera de images/ en S3.
             'name' => [
                 'required', 'string', 'max:255',
-                'not_regex:/(\.\.|\\)/',
-                'regex:/^((maintenances|devices)\/)?[^\/]+$/',
+                'not_regex:#(\.\.|\\\\)#',
+                'regex:#^((maintenances|devices)/)?[^/]+$#',
             ],
         ];
     }

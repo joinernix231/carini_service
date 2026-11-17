@@ -21,7 +21,7 @@ class LoadDocAPIRequest extends APIRequest
             'file' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png,webp,heic,heif', 'max:10240'],
             // Sin "/", "\\" ni "..": evita escribir fuera de la carpeta en S3
             // (p. ej. sobrescribir PDFs de órdenes de servicio de otros clientes).
-            'name' => ['required', 'string', 'max:255', 'not_regex:/(\.\.|\/|\\)/']
+            'name' => ['required', 'string', 'max:255', 'not_regex:#(\.\.|/|\\\\)#']
         ];
     }
 
