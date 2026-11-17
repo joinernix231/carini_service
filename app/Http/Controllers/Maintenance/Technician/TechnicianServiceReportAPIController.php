@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Maintenance\Technician;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Maintenance\SaveServiceReportRequest;
+use App\Http\Requests\Maintenance\ShowServiceReportRequest;
 use App\Models\ClientDevice\ClientDevice;
 use App\Models\Maintenance\Maintenance;
 use App\Models\Maintenance\MaintenanceClientDevice;
@@ -54,9 +55,10 @@ class TechnicianServiceReportAPIController extends Controller
      *
      * @param Maintenance $maintenance
      * @param ClientDevice $clientDevice
+     * @param ShowServiceReportRequest $request
      * @return JsonResponse
      */
-    public function show(Maintenance $maintenance, ClientDevice $clientDevice): JsonResponse
+    public function show(Maintenance $maintenance, ClientDevice $clientDevice, ShowServiceReportRequest $request): JsonResponse
     {
         // Verificar que el dispositivo pertenece al mantenimiento
         $maintenanceClientDevice = MaintenanceClientDevice::where('maintenance_id', $maintenance->id)
