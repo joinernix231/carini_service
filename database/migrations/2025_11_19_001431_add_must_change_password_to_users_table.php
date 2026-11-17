@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->boolean('must_change_password')->default(true)->after('policy_accepted_at');
+            $table->boolean('must_change_password')->default(false)->after('policy_accepted_at'); // false: la app móvil aún no tiene pantalla de cambio de contraseña
         });
     }
 
