@@ -21,6 +21,23 @@ class GenerateMaintenancePDFJob implements ShouldQueue
 
     public Maintenance $maintenance;
 
+    /**
+     * Intentos máximos. Un PDF con muchas fotos puede tardar; sin estos valores
+     * el worker lo mataba a los 60-90 s y lo reintentaba sin pausa.
+     * Importante: retry_after de la conexión de cola debe ser mayor que $timeout
+     * (ver config/queue.php), o el job se entrega dos veces mientras corre.
+     */
+    public int $tries = 3;
+
+    /** Segundos antes de matar el job. */
+    public int $timeout = 300;
+
+    /** Si se agota el tiempo, marcar como fallido en lugar de reintentar en bucle. */
+    public bool $failOnTimeout = true;
+
+    /** Espera entre reintentos (segundos). */
+    public array $backoff = [30, 120];
+
     public function __construct(Maintenance $maintenance)
     {
         $this->maintenance = $maintenance;
