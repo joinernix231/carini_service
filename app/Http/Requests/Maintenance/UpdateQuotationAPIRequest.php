@@ -3,11 +3,14 @@
 namespace App\Http\Requests\Maintenance;
 
 use App\Http\Requests\APIRequest;
+use App\Http\Requests\Concerns\AuthorizesRoles;
 use App\Models\Maintenance\Maintenance;
 use Illuminate\Validation\Rule;
 
 class UpdateQuotationAPIRequest extends APIRequest
 {
+    use AuthorizesRoles;
+
     public function validationData(): array
     {
         $maintenance = $this->route('maintenance');
@@ -18,10 +21,7 @@ class UpdateQuotationAPIRequest extends APIRequest
 
     public function authorize(): bool
     {
-        $allowedRoles = ['coordinador', 'administrador'];
-        $user = session('user');
-
-        return in_array($user->role, $allowedRoles);
+        return $this->userHasRole('coordinador', 'administrador');
     }
 
     public function rules(): array

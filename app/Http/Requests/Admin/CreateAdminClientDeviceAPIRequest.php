@@ -3,16 +3,17 @@
 namespace App\Http\Requests\Admin;
 
 use App\Http\Requests\APIRequest;
+use App\Http\Requests\Concerns\AuthorizesRoles;
 use App\Models\ClientDevice\ClientDevice;
 
 class CreateAdminClientDeviceAPIRequest extends APIRequest
 {
+    use AuthorizesRoles;
+
 
     public function authorize(): bool
     {
-        $admin = session('user');
-
-        return $admin && $admin->role === 'administrador';
+        return $this->userHasRole('administrador');
     }
 
     public function rules(): array

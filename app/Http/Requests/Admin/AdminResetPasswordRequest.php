@@ -3,17 +3,18 @@
 namespace App\Http\Requests\Admin;
 
 use App\Http\Requests\APIRequest;
+use App\Http\Requests\Concerns\AuthorizesRoles;
 
 class AdminResetPasswordRequest extends APIRequest
 {
+    use AuthorizesRoles;
+
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        $admin = session('user');
-
-        return $admin && $admin->role === 'administrador';
+        return $this->userHasRole('administrador');
     }
 
     /**

@@ -3,27 +3,18 @@
 namespace App\Http\Requests\Maintenance;
 
 use App\Http\Requests\APIRequest;
+use App\Http\Requests\Concerns\AuthorizesRoles;
 
 class SaveServiceReportRequest extends APIRequest
 {
+    use AuthorizesRoles;
+
     public function authorize(): bool
     {
-        $allowedRoles = ['tecnico'];
-        $user = session('user');
-
-        if (!$user || !in_array($user->role, $allowedRoles)) {
-            return false;
-        }
-
         $maintenance = $this->route('maintenance');
         $clientDevice = $this->route('clientDevice');
-        
-        if (!$maintenance || !$clientDevice) {
-            return false;
-        }
 
-        // Verificar que el técnico es el asignado al mantenimiento
-        if ($maintenance->technician_id !== session('technician_id')) {
+        if (!$clientDevice || !$this->isAssignedTechnician($maintenance)) {
             return false;
         }
 
