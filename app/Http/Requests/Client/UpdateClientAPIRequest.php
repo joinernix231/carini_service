@@ -2,18 +2,26 @@
 
 namespace App\Http\Requests\Client;
 
+use App\Http\Requests\Concerns\AuthorizesRoles;
 use App\Http\Requests\APIRequest;
 use App\Models\Client\Client;
 use Illuminate\Validation\Rule;
 
 class UpdateClientAPIRequest extends APIRequest
 {
+    use AuthorizesRoles;
+
     public function authorize(): bool
     {
-        $allowedRoles = ['coordinador', 'administrador'];
-        $user = session('user');
+        // Administración y coordinación pueden editar cualquier cliente (development-fix);
+        // un cliente solo puede editar su propio registro (fix/seguridad-roles).
+        if ($this->userHasRole('administrador', 'coordinador')) {
+            return true;
+        }
 
-        return $user && in_array($user->role, $allowedRoles);
+        $client = $this->route('client');
+
+        return $client !== null && (int) $client->user_id === (int) $this->currentUser()?->id;
     }
 
     public function rules(): array

@@ -2,13 +2,16 @@
 
 namespace App\Http\Requests\API;
 
+use App\Http\Requests\Concerns\AuthorizesRoles;
 use App\Http\Requests\APIRequest;
 
 class SendNotificationRequest extends APIRequest
 {
+    use AuthorizesRoles;
+
     public function authorize(): bool
     {
-        return true;
+        return $this->userHasRole('administrador', 'coordinador');
     }
 
     public function rules(): array

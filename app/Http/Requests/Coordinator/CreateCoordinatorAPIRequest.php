@@ -2,18 +2,21 @@
 
 namespace App\Http\Requests\Coordinator;
 
+use App\Http\Requests\Concerns\AuthorizesRoles;
 use App\Http\Requests\APIRequest;
 use App\Models\Coordinator\Coordinator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateCoordinatorAPIRequest extends APIRequest
 {
+    use AuthorizesRoles;
+
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->userHasRole('administrador');
     }
 
     /**

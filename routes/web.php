@@ -5,7 +5,7 @@ use App\Http\Controllers\Maintenance\MaintenancePDFPreviewController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::post('/login', [AuthAPIController::class, 'login']);
+Route::post('/login', [AuthAPIController::class, 'login'])->middleware('throttle:10,1');
 
 // Rutas para previsualizar y descargar PDFs de mantenimiento (sin middleware)
 Route::get('/preview-pdf/maintenance/{id}', [MaintenancePDFPreviewController::class, 'preview'])
