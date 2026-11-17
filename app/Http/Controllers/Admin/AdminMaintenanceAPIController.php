@@ -50,7 +50,7 @@ class AdminMaintenanceAPIController extends Controller
         }
 
         $maintenances = $request->has('unpaginated') ?
-            $this->maintenanceRepository->all() :
+            $this->maintenanceRepository->allCapped() :
             $this->maintenanceRepository->paginate(20);
 
         $maintenances->load([
@@ -63,6 +63,27 @@ class AdminMaintenanceAPIController extends Controller
             'Maintenances retrieved successfully',
             MaintenanceResource::collection($maintenances)
         );
+    }
+
+    /**
+     * Conteo de mantenimientos por estado (Admin/Coordinador).
+     * Sustituye a descargar el listado completo con ?unpaginated solo para contar.
+     *
+     * @param ReadAdminMaintenanceAPIRequest $request
+     * @return JsonResponse
+     */
+    public function summary(ReadAdminMaintenanceAPIRequest $request): JsonResponse
+    {
+        $byStatus = Maintenance::query()
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->map(fn ($total) => (int) $total);
+
+        return $this->makeResponse('Maintenances summary retrieved successfully', [
+            'total' => (int) $byStatus->sum(),
+            'by_status' => (object) $byStatus->all(),
+        ]);
     }
 
     /**
@@ -164,7 +185,7 @@ class AdminMaintenanceAPIController extends Controller
         }
 
         $maintenances = $request->has('unpaginated') ?
-            $this->maintenanceRepository->all() :
+            $this->maintenanceRepository->allCapped() :
             $this->maintenanceRepository->paginate(8);
 
         $maintenances->load([
@@ -209,7 +230,7 @@ class AdminMaintenanceAPIController extends Controller
         }
 
         $photos = $request->has('unpaginated') ?
-            $this->maintenancePhotoRepository->all() :
+            $this->maintenancePhotoRepository->allCapped() :
             $this->maintenancePhotoRepository->paginate(20);
 
         $photos->load(['clientDevice.device']);

@@ -87,7 +87,8 @@ class NotificationController extends Controller
     {
         $user = auth()->user();
         
-        $perPage = $request->input('per_page', 20);
+        // Tope para que nadie pida per_page=100000.
+        $perPage = max(1, min((int) $request->input('per_page', 20), 100));
         $notifications = $user->notifications()
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
@@ -128,7 +129,8 @@ class NotificationController extends Controller
     {
         $user = auth()->user();
         
-        $user->unreadNotifications->markAsRead();
+        // Un solo UPDATE en lugar de cargar todas las no leídas en memoria.
+        $user->unreadNotifications()->update(['read_at' => now()]);
 
         return ResponseUtil::makeResponse('Todas las notificaciones marcadas como leídas.');
     }

@@ -3,9 +3,11 @@
 namespace App\Http\Requests\API\Other;
 
 use App\Http\Requests\APIRequest;
+use App\Http\Requests\Concerns\PreventsUploadOverwrite;
 
 class LoadImageAPIRequest extends APIRequest
 {
+    use PreventsUploadOverwrite;
 
     public function authorize(): true
     {
@@ -15,17 +17,31 @@ class LoadImageAPIRequest extends APIRequest
     public function rules(): array
     {
         return [
-            'image' => 'required',
-            // Sin "/", "\\" ni "..": evita escribir fuera de la carpeta en S3
-            // (p. ej. sobrescribir PDFs de órdenes de servicio de otros clientes).
-            'name' => ['required', 'string', 'max:255', 'not_regex:/(\\.\\.|\\/|\\\\)/']
+            // La app siempre envía multipart (src/services/UploadImage.ts). Se valida
+            // por contenido real: foto de cámara/galería (jpeg/heic/webp) o firma (png).
+            'image' => ['required', 'file', 'mimes:jpg,jpeg,png,webp,heic,heif', 'max:10240'],
+            // Sin "\\" ni "..". Solo se permite "/" para las carpetas que usa la app
+            // (maintenances/..., devices/...); evita escribir fuera de images/ en S3.
+            'name' => [
+                'required', 'string', 'max:255',
+                'not_regex:#(\.\.|\\\\)#',
+                'regex:#^((maintenances|devices)/)?[^/]+$#',
+            ],
         ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $this->rejectIfExists($validator, fn (string $name) => 'images/' . $name . '.PNG');
     }
 
     public function messages(): array
     {
         $messages = parent::messages();
         $messages['file'] = 'Se debe enviar una imagen';
+        $messages['mimes'] = 'La imagen debe ser JPG, PNG, WEBP o HEIC';
+        $messages['regex'] = 'El nombre del archivo no es válido';
+        $messages['not_regex'] = 'El nombre del archivo no es válido';
         return $messages;
     }
 }

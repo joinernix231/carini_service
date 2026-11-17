@@ -54,6 +54,8 @@ Route::get('/linkDevices/{linkDevice}/maintenances', [MaintenanceAPIController::
 Route::post('/admin/clients/{client}/devices', [AdminDeviceLinkAPIController::class, 'store'])->name('admin.clients.devices.store');
 Route::delete('/admin/clients/devices/{clientDevice}', [AdminDeviceLinkAPIController::class, 'destroy'])->name('admin.clients.devices.destroy');
 // Admin Maintenances
+// Antes del apiResource para que "summary" no se tome como {maintenance}.
+Route::get('/admin/maintenances/summary', [AdminMaintenanceAPIController::class, 'summary'])->name('admin.maintenances.summary');
 Route::apiResource('/admin/maintenances', AdminMaintenanceAPIController::class);
 Route::get('/admin/clients/devices/{clientDevice}/maintenances', [AdminMaintenanceAPIController::class, 'getClientDeviceMaintenances'])->name('admin.clients.devices.maintenances');
 Route::get('/admin/maintenances/{maintenance}/photos', [AdminMaintenanceAPIController::class, 'getMaintenancePhotos'])->name('admin.maintenances.photos');
@@ -66,7 +68,8 @@ Route::apiResource('/devices', DeviceAPIController::class);
 // Maintenance
 Route::apiResource('/maintenances', MaintenanceAPIController::class)
     ->names('carini.maintenances');
-    Route::apiResource('/maintenancesCoordinator', MaintenanceCoordinatorAPIController::class);
+// Solo index existe en el controlador; store/show/update/destroy daban 500.
+Route::apiResource('/maintenancesCoordinator', MaintenanceCoordinatorAPIController::class)->only(['index']);
 // Maintenance - Queries (Listados)
 Route::get('/maintenancesNotAssigned', MaintenanceNotAssignedListAPIController::class);
 Route::get('/maintenancesAssigned', MaintenanceAssignedListAPIController::class);

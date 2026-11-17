@@ -42,7 +42,7 @@ class MaintenanceAPIController extends Controller
         $this->maintenanceRepository->pushCriteria(new OrderByCriteria('created_at','asc'));
 
         $maintenances = $request->has('unpaginated') ?
-            $this->maintenanceRepository->all() :
+            $this->maintenanceRepository->allCapped() :
             $this->maintenanceRepository->paginate(20);
         $maintenances->load(['clientDevices.device', 'clientDevices.client']);
 
@@ -111,7 +111,7 @@ class MaintenanceAPIController extends Controller
         $this->maintenanceRepository->pushCriteria(new OrderByCriteria('created_at', 'desc'));
 
         $maintenances = $request->has('unpaginated') ?
-            $this->maintenanceRepository->all() :
+            $this->maintenanceRepository->allCapped() :
             $this->maintenanceRepository->paginate(8);
 
         $maintenances->load([
@@ -150,13 +150,13 @@ class MaintenanceAPIController extends Controller
         ]);
 
         GenerateMaintenancePDFJob::dispatch($maintenance)
-            ->onQueue('PDFQueue_local');
+            ->onQueue(config('maintenance_pdf.queue', 'PDFQueue_local'));
 
         return response()->json([
             'success' => true,
             'data' => [
                 'maintenance_id' => $maintenance->id,
-                    'queue' => 'PDFQueue_local',
+                'queue' => config('maintenance_pdf.queue', 'PDFQueue_local'),
                 'devices_with_report' => $devicesWithReport,
             ],
             'message' => 'La generación del PDF fue encolada correctamente.',
