@@ -3,9 +3,12 @@
 namespace App\Http\Requests\Maintenance;
 
 use App\Http\Requests\APIRequest;
+use App\Http\Requests\Concerns\LimitsMaintenancePhotos;
 
 class UploadMultiplePhotosRequest extends APIRequest
 {
+    use LimitsMaintenancePhotos;
+
     public function authorize(): bool
     {
         $allowedRoles = ['tecnico'];
@@ -26,11 +29,16 @@ class UploadMultiplePhotosRequest extends APIRequest
     public function rules(): array
     {
         return [
-            'photos' => 'required|array|min:1',
-            'photos.*.client_device_id' => ['required', $this->existsRule('client_device')],
+            'photos' => ['required', 'array', 'min:1', 'max:' . $this->maxPhotosPerRequest()],
+            'photos.*.client_device_id' => ['required', 'integer', $this->deviceOfThisMaintenanceRule()],
             'photos.*.photo' => 'required|string|max:255',
             'photos.*.photo_type' => 'required|in:initial,final,part,other'
         ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $this->checkMaintenancePhotoTotal($validator, 'photos');
     }
 
     public function messages(): array
@@ -40,7 +48,8 @@ class UploadMultiplePhotosRequest extends APIRequest
             'photos.array' => 'Las fotos deben ser un array',
             'photos.min' => 'Debe enviar al menos una foto',
             'photos.*.client_device_id.required' => 'El ID del dispositivo del cliente es requerido para cada foto',
-            'photos.*.client_device_id.exists' => 'El dispositivo del cliente no existe',
+            'photos.max' => 'No se pueden enviar más de :max fotos a la vez',
+            'photos.*.client_device_id.exists' => 'El equipo no pertenece a este mantenimiento',
             'photos.*.photo.required' => 'El nombre de la foto es requerido',
             'photos.*.photo.string' => 'El nombre de la foto debe ser texto',
             'photos.*.photo.max' => 'El nombre de la foto no puede exceder 255 caracteres',

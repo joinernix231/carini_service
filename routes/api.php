@@ -68,7 +68,8 @@ Route::apiResource('/devices', DeviceAPIController::class);
 // Maintenance
 Route::apiResource('/maintenances', MaintenanceAPIController::class)
     ->names('carini.maintenances');
-    Route::apiResource('/maintenancesCoordinator', MaintenanceCoordinatorAPIController::class);
+// Solo index existe en el controlador; store/show/update/destroy daban 500.
+Route::apiResource('/maintenancesCoordinator', MaintenanceCoordinatorAPIController::class)->only(['index']);
 // Maintenance - Queries (Listados)
 Route::get('/maintenancesNotAssigned', MaintenanceNotAssignedListAPIController::class);
 Route::get('/maintenancesAssigned', MaintenanceAssignedListAPIController::class);

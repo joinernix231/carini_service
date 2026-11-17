@@ -70,6 +70,10 @@ return [
     // Tope de filas para los listados con ?unpaginated (ver BaseRepository::allCapped).
     'unpaginated_max' => (int) env('UNPAGINATED_MAX', 500),
 
+    // Fotos máximas por mantenimiento (todas las de todos los equipos) y por petición.
+    'maintenance_max_photos' => (int) env('MAINTENANCE_MAX_PHOTOS', 150),
+    'maintenance_max_photos_per_request' => (int) env('MAINTENANCE_MAX_PHOTOS_PER_REQUEST', 30),
+
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration

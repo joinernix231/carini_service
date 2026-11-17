@@ -3,9 +3,12 @@
 namespace App\Http\Requests\Maintenance;
 
 use App\Http\Requests\APIRequest;
+use App\Http\Requests\Concerns\LimitsMaintenancePhotos;
 
 class CompleteMaintenanceRequest extends APIRequest
 {
+    use LimitsMaintenancePhotos;
+
     public function authorize(): bool
     {
         $allowedRoles = ['tecnico'];
@@ -37,10 +40,15 @@ class CompleteMaintenanceRequest extends APIRequest
             'longitude' => 'required|numeric|between:-180,180',
             'final_observations' => 'nullable|string|max:1000',
             'client_signature' => 'nullable|string|max:255',
-            'final_photos' => 'nullable|array',
-            'final_photos.*.client_device_id' => 'required|integer|exists:client_device,id',
+            'final_photos' => ['nullable', 'array', 'max:' . $this->maxPhotosPerRequest()],
+            'final_photos.*.client_device_id' => ['required', 'integer', $this->deviceOfThisMaintenanceRule()],
             'final_photos.*.photo' => 'required|string|max:255',
         ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $this->checkMaintenancePhotoTotal($validator, 'final_photos');
     }
 
     public function messages(): array
@@ -55,7 +63,8 @@ class CompleteMaintenanceRequest extends APIRequest
             'final_observations.max' => 'Las observaciones finales no pueden exceder 1000 caracteres',
             'client_signature.max' => 'La firma del cliente no puede exceder 255 caracteres',
             'final_photos.*.client_device_id.required' => 'El ID del dispositivo del cliente es requerido para cada foto final',
-            'final_photos.*.client_device_id.exists' => 'El dispositivo del cliente no existe',
+            'final_photos.max' => 'No se pueden enviar más de :max fotos finales',
+            'final_photos.*.client_device_id.exists' => 'El equipo no pertenece a este mantenimiento',
             'final_photos.*.photo.required' => 'El nombre de la foto final es requerido',
             'final_photos.*.photo.string' => 'El nombre de la foto final debe ser texto',
             'final_photos.*.photo.max' => 'El nombre de la foto final no puede exceder 255 caracteres',
