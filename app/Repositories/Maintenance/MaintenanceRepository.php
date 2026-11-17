@@ -87,6 +87,11 @@ class MaintenanceRepository extends BaseRepository
     public function verifyPayment(Maintenance $maintenance): Maintenance
     {
         $maintenance->is_paid = true;
+        // El comprobante deja el estado en payment_uploaded. Al aprobarlo
+        // vuelve a quoted con is_paid=true para que se pueda asignar técnico.
+        if ($maintenance->status === 'payment_uploaded') {
+            $maintenance->status = 'quoted';
+        }
         $maintenance->save();
 
         event(new VerifyPaymentMaintenance($maintenance));
@@ -126,6 +131,7 @@ class MaintenanceRepository extends BaseRepository
     public function updatePaymentSupport(Maintenance $maintenance, string $paymentSupportFileName): Maintenance
     {
         $maintenance->payment_support = $paymentSupportFileName;
+        $maintenance->status = 'payment_uploaded';
         $maintenance->save();
 
         event(new UploadSupportPaymentMaintenance($maintenance));

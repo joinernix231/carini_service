@@ -27,8 +27,8 @@ class MaintenancePaymentStatusRule implements ValidationRule
             return;
         }
 
-        if ($this->maintenance->status !== 'quoted') {
-            $fail('El pago solo puede aprobarse si el mantenimiento está asignado.');
+        if (!in_array($this->maintenance->status, ['quoted', 'payment_uploaded'], true)) {
+            $fail('El pago solo se puede aprobar cuando la solicitud está cotizada o el comprobante ya fue enviado.');
         }
     }
 }
