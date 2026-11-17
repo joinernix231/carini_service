@@ -21,7 +21,7 @@ class GenerateMaintenancePDFListener
         ]);
 
         GenerateMaintenancePDFJob::dispatch($maintenance)
-            ->onQueue('PDFQueue_local');
+            ->onQueue(config('maintenance_pdf.queue', 'PDFQueue_local'));
     }
 }
 
