@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Maintenance;
 
+use App\Support\MaintenancePdfLinks;
 use App\Http\Resources\Client\ClientResource;
 use App\Http\Resources\Technician\TechnicianResource;
 use Illuminate\Http\Request;
@@ -87,6 +88,11 @@ class MaintenanceInformationResource extends JsonResource
                         // que ya retorna la URL completa.
                         'pdf_url' => $clientDevice->pivot && $clientDevice->pivot->getRawOriginal('pdf_url')
                         ? config('filesystems.disks.s3.url') . 'docs/' . $clientDevice->pivot->getRawOriginal('pdf_url') . '.pdf' : null,
+                        // Enlaces firmados a la orden de servicio (las rutas /preview-pdf y
+                        // /download-pdf exigen firma). Solo si ya se generó el PDF del equipo.
+                        'pdf_links' => $clientDevice->pivot && $clientDevice->pivot->getRawOriginal('pdf_url')
+                            ? MaintenancePdfLinks::make($this->id, $clientDevice->id)
+                            : null,
                         'pivot' => [
                             'description' => $clientDevice->pivot->description ?? null,
                             'progress_completed_indices' => $clientDevice->pivot->progress_completed_indices ?? null,

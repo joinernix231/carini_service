@@ -13,7 +13,7 @@ class MaintenancePDFPreviewController extends Controller
 {
     /**
      * Previsualizar el PDF de una orden de servicio
-     * Ruta sin middleware para poder acceder fácilmente
+     * Ruta protegida con URL firmada (middleware 'signed'); ver App\Support\MaintenancePdfLinks
      *
      * @param int $id ID del mantenimiento
      * @return Response
@@ -59,7 +59,7 @@ class MaintenancePDFPreviewController extends Controller
 
     /**
      * Descargar el PDF de una orden de servicio
-     * Ruta sin middleware para poder acceder fácilmente
+     * Ruta protegida con URL firmada (middleware 'signed'); ver App\Support\MaintenancePdfLinks
      *
      * @param int $id ID del mantenimiento
      * @return Response

@@ -81,6 +81,7 @@ Route::put('/cancelMaintenance/{maintenance}', MaintenanceAssignmentAPIControlle
 Route::put('/maintenances/{maintenance}/payment-support', MaintenancePaymentSupportAPIController::class);
 Route::put('/maintenance/{maintenance}/update-quotation', MaintenanceAPIController::class . '@updateQuotation');
 Route::post('/maintenances/{maintenance}/generate-pdf', MaintenanceAPIController::class . '@generatePdf');
+Route::get('/maintenances/{maintenance}/pdf-links', MaintenanceAPIController::class . '@pdfLinks');
 // Maintenance - Client actions
 Route::get('/maintenances/{maintenance}/information', MaintenanceInformationAPIController::class . '@maintenanceInformation');
 Route::post('/maintenances/{maintenance}/confirm', MaintenanceConfirmationAPIController::class . '@confirm');

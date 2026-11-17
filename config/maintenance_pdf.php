@@ -3,6 +3,9 @@
 return [
     'queue' => env('MAINTENANCE_PDF_QUEUE', 'pdf'),
 
+    // Minutos de validez de los enlaces firmados de vista previa/descarga.
+    'signed_url_ttl' => (int) env('MAINTENANCE_PDF_SIGNED_URL_TTL', 30),
+
     /*
     |--------------------------------------------------------------------------
     | Optimización de imágenes para PDF
