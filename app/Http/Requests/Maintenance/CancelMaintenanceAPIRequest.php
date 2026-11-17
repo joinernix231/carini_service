@@ -34,6 +34,7 @@ class CancelMaintenanceAPIRequest extends APIRequest
                 'required',
                 $this->existsRule('maintenances'),
             ],
+            'cancellation_reason' => 'nullable|string|max:1000',
         ];
     }
 }

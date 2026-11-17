@@ -54,6 +54,8 @@ class MaintenanceResource extends JsonResource
           'elapsed_work_time' => $this->started_at ? $this->getElapsedWorkTime() : null,
           'description' => $this->description,
           'photo' => $this->photo,
+          'signature_photo' => $this->signature_photo,
+          'pdf_url' => $this->pdf_url,
           'is_paid' => $this->is_paid,
           'payment_support' => $this->payment_support,
           'price_support' => $this->price_support,

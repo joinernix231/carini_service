@@ -16,7 +16,9 @@ class LoadImageAPIRequest extends APIRequest
     {
         return [
             'image' => 'required',
-            'name' => 'required|string'
+            // Sin "/", "\\" ni "..": evita escribir fuera de la carpeta en S3
+            // (p. ej. sobrescribir PDFs de órdenes de servicio de otros clientes).
+            'name' => ['required', 'string', 'max:255', 'not_regex:/(\\.\\.|\\/|\\\\)/']
         ];
     }
 

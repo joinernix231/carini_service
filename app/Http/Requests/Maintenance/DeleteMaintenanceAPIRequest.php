@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Maintenance;
 
 use App\Http\Requests\APIRequest;
+use App\Http\Requests\Concerns\AuthorizesRoles;
 use App\Models\Client\Client;
 use App\Models\Maintenance\Maintenance;
 use App\Rules\Maintenance\MaintenancePendingForDeletionRule;
@@ -10,6 +11,8 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class DeleteMaintenanceAPIRequest extends APIRequest
 {
+    use AuthorizesRoles;
+
 
     public function validationData(): array
     {
@@ -28,6 +31,11 @@ class DeleteMaintenanceAPIRequest extends APIRequest
         $maintenance = $this->route('maintenance');
         /** @var Client $client */
         $client = session('client');
+
+        // Solo un cliente puede borrar su solicitud (antes un no-cliente provocaba un 500).
+        if (!$maintenance || !$client || !$this->userHasRole('cliente')) {
+            return false;
+        }
 
         // Cargar la relación clientDevices si no está cargada
         if (!$maintenance->relationLoaded('clientDevices')) {

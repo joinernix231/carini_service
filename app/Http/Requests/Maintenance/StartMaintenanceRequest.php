@@ -32,7 +32,12 @@ class StartMaintenanceRequest extends APIRequest
             return false;
         }
 
-        return true;
+        // Un técnico solo puede iniciar mantenimientos asignados a él.
+        $maintenance = $this->route('maintenance');
+
+        return $maintenance !== null
+            && session('technician_id') !== null
+            && (int) $maintenance->technician_id === (int) session('technician_id');
     }
 
     public function rules(): array
@@ -41,7 +46,14 @@ class StartMaintenanceRequest extends APIRequest
         $maintenance = $this->route('maintenance');
 
         $rules = [
-            'maintenance_id' => ['bail', 'required', 'integer', $this->existsRule('maintenances')],
+            'maintenance_id' => [
+                'bail',
+                'required',
+                'integer',
+                $this->existsRule('maintenances'),
+                new MaintenanceStartableRule($maintenance),
+                new MaintenanceDateMatchRule($maintenance),
+            ],
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => 'required|numeric|between:-180,180',
             'notes' => 'nullable|string|max:1000'

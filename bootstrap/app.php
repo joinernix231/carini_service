@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\RequirePasswordChange;
 use App\Http\Middleware\ValidateUserToken;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -15,7 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
             // Rutas API (JSON, protegidas con token)
             Route::prefix('api')
-                ->middleware(['api', ValidateUserToken::class])
+                ->middleware(['api', ValidateUserToken::class, RequirePasswordChange::class])
                 ->as('api.')
                 ->group(base_path('routes/api.php'));
         },
@@ -23,7 +24,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up'
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Agregá aquí tus middleware globales si los necesitás
+        // Railway pone un proxy delante: sin esto todas las peticiones tendrían
+        // la IP del proxy y el límite de intentos de login sería compartido.
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // Podés capturar excepciones personalizadas aquí

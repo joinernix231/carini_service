@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
+use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
@@ -12,49 +13,25 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Crear administrador específico
-        User::firstOrCreate(
-            ['email' => 'joinernix2@gmail.com'],
+        // El repositorio es público: la contraseña del administrador no puede
+        // estar escrita aquí. Se toma de SEED_ADMIN_PASSWORD o se genera una
+        // aleatoria y se muestra una sola vez en consola.
+        $password = env('SEED_ADMIN_PASSWORD') ?: Str::random(20);
+
+        // Crear administrador específico (si ya existe, no se toca su contraseña)
+        $admin = User::firstOrCreate(
+            ['email' => 'talentohumano@carini.co'],
             [
-                'name' => 'Joiner Administrador',
-                'password' => bcrypt('saiz123'),
+                'name' => 'Adriana Administrador',
+                'password' => bcrypt($password),
                 'role' => 'administrador',
                 'policy_accepted_at' => now(),
             ]
         );
 
-        // Crear cliente específico (será usado por ClientSeeder)
-        User::firstOrCreate(
-            ['email' => 'jo@gmail.com'],
-            [
-                'name' => 'Joiner Davila Cliente',
-                'password' => bcrypt('saiz123'),
-                'role' => 'cliente',
-                'policy_accepted_at' => now(),
-            ]
-        );
-
-        // Crear técnico específico (será usado por TechnicalSeeder)
-        User::firstOrCreate(
-            ['email' => 'eyder@gmail.com'],
-            [
-                'name' => 'Eyder Técnico',
-                'password' => bcrypt('saiz123'),
-                'role' => 'tecnico',
-                'policy_accepted_at' => now(),
-            ]
-        );
-
-        // Crear coordinador específico (será usado por CoordinatorSeeder)
-        User::firstOrCreate(
-            ['email' => 'mauricio@gmail.com'],
-            [
-                'name' => 'Mauricio Coordinador',
-                'password' => bcrypt('saiz123'),
-                'role' => 'coordinador',
-                'policy_accepted_at' => now(),
-            ]
-        );
+        if ($admin->wasRecentlyCreated && !env('SEED_ADMIN_PASSWORD')) {
+            $this->command->warn("Contraseña generada para {$admin->email}: {$password}");
+        }
 
         $this->command->info('✅ Usuarios base creados correctamente (admin, cliente, técnico, coordinador).');
     }

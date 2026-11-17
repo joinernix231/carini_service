@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Maintenance;
 
 use App\Http\Requests\APIRequest;
+use App\Http\Requests\Concerns\AuthorizesRoles;
 use App\Models\Maintenance\Maintenance;
 use App\Rules\Maintenance\MaintenanceDateMatchRule;
 use App\Rules\Maintenance\MaintenanceStartableRule;
@@ -11,6 +12,8 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 
 class OnTheWayMaintenanceRequest extends APIRequest
 {
+    use AuthorizesRoles;
+
     public function validationData()
     {
         $maintenance = $this->route('maintenance');
@@ -25,14 +28,8 @@ class OnTheWayMaintenanceRequest extends APIRequest
 
     public function authorize(): bool
     {
-        $allowedRoles = ['tecnico'];
-        $user = session('user');
-
-        if (!$user || !in_array($user->role, $allowedRoles)) {
-            return false;
-        }
-
-        return true;
+        // Solo el técnico asignado puede marcar "en camino".
+        return $this->isAssignedTechnician($this->route('maintenance'));
     }
 
     public function rules(): array

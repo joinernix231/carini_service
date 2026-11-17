@@ -37,14 +37,15 @@ class MaintenanceActionLog extends Model
         'resume' => 'Reanudar',
         'end' => 'Finalizar',
         'on_the_way' => 'En Camino',
+        'cancel' => 'Cancelar',
     ];
 
     public static array $rules = [
         'maintenance_id' => 'required|integer|exists:maintenances,id',
-        'technician_id' => 'required|integer|exists:technicians,id',
-        'action' => 'required|in:assign,start,pause,resume,end,on_the_way',
+        'technician_id' => 'nullable|integer|exists:technicians,id',
+        'action' => 'required|in:assign,start,pause,resume,end,on_the_way,cancel',
         'timestamp' => 'required|date',
-        'reason' => 'nullable|string|max:255',
+        'reason' => 'nullable|string|max:1000',
         'latitude' => 'nullable|numeric|between:-90,90',
         'longitude' => 'nullable|numeric|between:-180,180',
         'is_last' => 'nullable|boolean',

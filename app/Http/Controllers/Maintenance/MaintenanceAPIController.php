@@ -6,14 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ClientDevice\GetLinkDeviceMaintenancesAPIRequest;
 use App\Http\Requests\Maintenance\CreateMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\DeleteMaintenanceAPIRequest;
+use App\Http\Requests\Maintenance\GenerateMaintenancePDFAPIRequest;
+use App\Http\Requests\Maintenance\MaintenancePdfLinksAPIRequest;
 use App\Http\Requests\Maintenance\ReadMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\ShowMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\UpdateMaintenanceAPIRequest;
 use App\Http\Requests\Maintenance\UpdateQuotationAPIRequest;
 use App\Http\Resources\Maintenance\MaintenanceResource;
+use App\Jobs\GenerateMaintenancePDFJob;
 use App\Models\ClientDevice\ClientDevice;
 use App\Models\Maintenance\Maintenance;
+use App\Models\Maintenance\MaintenanceClientDevice;
 use App\Repositories\Maintenance\MaintenanceRepository;
+use App\Support\MaintenancePdfLinks;
+use App\Utils\Resources\ResponseUtil;
 use App\Utils\Criterias\BasicCriteria\OrderByCriteria;
 use App\Utils\Criterias\Maintenance\ClientDeviceMaintenancesCriteria;
 use App\Utils\Criterias\Maintenance\ClientMaintenancesCriteria;
@@ -118,5 +124,68 @@ class MaintenanceAPIController extends Controller
             'Maintenances retrieved successfully',
             MaintenanceResource::collection($maintenances)
         );
+    }
+
+    public function generatePdf(Maintenance $maintenance, GenerateMaintenancePDFAPIRequest $request): JsonResponse
+    {
+        $devicesWithReport = MaintenanceClientDevice::query()
+            ->where('maintenance_id', $maintenance->id)
+            ->whereHas('serviceReport')
+            ->count();
+
+        if ($devicesWithReport === 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El mantenimiento no tiene reportes de servicio para generar el PDF.',
+            ], 422);
+        }
+
+        $maintenance->load([
+            'clientDevices.client.user',
+            'clientDevices.device',
+            'technician.user',
+            'photos.clientDevice',
+            'sparePartSuggestions.clientDevice.device',
+            'actionLogs.technician.user',
+        ]);
+
+        GenerateMaintenancePDFJob::dispatch($maintenance)
+            ->onQueue('PDFQueue_local');
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'maintenance_id' => $maintenance->id,
+                    'queue' => 'PDFQueue_local',
+                'devices_with_report' => $devicesWithReport,
+            ],
+            'message' => 'La generación del PDF fue encolada correctamente.',
+        ], 202);
+    }
+
+    /**
+     * Enlaces firmados (con vencimiento) para ver/descargar la orden de servicio
+     * de cada equipo del mantenimiento que ya tiene reporte de servicio.
+     */
+    public function pdfLinks(Maintenance $maintenance, MaintenancePdfLinksAPIRequest $request): JsonResponse
+    {
+        $devices = MaintenanceClientDevice::query()
+            ->where('maintenance_id', $maintenance->id)
+            ->whereHas('serviceReport')
+            ->get(['id', 'client_device_id']);
+
+        if ($devices->isEmpty()) {
+            return ResponseUtil::makeError('El mantenimiento aún no tiene reportes de servicio.', 404);
+        }
+
+        $links = $devices->map(fn (MaintenanceClientDevice $mcd) => array_merge(
+            ['client_device_id' => $mcd->client_device_id],
+            MaintenancePdfLinks::make($maintenance->id, $mcd->client_device_id)
+        ))->values();
+
+        return $this->makeResponse('Enlaces del PDF generados', [
+            'maintenance_id' => $maintenance->id,
+            'devices' => $links,
+        ]);
     }
 }

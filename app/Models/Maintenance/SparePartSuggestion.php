@@ -6,6 +6,7 @@ use App\Models\ClientDevice\ClientDevice;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Arr;
 
 class SparePartSuggestion extends Model
 {
@@ -55,5 +56,19 @@ class SparePartSuggestion extends Model
     public function scopeForDevice($query, int $clientDeviceId)
     {
         return $query->where('client_device_id', $clientDeviceId);
+    }
+
+    /**
+     * Accesor para obtener la URL completa de la foto.
+     * Sigue el patrón del proyecto: guarda solo el nombre y genera la URL completa.
+     *
+     * @return string|null
+     */
+    public function getPhotoAttribute(): ?string
+    {
+        if ($photo = Arr::get($this->attributes, 'photo')) {
+            return config('filesystems.disks.s3.url') . 'images/' . $photo . '.PNG';
+        }
+        return null;
     }
 }

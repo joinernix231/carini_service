@@ -3,11 +3,19 @@
 namespace App\Http\Requests\Admin;
 
 use App\Http\Requests\APIRequest;
+use App\Http\Requests\Concerns\AuthorizesRoles;
 use App\Models\Maintenance\Maintenance;
 use App\Rules\Maintenance\MaintenancePendingForDeletionRule;
 
 class DeleteAdminMaintenanceAPIRequest extends APIRequest
 {
+    use AuthorizesRoles;
+
+    public function authorize(): bool
+    {
+        return $this->userHasRole('coordinador', 'administrador');
+    }
+
     public function validationData(): array
     {
         $maintenance = $this->route('maintenance');
@@ -19,12 +27,7 @@ class DeleteAdminMaintenanceAPIRequest extends APIRequest
         return $this->all();
     }
 
-    public function authorize(): bool
-    {
-        $admin = session('user');
 
-        return $admin && $admin->role === 'administrador';
-    }
 
     public function rules(): array
     {

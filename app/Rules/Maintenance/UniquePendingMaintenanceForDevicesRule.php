@@ -2,6 +2,7 @@
 
 namespace App\Rules\Maintenance;
 
+use App\Models\ClientDevice\ClientDevice;
 use App\Models\Maintenance\Maintenance;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -40,7 +41,16 @@ class UniquePendingMaintenanceForDevicesRule implements ValidationRule
             $conflictingDeviceIds = array_intersect($deviceIds, $deviceIdsWithPending);
             
             if (!empty($conflictingDeviceIds)) {
-                $fail('Ya existen mantenimientos pendientes para los siguientes equipos: ' . implode(', ', $conflictingDeviceIds) . '. No se puede crear otro hasta que se completen los actuales.');
+                // Obtener los modelos de los equipos con conflictos
+                $conflictingDevices = ClientDevice::whereIn('id', $conflictingDeviceIds)
+                    ->with('device')
+                    ->get();
+                
+                $deviceModels = $conflictingDevices->map(function ($clientDevice) {
+                    return $clientDevice->device->model ?? 'Sin modelo';
+                })->toArray();
+                
+                $fail('Ya existen mantenimientos pendientes para los siguientes equipos: ' . implode(', ', $deviceModels) . '. No se puede crear otro hasta que se completen los actuales.');
             }
         }
     }

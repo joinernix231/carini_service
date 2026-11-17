@@ -5,6 +5,7 @@ namespace App\Http\Requests\Maintenance;
 use App\Http\Requests\APIRequest;
 use App\Models\Maintenance\Maintenance;
 use App\Rules\Maintenance\ClientDeviceOwnership;
+use App\Rules\Maintenance\DevicesWithinRadiusRule;
 use App\Rules\Maintenance\UniquePendingMaintenanceForDevicesRule;
 
 class CreateMaintenanceAPIRequest extends APIRequest
@@ -22,12 +23,24 @@ class CreateMaintenanceAPIRequest extends APIRequest
     {
         $rules = Maintenance::$rules;
 
+        // El cliente no puede fijar estado, técnico, precio ni pago al crear la
+        // solicitud: esos campos los gestionan coordinación/administración.
+        unset(
+            $rules['status'],
+            $rules['technician_id'],
+            $rules['value'],
+            $rules['is_paid'],
+            $rules['payment_support'],
+            $rules['spare_parts'],
+        );
+
 
         $rules['client_devices'] = [
             'required',
             'array',
             'min:1',
-            new UniquePendingMaintenanceForDevicesRule()
+            new UniquePendingMaintenanceForDevicesRule(),
+            new DevicesWithinRadiusRule()
         ];
 
         $rules['client_devices.*.id'] = [

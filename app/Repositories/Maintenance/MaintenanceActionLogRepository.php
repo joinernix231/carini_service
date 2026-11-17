@@ -29,8 +29,16 @@ class MaintenanceActionLogRepository extends BaseRepository
      * Crear un log de acción para un mantenimiento
      * Marca automáticamente los logs anteriores como is_last = false
      * y el nuevo log como is_last = true
+     * 
+     * @param int $maintenanceId
+     * @param int|null $technicianId Puede ser null para acciones administrativas (ej: cancelar)
+     * @param string $action
+     * @param string|null $reason
+     * @param float|null $latitude
+     * @param float|null $longitude
+     * @return MaintenanceActionLog
      */
-    public function createActionLog(int $maintenanceId, int $technicianId, string $action, ?string $reason = null, ?float $latitude = null, ?float $longitude = null): MaintenanceActionLog {
+    public function createActionLog(int $maintenanceId, ?int $technicianId, string $action, ?string $reason = null, ?float $latitude = null, ?float $longitude = null): MaintenanceActionLog {
 
 
         $previousLastLogs = $this->findWhere([
